@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720" font-family="sans-serif">
+  
+  <rect width="1280" height="720" fill="#FFFFFF" />
+  <text x="40" y="52" font-size="18" font-weight="bold" fill="#111111">SCR-06: 編成画面 — Desktop (1280×720)</text>
+  <text x="40" y="76" font-size="13" fill="#111111">出撃する主人公1名（パッシブ）と持ち込み主武器1枠の選択・総合ステータスプレビュー</text>
+
+  
+  <rect x="40" y="120" width="330" height="184" rx="8" fill="none" stroke="#666666" stroke-dasharray="4 4" />
+  <text x="58" y="148" font-size="14" font-weight="bold" fill="#111111">編成ルール・相互遷移</text>
+  <text x="58" y="174" font-size="12" fill="#111111">• 持ち込み主武器は1枠のみ必須選択</text>
+  <text x="58" y="196" font-size="12" fill="#111111">• 武器未装備（0枠）はエラーで拒否</text>
+  <text x="58" y="218" font-size="12" fill="#111111">• 一覧には所持済みのみ表示（未解放非表示）</text>
+  <text x="58" y="240" font-size="12" fill="#111111">• 「← 戻る」は遷移元（/ or /stages）へ復帰</text>
+  <text x="58" y="262" font-size="12" fill="#111111">• 下部ボタンから /stages へ直接遷移可</text>
+
+  
+  <rect x="415" y="20" width="450" height="680" rx="16" fill="none" stroke="#222222" stroke-width="2" />
+
+  
+  <rect x="431" y="36" width="418" height="48" rx="8" fill="none" stroke="#222222" />
+  <rect x="441" y="46" width="76" height="28" rx="6" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="479" y="64" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">← 戻る</text>
+  <text x="580" y="65" font-size="15" font-weight="bold" text-anchor="middle" fill="#111111">出撃編成</text>
+  <rect x="650" y="46" width="90" height="28" rx="14" fill="none" stroke="#222222" />
+  <text x="695" y="64" font-size="11" font-weight="bold" text-anchor="middle" fill="#111111">勾玉: 100</text>
+  <rect x="748" y="46" width="90" height="28" rx="14" fill="none" stroke="#222222" />
+  <text x="793" y="64" font-size="11" font-weight="bold" text-anchor="middle" fill="#111111">翡翠: 5</text>
+
+  
+  <rect x="435" y="97.6" width="410" height="144.3" rx="10" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="455" y="118.2" font-size="12" font-weight="bold" fill="#111111">現在の編成 &amp; 総合ステータス</text>
+  <rect x="451" y="128.5" width="184" height="61.8" rx="6" fill="none" stroke="#222222" />
+  <text x="543" y="149.1" font-size="13" font-weight="bold" text-anchor="middle" fill="#111111">見習い陰陽師 (Lv.0)</text>
+  <text x="543" y="169.7" font-size="10" text-anchor="middle" fill="#111111">神気結界: 結界耐久自然回復</text>
+
+  <rect x="645" y="128.5" width="184" height="61.8" rx="6" fill="none" stroke="#222222" />
+  <text x="737" y="149.1" font-size="13" font-weight="bold" text-anchor="middle" fill="#111111">銘刀・波紋 (Lv.0)</text>
+  <text x="737" y="169.7" font-size="10" text-anchor="middle" fill="#111111">刀剣系・扇状薙ぎ払い</text>
+
+  <text x="500" y="221.2" font-size="13" font-weight="bold" text-anchor="middle" fill="#111111">結界耐久: 500</text>
+  <text x="640" y="221.2" font-size="13" font-weight="bold" text-anchor="middle" fill="#111111">霊力攻撃: 40</text>
+  <text x="780" y="221.2" font-size="13" font-weight="bold" text-anchor="middle" fill="#111111">会心発生率: 5%</text>
+
+  
+  <rect x="435" y="253.9" width="200" height="36.1" rx="8" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="535" y="276.2" font-size="13" font-weight="bold" text-anchor="middle" fill="#111111">主人公（1名）</text>
+  <rect x="645" y="253.9" width="200" height="36.1" rx="8" fill="none" stroke="#222222" />
+  <text x="745" y="276.2" font-size="13" font-weight="bold" text-anchor="middle" fill="#111111">持ち込み武器（1枠）</text>
+
+  
+  <rect x="435" y="302.0" width="410" height="89.3" rx="10" fill="none" stroke="#222222" stroke-width="2" />
+  <rect x="451" y="314.0" width="64" height="18.9" rx="4" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="483" y="326.9" font-size="11" font-weight="bold" text-anchor="middle" fill="#111111">編成中</text>
+  <text x="526" y="327.7" font-size="15" font-weight="bold" fill="#111111">見習い陰陽師</text>
+  <text x="451" y="351.8" font-size="12" fill="#111111">覚醒 Lv.0 ｜ パッシブ: 神気結界</text>
+  <text x="451" y="372.4" font-size="11" fill="#111111">バランス型・結界耐久自然回復</text>
+
+  
+  <rect x="435" y="403.3" width="410" height="72.1" rx="10" fill="none" stroke="#666666" stroke-dasharray="4 4" />
+  <text x="640" y="436.0" font-size="13" text-anchor="middle" fill="#111111">所持している主人公のみ一覧表示</text>
+  <text x="640" y="454.8" font-size="11" text-anchor="middle" fill="#111111">（他の主人公・武器はガチャで獲得すると一覧に追加）</text>
+
+  
+  <rect x="435" y="561.3" width="410" height="41.2" rx="10" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="640" y="586.2" font-size="14" font-weight="bold" text-anchor="middle" fill="#111111">ステージ選択へ進む（/stages）</text>
+<rect x="431" y="616" width="418" height="70" rx="10" fill="none" stroke="#222222" stroke-width="1" /><rect x="441" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="1" /><text x="488" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">出撃</text><rect x="543" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="1" /><text x="590" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">ガチャ</text><rect x="645" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="1" /><text x="692" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">社（強化）</text><rect x="747" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="2.5" /><text x="794" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">[編成]</text></svg>

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720" font-family="sans-serif">
+  
+  <rect width="1280" height="720" fill="#FFFFFF" />
+  <text x="40" y="52" font-size="18" font-weight="bold" fill="#111111">SCR-04: ガチャ画面（召喚） — Desktop (1280×720)</text>
+  <text x="40" y="76" font-size="13" fill="#111111">キャラ召喚／武器召喚のタブ切替、翡翠消費、重複自動強化・上限勾玉変換</text>
+
+  
+  <rect x="40" y="120" width="330" height="160" rx="8" fill="none" stroke="#666666" stroke-dasharray="4 4" />
+  <text x="58" y="148" font-size="14" font-weight="bold" fill="#111111">ガチャ仕様・エラー保護</text>
+  <text x="58" y="174" font-size="12" fill="#111111">• 1回: 翡翠 5個 / 10回: 翡翠 50個</text>
+  <text x="58" y="196" font-size="12" fill="#111111">• 不足時はボタンDisabled＋不足数表示</text>
+  <text x="58" y="218" font-size="12" fill="#111111">• 演出再生中はタップで即時スキップ可</text>
+  <text x="58" y="240" font-size="12" fill="#111111">• IndexedDB書込失敗時は通貨減算を</text>
+  <text x="58" y="260" font-size="12" fill="#111111">  ロールバックしエラートースト表示</text>
+
+  
+  <rect x="415" y="20" width="450" height="680" rx="16" fill="none" stroke="#222222" stroke-width="2" />
+
+  
+  <rect x="431" y="36" width="418" height="48" rx="8" fill="none" stroke="#222222" />
+  <rect x="441" y="46" width="76" height="28" rx="6" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="479" y="64" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">← 戻る</text>
+  <text x="580" y="65" font-size="15" font-weight="bold" text-anchor="middle" fill="#111111">召喚（ガチャ）</text>
+  <rect x="650" y="46" width="90" height="28" rx="14" fill="none" stroke="#222222" />
+  <text x="695" y="64" font-size="11" font-weight="bold" text-anchor="middle" fill="#111111">勾玉: 100</text>
+  <rect x="748" y="46" width="90" height="28" rx="14" fill="none" stroke="#222222" />
+  <text x="793" y="64" font-size="11" font-weight="bold" text-anchor="middle" fill="#111111">翡翠: 5</text>
+
+  
+  <rect x="435" y="97.6" width="200" height="37.8" rx="8" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="535" y="120.8" font-size="14" font-weight="bold" text-anchor="middle" fill="#111111">キャラ召喚</text>
+  <rect x="645" y="97.6" width="200" height="37.8" rx="8" fill="none" stroke="#222222" />
+  <text x="745" y="120.8" font-size="14" font-weight="bold" text-anchor="middle" fill="#111111">武器召喚</text>
+
+  
+  <rect x="435" y="147.4" width="410" height="266.2" rx="12" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="640" y="181.7" font-size="13" font-weight="bold" text-anchor="middle" fill="#111111">ピックアップ召喚</text>
+  <text x="640" y="212.7" font-size="22" font-weight="bold" text-anchor="middle" fill="#111111">白狐の巫女 / 影縫いの忍び</text>
+  <circle cx="560" cy="288.2" r="39.5" fill="none" stroke="#222222" />
+  <text x="560" y="291.7" font-size="12" text-anchor="middle" fill="#111111">白狐の巫女</text>
+  <circle cx="720" cy="288.2" r="39.5" fill="none" stroke="#222222" />
+  <text x="720" y="291.7" font-size="12" text-anchor="middle" fill="#111111">影縫いの忍び</text>
+  <rect x="545" y="363.8" width="190" height="30.9" rx="18" fill="none" stroke="#222222" />
+  <text x="640" y="383.6" font-size="12" text-anchor="middle" fill="#111111">提供割合・排出一覧</text>
+
+  
+  <rect x="435" y="427.4" width="410" height="49.8" rx="8" fill="none" stroke="#222222" />
+  <text x="640" y="448.0" font-size="12" text-anchor="middle" fill="#111111">重複時は自動で「覚醒 / 精錬 Lv+1」</text>
+  <text x="640" y="465.2" font-size="11" text-anchor="middle" fill="#111111">最大レベル到達後は「水晶の勾玉」へ自動変換</text>
+
+  
+  <rect x="435" y="497.8" width="198" height="72.1" rx="10" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="534" y="528.7" font-size="16" font-weight="bold" text-anchor="middle" fill="#111111">1回召喚</text>
+  <text x="534" y="551.0" font-size="12" text-anchor="middle" fill="#111111">翡翠 5個</text>
+
+  <rect x="647" y="497.8" width="198" height="72.1" rx="10" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="746" y="525.3" font-size="16" font-weight="bold" text-anchor="middle" fill="#111111">10回連続召喚</text>
+  <text x="746" y="545.9" font-size="11" text-anchor="middle" fill="#111111">翡翠 50個（あと45個不足）</text>
+<rect x="431" y="616" width="418" height="70" rx="10" fill="none" stroke="#222222" stroke-width="1" /><rect x="441" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="1" /><text x="488" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">出撃</text><rect x="543" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="2.5" /><text x="590" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">[ガチャ]</text><rect x="645" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="1" /><text x="692" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">社（強化）</text><rect x="747" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="1" /><text x="794" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">編成</text></svg>

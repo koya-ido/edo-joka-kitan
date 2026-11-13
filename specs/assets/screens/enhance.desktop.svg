@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720" font-family="sans-serif">
+  
+  <rect width="1280" height="720" fill="#FFFFFF" />
+  <text x="40" y="52" font-size="18" font-weight="bold" fill="#111111">SCR-05: 強化画面（社・永続育成） — Desktop (1280×720)</text>
+  <text x="40" y="76" font-size="13" fill="#111111">水晶の勾玉を消費して基礎ステータス（結界耐久 / 霊力攻撃 / 会心発生率）を加算方式で永続強化</text>
+
+  
+  <rect x="40" y="120" width="330" height="150" rx="8" fill="none" stroke="#666666" stroke-dasharray="4 4" />
+  <text x="58" y="148" font-size="14" font-weight="bold" fill="#111111">永続強化・算出ルール</text>
+  <text x="58" y="174" font-size="12" fill="#111111">• 算出式: 基礎値 + 覚醒加算 + (Lv × 固定値)</text>
+  <text x="58" y="196" font-size="12" fill="#111111">• 保存中は全強化ボタンを一時Disabled</text>
+  <text x="58" y="218" font-size="12" fill="#111111">• 勾玉不足時・最大Lv到達時はDisabled</text>
+  <text x="58" y="240" font-size="12" fill="#111111">• 保存失敗時はロールバック＋エラー表示</text>
+
+  
+  <rect x="415" y="20" width="450" height="680" rx="16" fill="none" stroke="#222222" stroke-width="2" />
+
+  
+  <rect x="431" y="36" width="418" height="48" rx="8" fill="none" stroke="#222222" />
+  <rect x="441" y="46" width="76" height="28" rx="6" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="479" y="64" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">← 戻る</text>
+  <text x="580" y="65" font-size="15" font-weight="bold" text-anchor="middle" fill="#111111">社（永続強化）</text>
+  <rect x="690" y="46" width="148" height="28" rx="14" fill="none" stroke="#222222" />
+  <text x="764" y="64" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">水晶の勾玉: 100</text>
+
+  
+  <rect x="435" y="99.3" width="410" height="72.1" rx="10" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="455" y="119.9" font-size="12" font-weight="bold" fill="#111111">現在の総合基礎ステータス（装備反映）</text>
+  <text x="500" y="149.1" font-size="14" font-weight="bold" text-anchor="middle" fill="#111111">結界耐久: 500</text>
+  <text x="640" y="149.1" font-size="14" font-weight="bold" text-anchor="middle" fill="#111111">霊力攻撃: 40</text>
+  <text x="780" y="149.1" font-size="14" font-weight="bold" text-anchor="middle" fill="#111111">会心発生率: 5%</text>
+
+  
+  <rect x="435" y="188.6" width="410" height="120.2" rx="10" fill="none" stroke="#222222" stroke-width="1.5" />
+  <text x="455" y="212.7" font-size="16" font-weight="bold" fill="#111111">結界耐久</text>
+  <rect x="595" y="197.2" width="70" height="20.6" rx="12" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="630" y="210.9" font-size="11" font-weight="bold" text-anchor="middle" fill="#111111">Lv.0</text>
+  <text x="455" y="240.1" font-size="13" fill="#111111">現在 +0 → 次回 +50（固定加算）</text>
+  <text x="455" y="260.8" font-size="12" fill="#111111">必要勾玉: 30個</text>
+  <rect x="695" y="248.7" width="134" height="42.9" rx="8" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="762" y="274.5" font-size="14" font-weight="bold" text-anchor="middle" fill="#111111">強化する</text>
+
+  
+  <rect x="435" y="324.3" width="410" height="120.2" rx="10" fill="none" stroke="#222222" stroke-width="1.5" />
+  <text x="455" y="348.4" font-size="16" font-weight="bold" fill="#111111">霊力攻撃</text>
+  <rect x="595" y="332.9" width="70" height="20.6" rx="12" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="630" y="346.6" font-size="11" font-weight="bold" text-anchor="middle" fill="#111111">Lv.0</text>
+  <text x="455" y="375.8" font-size="13" fill="#111111">現在 +0 → 次回 +5（固定加算）</text>
+  <text x="455" y="396.4" font-size="12" fill="#111111">必要勾玉: 40個</text>
+  <rect x="695" y="384.4" width="134" height="42.9" rx="8" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="762" y="410.2" font-size="14" font-weight="bold" text-anchor="middle" fill="#111111">強化する</text>
+
+  
+  <rect x="435" y="460.0" width="410" height="120.2" rx="10" fill="none" stroke="#222222" stroke-width="1.5" />
+  <text x="455" y="484.0" font-size="16" font-weight="bold" fill="#111111">会心発生率</text>
+  <rect x="595" y="468.6" width="70" height="20.6" rx="12" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="630" y="482.3" font-size="11" font-weight="bold" text-anchor="middle" fill="#111111">Lv.2</text>
+  <text x="455" y="511.5" font-size="13" fill="#111111">現在 +2% → 次回 +3%（+1%）</text>
+  <text x="455" y="532.1" font-size="12" fill="#111111">必要勾玉: 120個（20個不足）</text>
+  <rect x="695" y="520.1" width="134" height="42.9" rx="8" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="762" y="545.9" font-size="14" font-weight="bold" text-anchor="middle" fill="#111111">勾玉不足</text>
+<rect x="431" y="616" width="418" height="70" rx="10" fill="none" stroke="#222222" stroke-width="1" /><rect x="441" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="1" /><text x="488" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">出撃</text><rect x="543" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="1" /><text x="590" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">ガチャ</text><rect x="645" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="2.5" /><text x="692" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">[社（強化）]</text><rect x="747" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="1" /><text x="794" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">編成</text></svg>

@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720" font-family="sans-serif">
+  
+  <rect width="1280" height="720" fill="#FFFFFF" />
+  <text x="40" y="52" font-size="18" font-weight="bold" fill="#111111">SCR-02: ステージ選択画面 — Desktop (1280×720)</text>
+  <text x="40" y="76" font-size="13" fill="#111111">全3節の順次解放ステージ一覧と、現在の出撃編成サマリーを表示</text>
+
+  
+  <rect x="40" y="120" width="330" height="150" rx="8" fill="none" stroke="#666666" stroke-dasharray="4 4" />
+  <text x="58" y="148" font-size="14" font-weight="bold" fill="#111111">進行・ガード仕様</text>
+  <text x="58" y="174" font-size="12" fill="#111111">• 第壱節のみ初期解放</text>
+  <text x="58" y="196" font-size="12" fill="#111111">• 前節未クリア時は鍵アイコン + Disabled</text>
+  <text x="58" y="218" font-size="12" fill="#111111">• 装備武器0枠時は出撃拒否＋インライン警告</text>
+  <text x="58" y="240" font-size="12" fill="#111111">• 浄化済みステージも再周回可能</text>
+
+  
+  <rect x="415" y="20" width="450" height="680" rx="16" fill="none" stroke="#222222" stroke-width="2" />
+
+  
+  <rect x="431" y="36" width="418" height="48" rx="8" fill="none" stroke="#222222" />
+  <rect x="441" y="46" width="76" height="28" rx="6" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="479" y="64" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">← 戻る</text>
+  <text x="578" y="65" font-size="15" font-weight="bold" text-anchor="middle" fill="#111111">ステージ選択</text>
+  <rect x="650" y="46" width="90" height="28" rx="14" fill="none" stroke="#222222" />
+  <text x="695" y="64" font-size="11" font-weight="bold" text-anchor="middle" fill="#111111">勾玉: 100</text>
+  <rect x="748" y="46" width="90" height="28" rx="14" fill="none" stroke="#222222" />
+  <text x="793" y="64" font-size="11" font-weight="bold" text-anchor="middle" fill="#111111">翡翠: 5</text>
+
+  
+  <rect x="435" y="101.0" width="410" height="127.1" rx="10" fill="none" stroke="#222222" stroke-width="1.5" />
+  <rect x="449" y="111.3" width="68" height="18.9" rx="4" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="483" y="124.2" font-size="11" font-weight="bold" text-anchor="middle" fill="#111111">未浄化</text>
+  <text x="528" y="125.1" font-size="15" font-weight="bold" fill="#111111">第壱節：迷いの竹林</text>
+  <text x="449" y="147.4" font-size="12" fill="#111111">全10ウェーブ ｜ 推奨穢れ度: 100</text>
+  <text x="449" y="166.3" font-size="12" fill="#111111">報酬: 勾玉 +50 / 翡翠 +2（初回 +5）</text>
+  <rect x="695" y="181.7" width="136" height="34.4" rx="8" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="763" y="203.2" font-size="13" font-weight="bold" text-anchor="middle" fill="#111111">出撃する</text>
+
+  
+  <rect x="435" y="240.1" width="410" height="127.1" rx="10" fill="none" stroke="#222222" />
+  <rect x="449" y="250.4" width="68" height="18.9" rx="4" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="483" y="263.3" font-size="11" font-weight="bold" text-anchor="middle" fill="#111111">未解放</text>
+  <text x="528" y="264.2" font-size="15" font-weight="bold" fill="#111111">第弐節：逢魔の古道</text>
+  <text x="449" y="286.5" font-size="12" fill="#111111">解放条件: 第壱節「迷いの竹林」を浄化</text>
+  <text x="449" y="305.4" font-size="12" fill="#111111">全10ウェーブ ｜ 推奨穢れ度: 350</text>
+  <rect x="695" y="320.9" width="136" height="34.4" rx="8" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="763" y="342.3" font-size="13" font-weight="bold" text-anchor="middle" fill="#111111">鍵（解放待ち）</text>
+
+  
+  <rect x="435" y="379.3" width="410" height="127.1" rx="10" fill="none" stroke="#222222" />
+  <rect x="449" y="389.6" width="68" height="18.9" rx="4" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="483" y="402.5" font-size="11" font-weight="bold" text-anchor="middle" fill="#111111">未解放</text>
+  <text x="528" y="403.3" font-size="15" font-weight="bold" fill="#111111">第参節：怨嗟の廃神社</text>
+  <text x="449" y="425.6" font-size="12" fill="#111111">解放条件: 第弐節「逢魔の古道」を浄化</text>
+  <text x="449" y="444.5" font-size="12" fill="#111111">全10ウェーブ ｜ 推奨穢れ度: 800</text>
+  <rect x="695" y="460.0" width="136" height="34.4" rx="8" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="763" y="481.5" font-size="13" font-weight="bold" text-anchor="middle" fill="#111111">鍵（解放待ち）</text>
+
+  
+  <rect x="435" y="525.3" width="410" height="72.1" rx="10" fill="none" stroke="#222222" />
+  <text x="451" y="547.6" font-size="12" font-weight="bold" fill="#111111">現在の出撃編成</text>
+  <text x="451" y="568.2" font-size="12" fill="#111111">主人公: 見習い陰陽師 / 武器: 銘刀・波紋</text>
+  <rect x="740" y="542.4" width="90" height="37.8" rx="8" fill="none" stroke="#222222" stroke-width="1" />
+  <text x="785" y="565.6" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">編成変更</text>
+<rect x="431" y="616" width="418" height="70" rx="10" fill="none" stroke="#222222" stroke-width="1" /><rect x="441" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="2.5" /><text x="488" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">[出撃]</text><rect x="543" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="1" /><text x="590" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">ガチャ</text><rect x="645" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="1" /><text x="692" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">社（強化）</text><rect x="747" y="625" width="94" height="52" rx="8" fill="none" stroke="#222222" stroke-width="1" /><text x="794" y="656" font-size="12" font-weight="bold" text-anchor="middle" fill="#111111">編成</text></svg>
