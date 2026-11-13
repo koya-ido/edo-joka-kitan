@@ -26,18 +26,19 @@ describe("app/App (Session Boot & Shell Integration)", () => {
     await clearDatabase();
   });
 
-  it("transitions from loading to success with auto-seeded initial save", async () => {
+  it("transitions from loading to success with auto-seeded initial save and HomeScreen", async () => {
     render(<App />);
     expect(screen.getByText("霊脈接続中…")).toBeTruthy();
 
     await waitFor(() => {
-      expect(screen.getByText("霊脈接続済み")).toBeTruthy();
+      expect(screen.getByText("見習い陰陽師")).toBeTruthy();
     });
 
-    expect(screen.getByText("apprentice_onmyoji")).toBeTruthy();
-    expect(screen.getByText("sword_hamon")).toBeTruthy();
+    expect(screen.getByText("銘刀・波紋")).toBeTruthy();
     expect(screen.getByLabelText("水晶の勾玉: 100")).toBeTruthy();
-    expect(screen.getByLabelText("翡翠: 5")).toBeTruthy();
+    expect(screen.getAllByLabelText("翡翠: 5").length).toBeGreaterThanOrEqual(1);
+    // 初回起動時はログインボーナスモーダルが自動表示される
+    expect(screen.getByText("本日のログインボーナス")).toBeTruthy();
   });
 
   it("shows error recovery state and locks navigation when save is corrupted", async () => {

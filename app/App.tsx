@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/Card";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { Heading, Text } from "@/components/ui/Typography";
 import { guardProtectedRouteAccess } from "@/domain";
+import { HomeHeaderActions, HomeScreen, useHomeActions } from "@/features/home";
 import { useEffect } from "react";
 
 const ROUTE_TITLES: Readonly<Record<string, string>> = {
@@ -31,7 +32,9 @@ const AppShellContent = () => {
     resetSessionToInitial,
   } = usePlayerSession();
 
+  const isHomeRoute = route.path === "/";
   const isBattleRoute = route.battleStageId !== undefined;
+  const homeActions = useHomeActions(isHomeRoute);
 
   useEffect(() => {
     if (status !== "success" || !save || !route.battleStageId) {
@@ -57,6 +60,8 @@ const AppShellContent = () => {
     }
   };
 
+  const isLocked = status !== "success" || isPending || homeActions.isMutating;
+
   return (
     <AppShell
       title={title}
@@ -66,14 +71,28 @@ const AppShellContent = () => {
       }}
       currencies={save?.currencies}
       onBack={
-        route.path !== "/"
+        !isHomeRoute
           ? () => {
             navigate("/");
           }
           : undefined
       }
+      headerActions={
+        isHomeRoute ? (
+          <HomeHeaderActions
+            hasUnclaimedLoginBonus={homeActions.canClaimLoginBonus}
+            disabled={isLocked}
+            onOpenLoginBonus={() => {
+              homeActions.setLoginBonusOpen(true);
+            }}
+            onOpenResetDialog={() => {
+              homeActions.setResetDialogOpen(true);
+            }}
+          />
+        ) : undefined
+      }
       hideBottomNav={isBattleRoute}
-      isNavigationDisabled={status !== "success" || isPending}
+      isNavigationDisabled={isLocked}
     >
       <StateView
         status={status}
@@ -82,27 +101,37 @@ const AppShellContent = () => {
         onRetry={reloadSession}
         onResetSave={handleReset}
       >
-        <Card.Root>
-          <Card.Header>
-            <div className="flex items-center justify-between gap-2">
-              <Heading as="h2">{title}</Heading>
-              <Badge variant="success">霊脈接続済み</Badge>
-            </div>
-          </Card.Header>
-          <Card.Content className="flex flex-col gap-2">
-            <Text>
-              装備中主人公:{" "}
-              <span className="font-semibold">{save?.equippedCharacterId}</span>
-            </Text>
-            <Text>
-              持ち込み主武器:{" "}
-              <span className="font-semibold">{save?.equippedWeaponId}</span>
-            </Text>
-            <Text size="caption" tone="muted">
-              解放済みステージ数: {save?.unlockedStageIds.length ?? 0}
-            </Text>
-          </Card.Content>
-        </Card.Root>
+        {isHomeRoute && save ? (
+          <HomeScreen
+            save={save}
+            actions={homeActions}
+            onNavigate={(to) => {
+              navigate(to);
+            }}
+          />
+        ) : (
+          <Card.Root>
+            <Card.Header>
+              <div className="flex items-center justify-between gap-2">
+                <Heading as="h2">{title}</Heading>
+                <Badge variant="success">霊脈接続済み</Badge>
+              </div>
+            </Card.Header>
+            <Card.Content className="flex flex-col gap-2">
+              <Text>
+                装備中主人公:{" "}
+                <span className="font-semibold">{save?.equippedCharacterId}</span>
+              </Text>
+              <Text>
+                持ち込み主武器:{" "}
+                <span className="font-semibold">{save?.equippedWeaponId}</span>
+              </Text>
+              <Text size="caption" tone="muted">
+                解放済みステージ数: {save?.unlockedStageIds.length ?? 0}
+              </Text>
+            </Card.Content>
+          </Card.Root>
+        )}
       </StateView>
     </AppShell>
   );

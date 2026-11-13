@@ -1,3 +1,9 @@
+export {
+  applyLoginBonus,
+  getLocalDateKey,
+  guardLoginBonusClaimable,
+  isLoginBonusClaimable,
+} from "./login-bonus";
 export { err, ok } from "./result";
 export {
   createInitialPlayerSave,
