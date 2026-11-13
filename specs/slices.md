@@ -49,7 +49,7 @@ flowchart TD
 
 | スライスID  | 進捗  | ユースケース名                                    | 対象画面 / モーダル                                                           | 主な API / サービス（`storage/`・`domain/`・`engine/`）                                                              | 対象ストア / テーブル・マスタ                                                                                                                      | 先行依存                  |
 | :---------- | :---: | :------------------------------------------------ | :---------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------ |
-| **Slice 0** | `[ ]` | 共通基盤・セッション初期化・和風シェル            | 全画面共通枠（`/` 初期疎通・エラー復旧枠含む）                                | `openPlayerDb`, `loadOrInitializeSave`, `validatePlayerSaveData`, `createInitialPlayerSave`, `ok` / `err` ガード基盤 | `playerSave`（キー `"primary"` 初期化・検証）、`data/` 初期マスタ骨格、`tokens.css`                                                                | なし                      |
+| **Slice 0** | `[x]` | 共通基盤・セッション初期化・和風シェル            | 全画面共通枠（`/` 初期疎通・エラー復旧枠含む）                                | `openPlayerDb`, `loadOrInitializeSave`, `validatePlayerSaveData`, `createInitialPlayerSave`, `ok` / `err` ガード基盤 | `playerSave`（キー `"primary"` 初期化・検証）、`data/` 初期マスタ骨格、`tokens.css`                                                                | なし                      |
 | **Slice 1** | `[ ]` | トップ画面・0:00ログインボーナス・セーブ初期化    | `home` (`/`), `login-bonus-modal`, `save-reset-confirm-modal`                 | `claimLoginBonus`, `resetPlayerSave`, `getLocalDateKey`, `guardLoginBonusClaimable`                                  | `playerSave` (`currencies`, `lastLoginBonusDate`, `equipped*`), `LOGIN_BONUS_CONFIG`, `CHARACTER_MASTERS`, `WEAPON_MASTERS`                        | Slice 0                   |
 | **Slice 2** | `[ ]` | 社（強化）による勾玉永続加算強化                  | `enhance` (`/enhance`)                                                        | `enhancePermanentStat`, `calculateTotalMetaStats`, `guardEnhanceable`                                                | `playerSave` (`currencies.magatama`, `permanentStats`), `ENHANCE_STAT_CONFIGS`, `CHARACTER_MASTERS`                                                | Slice 0                   |
 | **Slice 3** | `[ ]` | キャラ／武器ガチャ召喚・重複覚醒精錬・上限変換    | `gacha` (`/gacha`), `gacha-result-modal`                                      | `executeGachaPull`, `guardCurrencySufficient`, 重複・上限変換ロジック                                                | `playerSave` (`currencies.hisui`, `currencies.magatama`, `ownedCharacters`, `ownedWeapons`), `GACHA_CONFIG`, `CHARACTER_MASTERS`, `WEAPON_MASTERS` | Slice 0                   |
@@ -64,7 +64,7 @@ flowchart TD
 
 ### Slice 0: 共通基盤・セッション初期化・和風シェル基盤
 
-- **進捗ステータス**: `[ ]` 未着手
+- **進捗ステータス**: `[x]` 完了
 - **対象画面**: 全画面共通レイアウト枠（`/`, `*` フォールバック、エラー復旧枠）
 - **API / サービス**:
   - `storage/`: `openPlayerDb()`, `loadOrInitializeSave()`（`readwrite` トランザクション内初期生成＋マイグレーション）
