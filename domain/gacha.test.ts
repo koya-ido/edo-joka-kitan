@@ -99,13 +99,13 @@ describe("domain/gacha (Slice 3 gacha pull, awakening/refine, conversion & 403 g
       ...base,
       currencies: { magatama: 100, hisui: 60 },
     };
-    // 10 pulls of bow_azusa (index 1 -> 0.4):
+    // 10 pulls of bow_azusa (index 1):
     // #1: new(0), #2..#6: refine 1..5 (5 draws), #7..#10: converted x4 (+50 each = +200)
     const result = resolveGachaPulls(
       save,
       "weapon",
       10,
-      createSequenceRng([0.4]),
+      createSequenceRng([1.5 / WEAPON_MASTERS.length]),
       FIXED_NOW,
     );
     expect(result.ok).toBe(true);

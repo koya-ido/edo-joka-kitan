@@ -1,4 +1,3 @@
-import { BattlePlaceholderCard } from "@/app/BattlePlaceholderCard";
 import { appEnv } from "@/app/env";
 import { useHashRouter } from "@/app/router";
 import { PlayerSessionProvider, usePlayerSession } from "@/app/session";
@@ -7,6 +6,7 @@ import { AppToastProvider, useAppToast } from "@/components/shared/AppToastProvi
 import { StateView } from "@/components/shared/StateView";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { guardProtectedRouteAccess } from "@/domain";
+import { BattleScreen } from "@/features/battle";
 import { EnhanceScreen, useEnhanceActions } from "@/features/enhance";
 import { FormationScreen, useFormationActions } from "@/features/formation";
 import { GachaScreen, useGachaActions } from "@/features/gacha";
@@ -170,13 +170,12 @@ const AppShellContent = () => {
               navigate(to);
             }}
           />
-        ) : canEnterBattle ? (
-          <BattlePlaceholderCard
-            title={title}
-            equippedCharacterId={save?.equippedCharacterId}
-            equippedWeaponId={save?.equippedWeaponId}
-            onBackToStages={() => {
-              navigate("/stages");
+        ) : canEnterBattle && save && route.battleStageId ? (
+          <BattleScreen
+            save={save}
+            stageId={route.battleStageId}
+            onExitToStages={() => {
+              navigate("/stages", true);
             }}
           />
         ) : null}

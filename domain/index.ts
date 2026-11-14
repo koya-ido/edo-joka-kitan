@@ -1,3 +1,7 @@
+export {
+  prepareBattleSession,
+  type BattleLaunchContext,
+} from "./battle-session";
 export { guardCurrencySufficient } from "./currency-guard";
 export {
   applyEnhanceStat,

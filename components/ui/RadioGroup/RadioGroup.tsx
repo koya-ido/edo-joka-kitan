@@ -27,7 +27,7 @@ const RadioGroupItem = ({ className, ref, ...rest }: ItemProps) => (
   <RadioGroupPrimitive.Item
     ref={ref}
     className={cn(
-      "min-h-11 touch-manipulation rounded-lg border border-border bg-card text-left text-card-foreground transition-colors",
+      "game-panel min-h-11 touch-manipulation rounded-lg border-2 border-border bg-card text-left text-card-foreground transition-colors",
       "hover:border-primary/60",
       "data-[state=checked]:border-primary data-[state=checked]:bg-accent/15",
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",

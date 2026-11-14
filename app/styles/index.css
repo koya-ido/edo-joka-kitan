@@ -52,14 +52,60 @@
     color: var(--battle-foreground);
   }
 
-  /* 和風木札・絵馬調パネル */
+  /* 手漉き和紙質感パネル（有機的な色むら＋微細紙粒ノイズ） */
   .game-panel {
+    position: relative;
+    isolation: isolate;
     box-shadow: var(--shadow-game-panel);
-    background-image: linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--card) 100%, transparent) 0%,
-      color-mix(in oklab, var(--background) 65%, var(--card)) 100%
-    );
+    background-image:
+      radial-gradient(
+        110% 80% at 15% 18%,
+        color-mix(in oklab, var(--card) 96%, transparent) 0%,
+        transparent 62%
+      ),
+      radial-gradient(
+        90% 120% at 85% 78%,
+        color-mix(in oklab, var(--secondary) 45%, transparent) 0%,
+        transparent 65%
+      ),
+      radial-gradient(
+        70% 60% at 62% 28%,
+        color-mix(in oklab, var(--accent) 8%, transparent) 0%,
+        transparent 58%
+      ),
+      linear-gradient(
+        168deg,
+        color-mix(in oklab, var(--card) 100%, transparent) 0%,
+        color-mix(in oklab, var(--background) 86%, var(--card)) 100%
+      );
+  }
+
+  .game-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background-color: color-mix(in oklab, var(--foreground) 7%, transparent);
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 -0.25'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 -0.25'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    -webkit-mask-repeat: repeat;
+    mask-repeat: repeat;
+  }
+
+  .game-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background-color: color-mix(in oklab, var(--secondary) 32%, transparent);
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.032' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.2 -0.35'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.032' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.2 -0.35'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+    -webkit-mask-repeat: repeat;
+    mask-repeat: repeat;
   }
 
   /* 立体押下ボタン（朱塗り） */

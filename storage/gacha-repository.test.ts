@@ -1,3 +1,4 @@
+import { WEAPON_MASTERS } from "@/data";
 import {
   executeGachaPull,
   loadOrInitializeSave,
@@ -54,8 +55,12 @@ describe("storage/gacha-repository (Slice 3 atomic gacha & 401/403 guards)", () 
 
   it("commits 10-pull weapon gacha and surplus magatama conversion atomically", async () => {
     await seedGachaMaxedPoolSave();
-    // bow_azusa (index 1 -> 0.4) has duplicateRewardMagatama = 50 -> 10 * 50 = +500
-    const res = await executeGachaPull("weapon", 10, () => 0.4);
+    // bow_azusa (index 1) has duplicateRewardMagatama = 50 -> 10 * 50 = +500
+    const res = await executeGachaPull(
+      "weapon",
+      10,
+      () => 1.5 / WEAPON_MASTERS.length,
+    );
     expect(res.ok).toBe(true);
     if (res.ok) {
       expect(res.data.spentHisui).toBe(50);
