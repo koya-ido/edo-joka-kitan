@@ -9,4 +9,5 @@ dist-ssr
 coverage
 
 .master-path
-.update-task-list.md
+doc-updates.todo.md
+update-task-list.md
