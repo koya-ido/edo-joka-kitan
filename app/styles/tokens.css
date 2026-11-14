@@ -37,6 +37,19 @@
   --barrier: oklch(0.62 0.155 150);
   --exp: oklch(0.6 0.16 245);
 
+  /* ゲームUI 立体・質感トークン */
+  --primary-edge: oklch(0.36 0.17 26);
+  --secondary-edge: oklch(0.76 0.028 76);
+  --accent-edge: oklch(0.56 0.13 78);
+  --battle-surface-deep: oklch(0.11 0.022 260);
+  --shadow-game-btn:
+    0 3px 0 0 var(--primary-edge), 0 6px 14px -2px oklch(0.18 0.02 65 / 0.35);
+  --shadow-game-btn-secondary:
+    0 2px 0 0 var(--secondary-edge), 0 4px 10px -2px oklch(0.18 0.02 65 / 0.18);
+  --shadow-game-panel:
+    0 8px 20px -4px oklch(0.18 0.02 65 / 0.22),
+    inset 0 1px 0 0 oklch(1 0 0 / 0.45);
+
   /* タイポグラフィ */
   --font-display:
     "Shippori Mincho", "Noto Serif JP", "Hiragino Mincho ProN", serif;
@@ -88,6 +101,7 @@
   --color-ring: var(--ring);
   --color-frame-outer: var(--frame-outer);
   --color-battle-surface: var(--battle-surface);
+  --color-battle-surface-deep: var(--battle-surface-deep);
   --color-battle-foreground: var(--battle-foreground);
   --color-magatama: var(--magatama);
   --color-magatama-foreground: var(--magatama-foreground);

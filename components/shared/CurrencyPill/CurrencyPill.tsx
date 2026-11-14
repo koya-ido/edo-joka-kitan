@@ -17,12 +17,12 @@ const CURRENCY_META: Record<
   magatama: {
     label: "水晶の勾玉",
     iconClass: "text-magatama",
-    bgClass: "bg-magatama/10 border-magatama/30",
+    bgClass: "bg-battle-surface-deep/90 border-magatama/55",
   },
   hisui: {
     label: "翡翠",
     iconClass: "text-hisui",
-    bgClass: "bg-hisui/10 border-hisui/30",
+    bgClass: "bg-battle-surface-deep/90 border-hisui/55",
   },
 };
 
@@ -40,9 +40,9 @@ export const CurrencyPill = ({
     <div
       aria-label={`${meta.label}: ${String(amount)}`}
       className={cn(
-        "inline-flex min-h-8 items-center gap-1.5 rounded-full border px-2.5 py-1",
+        "inline-flex min-h-8 items-center gap-1.5 rounded-full border px-2.5 py-0.5 shadow-inner",
         isInsufficient
-          ? "border-destructive/50 bg-destructive/10"
+          ? "border-destructive bg-destructive/20"
           : meta.bgClass,
         className,
       )}
@@ -54,7 +54,10 @@ export const CurrencyPill = ({
       <Text
         size="caption"
         tabularNums
-        tone={isInsufficient ? "destructive" : "default"}
+        className={cn(
+          "font-bold tracking-tight",
+          isInsufficient ? "text-destructive-foreground" : "text-battle-foreground",
+        )}
       >
         {amount.toLocaleString("ja-JP")}
       </Text>

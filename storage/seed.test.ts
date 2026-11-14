@@ -2,6 +2,9 @@ import {
   loadOrInitializeSave,
   openPlayerDb,
   seedClaimedLoginBonusSave,
+  seedEnhanceInsufficientMagatamaSave,
+  seedEnhanceMaxedStatSave,
+  seedEnhanceMidProgressSave,
   seedResettableProgressSave,
   seedUnclaimedLoginBonusSave,
 } from "@/storage";
@@ -79,6 +82,54 @@ describe("storage/seed (Slice 1 migration & seed verification)", () => {
         "stage_2_old_road",
       ]);
       expect(loaded.data.save.clearedStageIds).toEqual(["stage_1_bamboo"]);
+    }
+  });
+
+  it("seeds insufficient magatama save for Slice 2 enhance guard testing", async () => {
+    const seeded = await seedEnhanceInsufficientMagatamaSave();
+    expect(seeded.ok).toBe(true);
+
+    const loaded = await loadOrInitializeSave();
+    expect(loaded.ok).toBe(true);
+    if (loaded.ok) {
+      expect(loaded.data.save.currencies.magatama).toBe(10);
+      expect(loaded.data.save.permanentStats).toEqual({
+        hpLevel: 0,
+        atkLevel: 0,
+        lukLevel: 0,
+      });
+    }
+  });
+
+  it("seeds maxed permanent stats save for Slice 2 max-level guard testing", async () => {
+    const seeded = await seedEnhanceMaxedStatSave();
+    expect(seeded.ok).toBe(true);
+
+    const loaded = await loadOrInitializeSave();
+    expect(loaded.ok).toBe(true);
+    if (loaded.ok) {
+      expect(loaded.data.save.currencies.magatama).toBe(500);
+      expect(loaded.data.save.permanentStats).toEqual({
+        hpLevel: 20,
+        atkLevel: 20,
+        lukLevel: 15,
+      });
+    }
+  });
+
+  it("seeds mid-progress permanent stats save for Slice 2 stat calculation testing", async () => {
+    const seeded = await seedEnhanceMidProgressSave();
+    expect(seeded.ok).toBe(true);
+
+    const loaded = await loadOrInitializeSave();
+    expect(loaded.ok).toBe(true);
+    if (loaded.ok) {
+      expect(loaded.data.save.currencies.magatama).toBe(300);
+      expect(loaded.data.save.permanentStats).toEqual({
+        hpLevel: 3,
+        atkLevel: 2,
+        lukLevel: 1,
+      });
     }
   });
 });

@@ -1,5 +1,6 @@
 import {
   CHARACTER_MASTER_MAP,
+  ENHANCE_STAT_CONFIG_MAP,
   STAGE_MASTER_MAP,
   WEAPON_MASTER_MAP,
 } from "@/data";
@@ -144,8 +145,11 @@ export const validatePlayerSaveData = (
     !isNonNegativeInt(raw.currencies.magatama) ||
     !isNonNegativeInt(raw.currencies.hisui) ||
     !isNonNegativeInt(raw.permanentStats.hpLevel) ||
+    raw.permanentStats.hpLevel > ENHANCE_STAT_CONFIG_MAP.hpLevel.maxLevel ||
     !isNonNegativeInt(raw.permanentStats.atkLevel) ||
-    !isNonNegativeInt(raw.permanentStats.lukLevel)
+    raw.permanentStats.atkLevel > ENHANCE_STAT_CONFIG_MAP.atkLevel.maxLevel ||
+    !isNonNegativeInt(raw.permanentStats.lukLevel) ||
+    raw.permanentStats.lukLevel > ENHANCE_STAT_CONFIG_MAP.lukLevel.maxLevel
   ) {
     return corrupted("数値フィールド不正");
   }

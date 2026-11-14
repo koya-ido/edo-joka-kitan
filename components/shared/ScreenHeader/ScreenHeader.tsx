@@ -1,10 +1,9 @@
 import { CurrencyPill } from "@/components/shared/CurrencyPill";
 import { Button } from "@/components/ui/Button";
-import { Separator } from "@/components/ui/Separator";
 import { Heading } from "@/components/ui/Typography";
 import { VisuallyHidden } from "@/components/ui/VisuallyHidden";
 import type { CurrencyBalances } from "@/types";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Flame } from "lucide-react";
 import type { ReactNode } from "react";
 
 export interface ScreenHeaderProps {
@@ -24,24 +23,42 @@ export const ScreenHeader = ({
   disabled = false,
   actions,
 }: ScreenHeaderProps) => (
-  <header className="sticky top-0 z-20 bg-background/95 pt-[env(safe-area-inset-top)] backdrop-blur-xs">
-    <div className="flex min-h-14 items-center justify-between gap-2 px-3 py-2">
+  <header className="game-urushi-bar sticky top-0 z-20 border-b-2 border-accent/45 pt-[env(safe-area-inset-top)] shadow-md">
+    <div className="flex min-h-14 items-center justify-between gap-2 px-3 py-1.5">
       <div className="flex min-w-0 items-center gap-2">
-        {onBack && (
-          <Button
-            variant="ghost"
-            size="icon"
-            disabled={disabled}
-            onClick={onBack}
-            aria-label={backLabel}
-          >
-            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-            <VisuallyHidden>{backLabel}</VisuallyHidden>
-          </Button>
+        {onBack ? (
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={disabled}
+              onClick={onBack}
+              aria-label={backLabel}
+              className="text-battle-foreground hover:bg-battle-foreground/10"
+            >
+              <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+              <VisuallyHidden>{backLabel}</VisuallyHidden>
+            </Button>
+            <Heading as="h1" className="truncate text-base leading-6 text-battle-foreground sm:text-lg">
+              {title}
+            </Heading>
+          </>
+        ) : (
+          <div className="flex items-center gap-1.5">
+            <span
+              aria-hidden="true"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-accent/60 bg-primary/85 text-primary-foreground shadow-xs"
+            >
+              <Flame className="h-4 w-4" />
+            </span>
+            <span className="font-display text-sm font-bold tracking-wider text-accent">
+              本陣
+            </span>
+            <VisuallyHidden>
+              <Heading as="h1">{title}</Heading>
+            </VisuallyHidden>
+          </div>
         )}
-        <Heading as="h1" className="truncate text-lg leading-6 sm:text-xl">
-          {title}
-        </Heading>
       </div>
       <div className="flex shrink-0 items-center gap-1.5">
         {currencies && (
@@ -53,6 +70,5 @@ export const ScreenHeader = ({
         {actions}
       </div>
     </div>
-    <Separator />
   </header>
 );

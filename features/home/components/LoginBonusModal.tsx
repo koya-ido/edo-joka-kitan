@@ -42,17 +42,17 @@ export const LoginBonusModal = ({
         </Dialog.Description>
       </Dialog.Header>
 
-      <Card.Root className="mt-4 bg-secondary/40">
-        <Card.Content className="flex flex-col gap-3 pt-4">
+      <Card.Root className="mt-4 border-2 border-accent/55 bg-battle-surface bg-none text-battle-foreground shadow-md">
+        <Card.Content className="flex flex-col gap-3 pt-3.5 pb-4">
           <div className="flex items-center justify-between">
-            <Text size="caption" tone="muted">
+            <Text size="caption" className="font-semibold text-battle-foreground/80">
               本日の報酬内容
             </Text>
             <Badge variant={canClaim ? "accent" : "success"}>
               {canClaim ? "受取可能" : "受取済み"}
             </Badge>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-3 py-2">
+          <div className="flex flex-wrap items-center justify-center gap-3 rounded-md border border-accent/25 bg-battle-surface-deep/70 py-3">
             <CurrencyPill type="magatama" amount={LOGIN_BONUS_CONFIG.magatama} />
             <CurrencyPill type="hisui" amount={LOGIN_BONUS_CONFIG.hisui} />
           </div>

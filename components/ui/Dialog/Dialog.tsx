@@ -47,26 +47,43 @@ const DialogContent = ({
         onPointerDownOutside?.(event);
       }}
       className={cn(
-        "fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-[410px] -translate-x-1/2 -translate-y-1/2",
-        "rounded-lg border border-border bg-popover p-6 text-popover-foreground shadow-xl",
-        "focus-visible:outline-none",
+        "fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-[410px] -translate-x-1/2 -translate-y-1/2 overflow-hidden",
+        "game-washi-canvas rounded-lg border-2 border-accent/65 p-5 pt-6 text-popover-foreground shadow-2xl",
+        "ring-1 ring-inset ring-accent/30 focus-visible:outline-none",
         className,
       )}
       {...rest}
     >
+      {/* 上部の漆塗り飾り帯と四隅の隅金具 */}
+      <span
+        aria-hidden="true"
+        className="game-urushi-bar pointer-events-none absolute inset-x-0 top-0 h-2 border-b border-accent/60"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute top-3 left-2 h-2.5 w-2.5 border-t-2 border-l-2 border-accent/70"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-2 left-2 h-2.5 w-2.5 border-b-2 border-l-2 border-accent/70"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute right-2 bottom-2 h-2.5 w-2.5 border-r-2 border-b-2 border-accent/70"
+      />
       {children}
       {!hideCloseButton && (
         <DialogPrimitive.Close
           disabled={isPending}
           aria-label="閉じる"
           className={cn(
-            "absolute top-3 right-3 inline-flex min-h-11 min-w-11 items-center justify-center rounded-md",
-            "text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
+            "absolute top-3.5 right-3 inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border border-border bg-secondary/70",
+            "text-foreground transition-colors hover:border-accent/60 hover:bg-secondary",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
             "disabled:pointer-events-none disabled:opacity-50",
           )}
         >
-          <X className="h-5 w-5" aria-hidden="true" />
+          <X className="h-4 w-4" aria-hidden="true" />
         </DialogPrimitive.Close>
       )}
     </DialogPrimitive.Content>
@@ -79,7 +96,11 @@ const DialogHeader = ({
 }: {
   className?: string;
   children: ReactNode;
-}) => <div className={cn("flex flex-col gap-1.5 pr-8", className)}>{children}</div>;
+}) => (
+  <div className={cn("flex flex-col gap-1.5 border-b border-accent/35 pb-3 pr-10", className)}>
+    {children}
+  </div>
+);
 
 const DialogFooter = ({
   className,
@@ -88,7 +109,7 @@ const DialogFooter = ({
   className?: string;
   children: ReactNode;
 }) => (
-  <div className={cn("mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}>
+  <div className={cn("mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}>
     {children}
   </div>
 );

@@ -1,7 +1,6 @@
 import { ConfirmAlertDialog } from "@/components/shared/ConfirmAlertDialog";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { Heading, Text } from "@/components/ui/Typography";
 import { HomeEquippedPreview } from "@/features/home/components/HomeEquippedPreview";
 import { LoginBonusModal } from "@/features/home/components/LoginBonusModal";
@@ -16,22 +15,27 @@ export interface HomeScreenProps {
 }
 
 export const HomeScreen = ({ save, actions, onNavigate }: HomeScreenProps) => (
-  <div className="flex flex-col gap-4">
-    <Card.Root className="border-primary/25 bg-card">
-      <Card.Content className="flex flex-col items-center gap-1.5 py-5 text-center">
-        <Badge variant="accent">和風縦型ローグライク防衛</Badge>
-        <Heading as="h2" className="text-2xl leading-8">
+  <div className="flex flex-1 flex-col justify-between gap-3.5 py-1">
+    {/* 和風題字ロゴ（Webカード枠を廃し、和紙上に直接刻む） */}
+    <header className="flex flex-col items-center gap-1.5 pt-1 text-center">
+      <Badge variant="default" className="border border-primary/40 px-3 py-0.5 tracking-widest">
+        和風縦型ローグライク防衛
+      </Badge>
+      <div className="flex w-full items-center gap-3">
+        <span className="h-px flex-1 bg-gradient-to-r from-transparent to-accent/65" />
+        <Heading as="h2" className="text-2xl font-bold leading-8 tracking-[0.14em] text-foreground">
           穢土浄化奇譚
         </Heading>
-        <Text size="caption" tone="muted">
-          〜 妖魔祓ひの旅路 〜
-        </Text>
-      </Card.Content>
-    </Card.Root>
+        <span className="h-px flex-1 bg-gradient-to-l from-transparent to-accent/65" />
+      </div>
+      <Text size="caption" tone="muted" className="font-display tracking-[0.2em]">
+        〜 妖魔祓ひの旅路 〜
+      </Text>
+    </header>
 
     <HomeEquippedPreview save={save} />
 
-    <div className="flex flex-col gap-2 pt-1">
+    <div className="flex flex-col gap-2.5 pb-1">
       <Button
         variant="primary"
         size="lg"
@@ -39,7 +43,7 @@ export const HomeScreen = ({ save, actions, onNavigate }: HomeScreenProps) => (
         onClick={() => {
           onNavigate("/stages");
         }}
-        className="w-full gap-2"
+        className="min-h-14 w-full gap-2.5 rounded-lg border-2 border-accent/60 font-display text-lg font-bold tracking-wider"
       >
         <Compass className="h-5 w-5" aria-hidden="true" />
         出撃する（ステージ選択へ）
@@ -51,9 +55,9 @@ export const HomeScreen = ({ save, actions, onNavigate }: HomeScreenProps) => (
         onClick={() => {
           onNavigate("/formation");
         }}
-        className="w-full gap-2"
+        className="w-full gap-2 font-display tracking-wider"
       >
-        <Sparkles className="h-4 w-4" aria-hidden="true" />
+        <Sparkles className="h-4 w-4 text-accent-foreground" aria-hidden="true" />
         編成を整える
       </Button>
     </div>

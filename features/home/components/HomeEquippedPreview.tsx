@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { Separator } from "@/components/ui/Separator";
 import { Heading, Text } from "@/components/ui/Typography";
 import { CHARACTER_MASTER_MAP, WEAPON_MASTER_MAP } from "@/data";
+import { BattleStageBackdrop } from "@/features/home/components/BattleStageBackdrop";
 import type { PlayerSaveData, WeaponGenre } from "@/types";
 import { Shield } from "lucide-react";
 
@@ -43,27 +44,33 @@ export const HomeEquippedPreview = ({ save }: HomeEquippedPreviewProps) => {
   }
 
   return (
-    <Card.Root className="overflow-hidden">
+    <Card.Root className="overflow-hidden border-2 border-accent/55 shadow-lg">
       <AspectRatio
         ratio={16 / 9}
-        className="flex flex-col justify-between bg-battle-surface p-4 text-battle-foreground"
+        className="relative flex flex-col justify-between bg-battle-surface p-3.5 text-battle-foreground"
       >
-        <div className="flex items-center justify-between gap-2">
-          <Badge variant="accent">現在の出撃編成</Badge>
-          <span className="inline-flex items-center gap-1 text-xs text-battle-foreground/80">
+        <BattleStageBackdrop />
+
+        <div className="relative z-10 flex items-center justify-between gap-2">
+          <Badge variant="accent" className="border border-accent-foreground/20 shadow-xs">
+            現在の出撃編成
+          </Badge>
+          <span className="inline-flex items-center gap-1 rounded-full border border-barrier/40 bg-battle-surface-deep/80 px-2.5 py-0.5 text-xs font-semibold text-battle-foreground">
             <Shield className="h-3.5 w-3.5 text-barrier" aria-hidden="true" />
             <span>解放済: {save.unlockedStageIds.length} 節</span>
           </span>
         </div>
 
-        <div className="flex items-center justify-around gap-4 py-1">
+        <div className="relative z-10 flex items-center justify-around gap-3 py-1">
           <div className="flex flex-col items-center gap-1.5 text-center">
-            <ItemAvatar
-              kind="character"
-              size="lg"
-              name={charMaster.name}
-              badgeLabel={`覚醒Lv.${String(charState.awakeningLevel)}`}
-            />
+            <div className="rounded-full p-1 ring-2 ring-primary/45 ring-offset-2 ring-offset-battle-surface">
+              <ItemAvatar
+                kind="character"
+                size="lg"
+                name={charMaster.name}
+                badgeLabel={`覚醒Lv.${String(charState.awakeningLevel)}`}
+              />
+            </div>
             <Text size="caption" className="text-battle-foreground/80">
               {charMaster.title}
             </Text>
@@ -72,15 +79,17 @@ export const HomeEquippedPreview = ({ save }: HomeEquippedPreviewProps) => {
             </Heading>
           </div>
 
-          <Separator orientation="vertical" className="h-16 bg-border/30" />
+          <Separator orientation="vertical" className="h-16 bg-accent/35" />
 
           <div className="flex flex-col items-center gap-1.5 text-center">
-            <ItemAvatar
-              kind="weapon"
-              size="lg"
-              name={weaponMaster.name}
-              badgeLabel={`精錬Lv.${String(weaponState.refineLevel)}`}
-            />
+            <div className="rounded-full p-1 ring-2 ring-accent/45 ring-offset-2 ring-offset-battle-surface">
+              <ItemAvatar
+                kind="weapon"
+                size="lg"
+                name={weaponMaster.name}
+                badgeLabel={`精錬Lv.${String(weaponState.refineLevel)}`}
+              />
+            </div>
             <Text size="caption" className="text-battle-foreground/80">
               {WEAPON_GENRE_LABELS[weaponMaster.genre]}
             </Text>
@@ -91,12 +100,14 @@ export const HomeEquippedPreview = ({ save }: HomeEquippedPreviewProps) => {
         </div>
       </AspectRatio>
 
-      <Card.Content className="flex flex-col gap-1.5 pt-3">
+      <Card.Content className="flex flex-col gap-1 border-t-2 border-accent/35 bg-card/95 py-2.5">
         <div className="flex items-center justify-between gap-2">
-          <Text size="caption" tone="muted">
+          <Text size="caption" tone="muted" className="font-semibold">
             固有パッシブ
           </Text>
-          <Badge variant="muted">{charMaster.passiveSkill.name}</Badge>
+          <Badge variant="muted" className="border border-border">
+            {charMaster.passiveSkill.name}
+          </Badge>
         </div>
         <Text size="caption">{charMaster.passiveSkill.description}</Text>
       </Card.Content>

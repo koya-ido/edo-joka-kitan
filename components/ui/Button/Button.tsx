@@ -22,15 +22,15 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-primary-foreground hover:bg-primary/90 border border-transparent",
+    "game-btn-primary bg-primary text-primary-foreground hover:brightness-105 border border-accent/40",
   secondary:
-    "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border",
+    "game-btn-secondary bg-secondary text-secondary-foreground hover:bg-secondary/90 border border-border",
   destructive:
-    "bg-destructive text-destructive-foreground hover:bg-destructive/90 border border-transparent",
+    "game-btn-primary bg-destructive text-destructive-foreground hover:brightness-105 border border-destructive-foreground/20",
   ghost:
     "bg-transparent text-foreground hover:bg-secondary/60 border border-transparent",
   outline:
-    "bg-card text-card-foreground hover:bg-secondary/50 border border-input",
+    "game-btn-secondary bg-card text-card-foreground hover:bg-secondary/50 border-2 border-border",
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {

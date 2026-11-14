@@ -28,7 +28,7 @@ export const BottomTabNav = ({
 }: BottomTabNavProps) => (
   <nav
     aria-label="メインナビゲーション"
-    className="sticky bottom-0 z-20 grid grid-cols-4 gap-1 border-t border-border bg-card px-2 pt-1 pb-[calc(0.25rem+env(safe-area-inset-bottom))]"
+    className="game-urushi-bar sticky bottom-0 z-20 grid grid-cols-4 gap-1.5 border-t-2 border-accent/45 px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] shadow-lg"
   >
     {TAB_ITEMS.map(({ path, label, Icon }) => {
       const isActive = currentPath === path;
@@ -43,14 +43,16 @@ export const BottomTabNav = ({
             onNavigate(path);
           }}
           className={cn(
-            "flex h-auto min-h-12 flex-col gap-0.5 px-1 py-1.5",
+            "flex h-auto min-h-12 flex-col gap-0.5 rounded-md border px-1 py-1.5 transition-all",
             isActive
-              ? "bg-primary/10 text-primary"
-              : "text-muted-foreground hover:text-foreground",
+              ? "game-btn-primary border-accent/60 bg-primary text-primary-foreground"
+              : "border-battle-foreground/10 bg-battle-foreground/5 text-battle-foreground/75 hover:border-accent/40 hover:bg-battle-foreground/10 hover:text-battle-foreground",
           )}
         >
           <Icon className="h-4 w-4" aria-hidden="true" />
-          <span className="text-xs font-semibold leading-4">{label}</span>
+          <span className="font-display text-xs font-bold leading-4 tracking-wider">
+            {label}
+          </span>
         </Button>
       );
     })}

@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/Card";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { Heading, Text } from "@/components/ui/Typography";
 import { guardProtectedRouteAccess } from "@/domain";
+import { EnhanceScreen, useEnhanceActions } from "@/features/enhance";
 import { HomeHeaderActions, HomeScreen, useHomeActions } from "@/features/home";
 import { useEffect } from "react";
 
@@ -33,8 +34,10 @@ const AppShellContent = () => {
   } = usePlayerSession();
 
   const isHomeRoute = route.path === "/";
+  const isEnhanceRoute = route.path === "/enhance";
   const isBattleRoute = route.battleStageId !== undefined;
   const homeActions = useHomeActions(isHomeRoute);
+  const enhanceActions = useEnhanceActions();
 
   useEffect(() => {
     if (status !== "success" || !save || !route.battleStageId) {
@@ -60,7 +63,11 @@ const AppShellContent = () => {
     }
   };
 
-  const isLocked = status !== "success" || isPending || homeActions.isMutating;
+  const isLocked =
+    status !== "success" ||
+    isPending ||
+    homeActions.isMutating ||
+    enhanceActions.isMutating;
 
   return (
     <AppShell
@@ -108,6 +115,12 @@ const AppShellContent = () => {
             onNavigate={(to) => {
               navigate(to);
             }}
+          />
+        ) : isEnhanceRoute && save ? (
+          <EnhanceScreen
+            save={save}
+            actions={enhanceActions}
+            isSessionPending={isPending}
           />
         ) : (
           <Card.Root>

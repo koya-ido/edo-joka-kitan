@@ -79,3 +79,39 @@ export const seedResettableProgressSave = async (
     lastLoginBonusDate: "2026-11-13",
   });
 };
+
+/** Slice 2 テスト・動作確認用: 勾玉不足状態（最小コスト20未満）のセーブを投入する */
+export const seedEnhanceInsufficientMagatamaSave = async (
+  now: Date = new Date(),
+): Promise<DomainResult<PlayerSaveData>> => {
+  const base = createInitialPlayerSave(now);
+  return seedPlayerSave({
+    ...base,
+    currencies: { ...base.currencies, magatama: 10 },
+    permanentStats: { hpLevel: 0, atkLevel: 0, lukLevel: 0 },
+  });
+};
+
+/** Slice 2 テスト・動作確認用: 一部・全強化項目が最大レベル到達済みのセーブを投入する */
+export const seedEnhanceMaxedStatSave = async (
+  now: Date = new Date(),
+): Promise<DomainResult<PlayerSaveData>> => {
+  const base = createInitialPlayerSave(now);
+  return seedPlayerSave({
+    ...base,
+    currencies: { ...base.currencies, magatama: 500 },
+    permanentStats: { hpLevel: 20, atkLevel: 20, lukLevel: 15 },
+  });
+};
+
+/** Slice 2 テスト・動作確認用: 強化途中段階（加算合算確認用）のセーブを投入する */
+export const seedEnhanceMidProgressSave = async (
+  now: Date = new Date(),
+): Promise<DomainResult<PlayerSaveData>> => {
+  const base = createInitialPlayerSave(now);
+  return seedPlayerSave({
+    ...base,
+    currencies: { ...base.currencies, magatama: 300 },
+    permanentStats: { hpLevel: 3, atkLevel: 2, lukLevel: 1 },
+  });
+};

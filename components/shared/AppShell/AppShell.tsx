@@ -30,8 +30,8 @@ export const AppShell = ({
   <div className="min-h-dvh w-full bg-frame-outer md:flex md:justify-center">
     <div
       className={cn(
-        "flex min-h-dvh w-full flex-col bg-background text-foreground",
-        "md:max-w-[450px] md:border-x md:border-border md:shadow-xl",
+        "game-washi-canvas flex min-h-dvh w-full flex-col text-foreground",
+        "md:max-w-[450px] md:border-x-2 md:border-accent/35 md:shadow-2xl",
       )}
     >
       <ScreenHeader
@@ -41,7 +41,7 @@ export const AppShell = ({
         disabled={isNavigationDisabled}
         actions={headerActions}
       />
-      <main className="flex-1 px-4 py-4">{children}</main>
+      <main className="flex flex-1 flex-col px-3.5 py-3">{children}</main>
       {!hideBottomNav && (
         <BottomTabNav
           currentPath={currentPath}

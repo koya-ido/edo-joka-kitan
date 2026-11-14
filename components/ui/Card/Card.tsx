@@ -15,7 +15,7 @@ const CardRoot = ({ className, children, ref, ...rest }: CardSlotProps) => (
   <section
     ref={ref}
     className={cn(
-      "rounded-lg border border-border bg-card text-card-foreground shadow-sm",
+      "game-panel rounded-lg border-2 border-border bg-card text-card-foreground",
       className,
     )}
     {...rest}
