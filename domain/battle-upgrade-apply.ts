@@ -63,6 +63,7 @@ export const applyWeaponModifierOption = (
     );
     if (!r.ok) return r;
     nextMod.slashWavePierceBonus = r.data;
+    nextMod.damageMultiplier *= st === "sword_slash_pierce_1" ? 0.9 : 0.8;
   } else if (st === "sword_combo_1" || st === "sword_combo_2") {
     const r = addCapped(
       nextMod.comboBonus,
@@ -82,6 +83,7 @@ export const applyWeaponModifierOption = (
     );
     if (!r.ok) return r;
     nextMod.extraProjectiles = r.data;
+    nextMod.damageMultiplier *= st === "projectile_plus_1" ? 0.85 : 0.75;
   } else if (st === "pierce_plus_1" || st === "pierce_plus_2") {
     const r = addCapped(
       nextMod.pierceBonus,
@@ -91,6 +93,7 @@ export const applyWeaponModifierOption = (
     );
     if (!r.ok) return r;
     nextMod.pierceBonus = r.data;
+    nextMod.damageMultiplier *= st === "pierce_plus_1" ? 0.9 : 0.8;
   } else if (st === "bounce_plus_1" || st === "bounce_plus_2") {
     const r = addCapped(
       nextMod.bounceBonus,
@@ -128,6 +131,7 @@ export const applyWeaponModifierOption = (
     );
     if (!r.ok) return r;
     nextMod.splitPierceBonus = r.data;
+    nextMod.damageMultiplier *= st === "split_pierce_plus_1" ? 0.9 : 0.8;
   } else if (st === "split_bounce_plus_1") {
     const r = addCapped(
       nextMod.splitBounceBonus,

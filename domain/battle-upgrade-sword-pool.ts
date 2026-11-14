@@ -80,7 +80,7 @@ export const buildSwordOptions = (
           "sword_slash_pierce_1",
           "sword_slash_pierce_1",
           "斬撃貫通+1",
-          "斬撃波の貫通数 +1",
+          "斬撃波の貫通数 +1 / 威力 -10%",
           1,
         ),
       );
@@ -95,7 +95,7 @@ export const buildSwordOptions = (
           "sword_slash_pierce_2",
           "sword_slash_pierce_2",
           "斬撃貫通+2",
-          "斬撃波の貫通数 +2",
+          "斬撃波の貫通数 +2 / 威力 -20%",
           2,
         ),
       );

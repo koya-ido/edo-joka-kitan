@@ -37,7 +37,7 @@ export const buildProjectileCountOpts = (
         "projectile_plus_1",
         "projectile_plus_1",
         `${label}+1`,
-        `${label} +1`,
+        `${label} +1 / 威力 -15%`,
         1,
       ),
     );
@@ -49,7 +49,7 @@ export const buildProjectileCountOpts = (
         "projectile_plus_2",
         "projectile_plus_2",
         `${label}+2`,
-        `${label} +2`,
+        `${label} +2 / 威力 -25%`,
         2,
       ),
     );
@@ -70,7 +70,7 @@ export const buildPierceOpts = (
         "pierce_plus_1",
         "pierce_plus_1",
         "貫通+1",
-        "貫通数 +1",
+        "貫通数 +1 / 威力 -10%",
         1,
       ),
     );
@@ -82,7 +82,7 @@ export const buildPierceOpts = (
         "pierce_plus_2",
         "pierce_plus_2",
         "貫通+2",
-        "貫通数 +2",
+        "貫通数 +2 / 威力 -20%",
         2,
       ),
     );
@@ -148,7 +148,7 @@ export const buildSplitOpts = (
         "split_pierce_plus_1",
         "split_pierce_plus_1",
         "分裂弾貫通+1",
-        "分裂子弾の貫通数 +1",
+        "分裂子弾の貫通数 +1 / 威力 -10%",
         1,
       ),
     );
@@ -160,7 +160,7 @@ export const buildSplitOpts = (
         "split_pierce_plus_2",
         "split_pierce_plus_2",
         "分裂弾貫通+2",
-        "分裂子弾の貫通数 +2",
+        "分裂子弾の貫通数 +2 / 威力 -20%",
         2,
       ),
     );

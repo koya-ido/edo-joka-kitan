@@ -228,4 +228,66 @@ describe("domain/battle-upgrade (genre pools & caps)", () => {
       expect(dupRejected.error.code).toBe("ALREADY_MAX_LEVEL");
     }
   });
+
+  it("reduces damageMultiplier when applying projectile count or pierce upgrades", () => {
+    const buff = createBaseBuffState(["bow_azusa", "sword_hamon"]);
+    const bowPool = generateUpgradeChoices({
+      buffState: buff,
+      weaponMap: WEAPON_MASTER_MAP,
+      allWeapons: WEAPON_MASTERS,
+      choiceCount: 100,
+    });
+
+    const checks: readonly [string, "bow_azusa" | "sword_hamon", number][] = [
+      ["projectile_plus_1_bow_azusa", "bow_azusa", 0.85],
+      ["projectile_plus_2_bow_azusa", "bow_azusa", 0.75],
+      ["pierce_plus_1_bow_azusa", "bow_azusa", 0.9],
+      ["pierce_plus_2_bow_azusa", "bow_azusa", 0.8],
+    ];
+    for (const [optId, weaponId, expectedMult] of checks) {
+      const opt = bowPool.find((c) => c.id === optId);
+      expect(opt).toBeDefined();
+      if (!opt) continue;
+      const res = applyUpgradeOption(buff, opt, WEAPON_MASTER_MAP);
+      expect(res.ok).toBe(true);
+      if (res.ok) {
+        expect(res.data.weaponModifiers[weaponId].damageMultiplier).toBeCloseTo(
+          expectedMult,
+          6,
+        );
+      }
+    }
+
+    // 斬撃波の貫通（sword_slash_pierce_1）も威力倍率が減少すること
+    const slashUnlock = bowPool.find(
+      (c) => c.id === "sword_slash_unlock_sword_hamon",
+    );
+    expect(slashUnlock).toBeDefined();
+    if (!slashUnlock) return;
+    const unlocked = applyUpgradeOption(buff, slashUnlock, WEAPON_MASTER_MAP);
+    expect(unlocked.ok).toBe(true);
+    if (!unlocked.ok) return;
+    const swordPool = generateUpgradeChoices({
+      buffState: unlocked.data,
+      weaponMap: WEAPON_MASTER_MAP,
+      allWeapons: WEAPON_MASTERS,
+      choiceCount: 100,
+    });
+    const slashPierce1 = swordPool.find(
+      (c) => c.id === "sword_slash_pierce_1_sword_hamon",
+    );
+    expect(slashPierce1).toBeDefined();
+    if (!slashPierce1) return;
+    const afterSlashPierce = applyUpgradeOption(
+      unlocked.data,
+      slashPierce1,
+      WEAPON_MASTER_MAP,
+    );
+    expect(afterSlashPierce.ok).toBe(true);
+    if (afterSlashPierce.ok) {
+      expect(
+        afterSlashPierce.data.weaponModifiers.sword_hamon.damageMultiplier,
+      ).toBeCloseTo(0.9, 6);
+    }
+  });
 });
