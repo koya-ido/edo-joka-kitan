@@ -1,18 +1,17 @@
+import { BattlePlaceholderCard } from "@/app/BattlePlaceholderCard";
 import { appEnv } from "@/app/env";
 import { useHashRouter } from "@/app/router";
 import { PlayerSessionProvider, usePlayerSession } from "@/app/session";
 import { AppShell } from "@/components/shared/AppShell";
 import { AppToastProvider, useAppToast } from "@/components/shared/AppToastProvider";
 import { StateView } from "@/components/shared/StateView";
-import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
 import { Tooltip } from "@/components/ui/Tooltip";
-import { Heading, Text } from "@/components/ui/Typography";
 import { guardProtectedRouteAccess } from "@/domain";
 import { EnhanceScreen, useEnhanceActions } from "@/features/enhance";
 import { FormationScreen, useFormationActions } from "@/features/formation";
 import { GachaScreen, useGachaActions } from "@/features/gacha";
 import { HomeHeaderActions, HomeScreen, useHomeActions } from "@/features/home";
+import { StageSelectScreen } from "@/features/stage-select";
 import { useEffect } from "react";
 
 const ROUTE_TITLES: Readonly<Record<string, string>> = {
@@ -36,6 +35,7 @@ const AppShellContent = () => {
   } = usePlayerSession();
 
   const isHomeRoute = route.path === "/";
+  const isStagesRoute = route.path === "/stages";
   const isEnhanceRoute = route.path === "/enhance";
   const isGachaRoute = route.path === "/gacha";
   const isFormationRoute = route.path === "/formation";
@@ -46,7 +46,14 @@ const AppShellContent = () => {
   const formationActions = useFormationActions();
 
   useEffect(() => {
-    if (status !== "success" || !save || !route.battleStageId) {
+    if (!route.battleStageId) {
+      return;
+    }
+    if (status === "error") {
+      navigate("/", true);
+      return;
+    }
+    if (status !== "success" || !save) {
       return;
     }
     const guardResult = guardProtectedRouteAccess(save, route.battleStageId);
@@ -55,6 +62,13 @@ const AppShellContent = () => {
       navigate("/stages", true);
     }
   }, [status, save, route.battleStageId, showErrorToast, navigate]);
+
+  const canEnterBattle = Boolean(
+    isBattleRoute &&
+    save &&
+    route.battleStageId &&
+    guardProtectedRouteAccess(save, route.battleStageId).ok,
+  );
 
   const title = isBattleRoute
     ? `穢土浄化戦 (${route.battleStageId})`
@@ -127,6 +141,14 @@ const AppShellContent = () => {
               navigate(to);
             }}
           />
+        ) : isStagesRoute && save ? (
+          <StageSelectScreen
+            save={save}
+            isSessionPending={isPending}
+            onNavigate={(to) => {
+              navigate(to);
+            }}
+          />
         ) : isEnhanceRoute && save ? (
           <EnhanceScreen
             save={save}
@@ -148,29 +170,16 @@ const AppShellContent = () => {
               navigate(to);
             }}
           />
-        ) : (
-          <Card.Root>
-            <Card.Header>
-              <div className="flex items-center justify-between gap-2">
-                <Heading as="h2">{title}</Heading>
-                <Badge variant="success">霊脈接続済み</Badge>
-              </div>
-            </Card.Header>
-            <Card.Content className="flex flex-col gap-2">
-              <Text>
-                装備中主人公:{" "}
-                <span className="font-semibold">{save?.equippedCharacterId}</span>
-              </Text>
-              <Text>
-                持ち込み主武器:{" "}
-                <span className="font-semibold">{save?.equippedWeaponId}</span>
-              </Text>
-              <Text size="caption" tone="muted">
-                解放済みステージ数: {save?.unlockedStageIds.length ?? 0}
-              </Text>
-            </Card.Content>
-          </Card.Root>
-        )}
+        ) : canEnterBattle ? (
+          <BattlePlaceholderCard
+            title={title}
+            equippedCharacterId={save?.equippedCharacterId}
+            equippedWeaponId={save?.equippedWeaponId}
+            onBackToStages={() => {
+              navigate("/stages");
+            }}
+          />
+        ) : null}
       </StateView>
     </AppShell>
   );

@@ -1,6 +1,7 @@
 import { STAGE_MASTER_MAP } from "@/data";
 import { err } from "@/domain/result";
 import { validatePlayerSaveData } from "@/domain/save-validator";
+import { guardBattleSortie } from "@/domain/stage-select";
 import type { DomainResult, PlayerSaveData, StageMaster } from "@/types";
 
 /**
@@ -32,18 +33,13 @@ export const guardProtectedRouteAccess = (
   }
 
   if (stageId !== undefined) {
-    if (!Object.hasOwn(stageMap, stageId)) {
-      return err("INVALID_STAGE_ID", "指定されたステージは存在しません。");
-    }
-    const validSave = sessionResult.data;
-    if (!validSave.unlockedStageIds.includes(stageId)) {
-      return err("STAGE_LOCKED", "このステージはまだ解放されていません。");
-    }
-    if (validSave.equippedWeaponId.length === 0) {
-      return err(
-        "EMPTY_WEAPON_SELECTION",
-        "持ち込み武器を1つ選択してください。",
-      );
+    const sortieResult = guardBattleSortie(
+      sessionResult.data,
+      stageId,
+      stageMap,
+    );
+    if (!sortieResult.ok) {
+      return sortieResult;
     }
   }
 

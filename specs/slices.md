@@ -54,7 +54,7 @@ flowchart TD
 | **Slice 2** | `[x]` | 社（強化）による勾玉永続加算強化                  | `enhance` (`/enhance`)                                                        | `enhancePermanentStat`, `calculateTotalMetaStats`, `guardEnhanceable`                                                | `playerSave` (`currencies.magatama`, `permanentStats`), `ENHANCE_STAT_CONFIGS`, `CHARACTER_MASTERS`                                                | Slice 0                   |
 | **Slice 3** | `[x]` | キャラ／武器ガチャ召喚・重複覚醒精錬・上限変換    | `gacha` (`/gacha`), `gacha-result-modal`                                      | `executeGachaPull`, `guardCurrencySufficient`, 重複・上限変換ロジック                                                | `playerSave` (`currencies.hisui`, `currencies.magatama`, `ownedCharacters`, `ownedWeapons`), `GACHA_CONFIG`, `CHARACTER_MASTERS`, `WEAPON_MASTERS` | Slice 0                   |
 | **Slice 4** | `[x]` | 編成画面（主人公1名・持ち込み武器1枠切替）        | `formation` (`/formation`)                                                    | `updateFormation`, `guardEquipmentSelection`, `calculateTotalMetaStats`                                              | `playerSave` (`ownedCharacters`, `ownedWeapons`, `equippedCharacterId`, `equippedWeaponId`), `CHARACTER_MASTERS`, `WEAPON_MASTERS`                 | Slice 0, Slice 2, Slice 3 |
-| **Slice 5** | `[ ]` | ステージ選択・全3節一覧・出撃ルートガード         | `stage-select` (`/stages`)                                                    | `guardBattleSortie`, ルートガード（`/battle/:stageId` 直リンク検証）                                                 | `playerSave` (`unlockedStageIds`, `clearedStageIds`, `equipped*`), `STAGE_MASTERS`                                                                 | Slice 0, Slice 4          |
+| **Slice 5** | `[x]` | ステージ選択・全3節一覧・出撃ルートガード         | `stage-select` (`/stages`)                                                    | `guardBattleSortie`, ルートガード（`/battle/:stageId` 直リンク検証）                                                 | `playerSave` (`unlockedStageIds`, `clearedStageIds`, `equipped*`), `STAGE_MASTERS`                                                                 | Slice 0, Slice 4          |
 | **Slice 6** | `[ ]` | バトル中核（Canvas 2D戦闘・HUD・ポーズ・撤退）    | `battle` (`/battle/:stageId`), `battle-pause-modal`                           | `BattleEngine`, `useBattleEngine`, 9系統武器・敵AI・パッシブ・No-op Audio                                            | `playerSave`（読込のみ）, `STAGE_MASTERS`, `ENEMY_MASTERS`, `WEAPON_MASTERS`, `CHARACTER_MASTERS`                                                  | Slice 5                   |
 | **Slice 7** | `[ ]` | バトル3択成長・リロール・勝敗リザルト・報酬永続化 | `battle` (`/battle/:stageId`), `level-up-choice-modal`, `battle-result-modal` | `generateUpgradeChoices`, `applyUpgradeOption`, `rerollBattleChoices`, `commitBattleResult`                          | `playerSave` (`currencies`, `unlockedStageIds`, `clearedStageIds`), `STAGE_MASTERS`, `WEAPON_MASTERS`                                              | Slice 6                   |
 
@@ -138,7 +138,7 @@ flowchart TD
 
 ### Slice 5: ステージ選択画面 & 出撃ルートガード
 
-- **進捗ステータス**: `[ ]` 未着手
+- **進捗ステータス**: `[x]` 完了
 - **対象画面**: `stage-select` (`/stages`)
 - **API / サービス**:
   - `domain/`: `guardBattleSortie(save, stageId, STAGE_MASTER_MAP)`

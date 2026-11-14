@@ -30,7 +30,7 @@ export const AppShell = ({
   <div className="min-h-dvh w-full bg-frame-outer md:flex md:justify-center">
     <div
       className={cn(
-        "game-washi-canvas flex min-h-dvh w-full flex-col text-foreground",
+        "game-washi-canvas relative flex min-h-dvh w-full flex-col text-foreground",
         "md:max-w-[450px] md:border-x-2 md:border-accent/35 md:shadow-2xl",
       )}
     >

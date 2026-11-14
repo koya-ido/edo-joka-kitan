@@ -52,3 +52,10 @@ export {
   guardProtectedRouteAccess,
   guardSessionEstablished,
 } from "./session-guard";
+export {
+  buildStageSelectItems,
+  guardBattleSortie,
+  type BattleSortieContext,
+  type StageProgressStatus,
+  type StageSelectItem,
+} from "./stage-select";
