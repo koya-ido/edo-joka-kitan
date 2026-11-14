@@ -9,6 +9,7 @@ import {
   type SlashArcEntity,
   type TalismanStrikeEntity,
 } from "@/engine/types";
+import { computeFanAngles } from "@/engine/weapons/beam-geometry";
 import { applyEnemyDebuff } from "@/engine/weapons/debuff";
 import { applyExplosion } from "@/engine/weapons/projectile-effects";
 import type { WeaponMaster, WeaponModifierState } from "@/types";
@@ -122,11 +123,9 @@ export const fireFanProjectiles = (
   spreadDeg: number,
   opts: ProjectileOptions,
 ): void => {
-  const safeCount = Math.max(1, count);
-  const spreadRad = (spreadDeg * Math.PI) / 180;
-  const start = baseAngle - (spreadRad * (safeCount - 1)) / 2;
-  for (let i = 0; i < safeCount; i += 1) {
-    ctx.projectiles.push(createProjectile(ctx, start + spreadRad * i, opts));
+  const angles = computeFanAngles(baseAngle, count, spreadDeg, 130);
+  for (const angle of angles) {
+    ctx.projectiles.push(createProjectile(ctx, angle, opts));
   }
 };
 

@@ -141,7 +141,11 @@ export const applyUpgradeOption = (
     ? buffState.weaponModifiers[targetId]
     : createDefaultWeaponModifier();
 
-  const modResult = applyWeaponModifierOption(existing, option);
+  const modResult = applyWeaponModifierOption(
+    existing,
+    option,
+    weaponMap[targetId],
+  );
   if (!modResult.ok) return modResult;
 
   return ok({

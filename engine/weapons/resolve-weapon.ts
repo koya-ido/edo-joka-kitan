@@ -2,12 +2,17 @@ import {
   BARRIER_CENTER_X,
   BARRIER_CENTER_Y,
   type BeamEntity,
+  type BeamSegment,
   type EnemyEntity,
   type ExplosionEntity,
   type ProjectileEntity,
   type SlashArcEntity,
   type TalismanStrikeEntity,
 } from "@/engine/types";
+import {
+  computeWallBounceSegments,
+  pointToSegmentDistance,
+} from "@/engine/weapons/beam-geometry";
 import {
   applyExplosion,
   updateProjectiles,
@@ -31,7 +36,7 @@ export interface WeaponEffectsUpdateContext {
   ) => void;
 }
 
-const MIRROR_CHAIN_RADIUS = 140;
+const BEAM_HALF_WIDTH = 6;
 
 const updateBeams = (ctx: WeaponEffectsUpdateContext): void => {
   for (let i = ctx.beams.length - 1; i >= 0; i -= 1) {
@@ -43,47 +48,62 @@ const updateBeams = (ctx: WeaponEffectsUpdateContext): void => {
       ctx.enemies.find((e) => e.id === beam.targetEnemyId && e.hp > 0) ??
       findNearestEnemy(ctx.enemies);
     if (target) {
-      beam.endX = target.x;
-      beam.endY = target.y;
-      const chainTargets =
-        beam.bounceRemaining > 0
-          ? ctx.enemies
-              .filter(
-                (e) =>
-                  e.hp > 0 &&
-                  e.id !== target.id &&
-                  Math.hypot(e.x - target.x, e.y - target.y) <=
-                    MIRROR_CHAIN_RADIUS + e.radius,
-              )
-              .slice(0, beam.bounceRemaining)
-          : [];
-      beam.chainPoints = chainTargets.map((e) => ({ x: e.x, y: e.y }));
+      const baseAngle = Math.atan2(
+        target.y - BARRIER_CENTER_Y,
+        target.x - BARRIER_CENTER_X,
+      );
+      const segments = computeWallBounceSegments(
+        BARRIER_CENTER_X,
+        BARRIER_CENTER_Y,
+        baseAngle + (beam.angleOffsetRad ?? 0),
+        beam.bounceRemaining,
+      );
+      beam.segments = segments;
+      const lastSeg = segments[segments.length - 1];
+      beam.endX = lastSeg.x2;
+      beam.endY = lastSeg.y2;
+    }
 
-      if (beam.tickTimerMs <= 0) {
-        beam.tickTimerMs += beam.tickIntervalMs;
-        const dist = Math.hypot(
-          target.x - BARRIER_CENTER_X,
-          target.y - BARRIER_CENTER_Y,
-        );
-        if (dist <= beam.range + target.radius) {
-          ctx.onDamageEnemy(target, beam.damagePerTick, beam.isCrit);
-          if (beam.explosionRadius > 0) {
-            applyExplosion(
-              target.x,
-              target.y,
-              beam.explosionRadius,
-              beam.damagePerTick * 0.6,
-              beam.isCrit,
-              target.id,
-              ctx.enemies,
-              ctx.onDamageEnemy,
-              ctx.explosions,
-              ctx.nextEntityId,
-            );
-          }
-          const chainDmg = Math.max(1, Math.round(beam.damagePerTick * 0.75));
-          for (const ct of chainTargets) {
-            ctx.onDamageEnemy(ct, chainDmg, beam.isCrit);
+    if (beam.tickTimerMs <= 0) {
+      beam.tickTimerMs += beam.tickIntervalMs;
+      const segments: readonly BeamSegment[] = beam.segments ?? [
+        {
+          x1: BARRIER_CENTER_X,
+          y1: BARRIER_CENTER_Y,
+          x2: beam.endX,
+          y2: beam.endY,
+        },
+      ];
+      const hitEnemyIds = new Set<number>();
+      const halfWidth = BEAM_HALF_WIDTH * (beam.widthMultiplier ?? 1);
+      for (const seg of segments) {
+        for (const enemy of ctx.enemies) {
+          if (enemy.hp <= 0 || hitEnemyIds.has(enemy.id)) continue;
+          const dist = pointToSegmentDistance(
+            enemy.x,
+            enemy.y,
+            seg.x1,
+            seg.y1,
+            seg.x2,
+            seg.y2,
+          );
+          if (dist <= enemy.radius + halfWidth) {
+            hitEnemyIds.add(enemy.id);
+            ctx.onDamageEnemy(enemy, beam.damagePerTick, beam.isCrit);
+            if (beam.explosionRadius > 0) {
+              applyExplosion(
+                enemy.x,
+                enemy.y,
+                beam.explosionRadius,
+                beam.damagePerTick * 0.6,
+                beam.isCrit,
+                enemy.id,
+                ctx.enemies,
+                ctx.onDamageEnemy,
+                ctx.explosions,
+                ctx.nextEntityId,
+              );
+            }
           }
         }
       }

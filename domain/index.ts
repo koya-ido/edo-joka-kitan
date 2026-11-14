@@ -20,6 +20,11 @@ export {
   MAX_ACTIVE_WEAPONS_IN_RUN,
   type GenerateUpgradeChoicesInput,
 } from "./battle-upgrade";
+export {
+  getUpgradeOptionTier,
+  getUpgradeOptionWeight,
+  type UpgradeWeightTier,
+} from "./battle-upgrade-weights";
 export { guardCurrencySufficient } from "./currency-guard";
 export {
   applyEnhanceStat,

@@ -5,6 +5,7 @@ export const WEAPON_UPGRADE_CAPS = {
   maxRangeMultiplier: 2.2,
   maxDurationMultiplier: 2.5,
   maxExtraProjectiles: 4,
+  maxShurikenExtraProjectiles: 7,
   maxPierceBonus: 5,
   maxBounceBonus: 4,
   maxSplitPierceBonus: 3,

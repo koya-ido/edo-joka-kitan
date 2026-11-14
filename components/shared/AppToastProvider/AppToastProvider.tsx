@@ -4,6 +4,8 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -22,8 +24,28 @@ interface AppToastContextValue {
 
 const AppToastContext = createContext<AppToastContextValue | null>(null);
 
+const TOAST_DURATION_MS = 2000;
+
 export const AppToastProvider = ({ children }: { children: ReactNode }) => {
   const [messages, setMessages] = useState<ToastMessage[]>([]);
+  const viewportRef = useRef<HTMLOListElement | null>(null);
+
+  useEffect(() => {
+    if (messages.length === 0) {
+      return;
+    }
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node | null;
+      if (target && viewportRef.current?.contains(target)) {
+        return;
+      }
+      setMessages([]);
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [messages.length]);
 
   const enqueueToast = useCallback(
     (title: string, variant: ToastVariant, description?: string) => {
@@ -55,7 +77,7 @@ export const AppToastProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AppToastContext.Provider value={{ showErrorToast, showSuccessToast }}>
-      <Toast.Provider swipeDirection="up" duration={4000}>
+      <Toast.Provider swipeDirection="up" duration={TOAST_DURATION_MS}>
         {children}
         {messages.map((item) => (
           <Toast.Root
@@ -75,7 +97,7 @@ export const AppToastProvider = ({ children }: { children: ReactNode }) => {
             <Toast.Close />
           </Toast.Root>
         ))}
-        <Toast.Viewport />
+        <Toast.Viewport ref={viewportRef} />
       </Toast.Provider>
     </AppToastContext.Provider>
   );

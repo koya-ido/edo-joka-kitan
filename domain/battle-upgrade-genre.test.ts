@@ -3,6 +3,8 @@ import {
   applyUpgradeOption,
   createDefaultWeaponModifier,
   generateUpgradeChoices,
+  getUpgradeOptionTier,
+  getUpgradeOptionWeight,
 } from "@/domain";
 import type { InGameBuffState, WeaponId, WeaponModifierState } from "@/types";
 import { describe, expect, it } from "vitest";
@@ -289,5 +291,80 @@ describe("domain/battle-upgrade (genre pools & caps)", () => {
         afterSlashPierce.data.weaponModifiers.sword_hamon.damageMultiplier,
       ).toBeCloseTo(0.9, 6);
     }
+  });
+
+  it("caps shuriken extra projectiles at 7 (10 simultaneous directions) with 同時射出数 label", () => {
+    let buff = createBaseBuffState(["shuriken_kaze"]);
+    const initialPool = generateUpgradeChoices({
+      buffState: buff,
+      weaponMap: WEAPON_MASTER_MAP,
+      allWeapons: WEAPON_MASTERS,
+      choiceCount: 100,
+    });
+    const plus1 = initialPool.find(
+      (c) => c.id === "projectile_plus_1_shuriken_kaze",
+    );
+    expect(plus1).toBeDefined();
+    expect(plus1?.title).toBe("風魔手裏剣・同時射出数+1");
+    if (!plus1) return;
+
+    for (let i = 0; i < 7; i += 1) {
+      const res = applyUpgradeOption(buff, plus1, WEAPON_MASTER_MAP);
+      expect(res.ok).toBe(true);
+      if (!res.ok) return;
+      buff = res.data;
+    }
+    expect(buff.weaponModifiers.shuriken_kaze.extraProjectiles).toBe(7);
+
+    const cappedPool = generateUpgradeChoices({
+      buffState: buff,
+      weaponMap: WEAPON_MASTER_MAP,
+      allWeapons: WEAPON_MASTERS,
+      choiceCount: 100,
+    });
+    expect(
+      cappedPool.some((c) => c.id === "projectile_plus_1_shuriken_kaze"),
+    ).toBe(false);
+
+    const rejected = applyUpgradeOption(buff, plus1, WEAPON_MASTER_MAP);
+    expect(rejected.ok).toBe(false);
+  });
+
+  it("raises rarity (lowers weight) for projectile/combo/chain count upgrades", () => {
+    const shurikenBuff = createBaseBuffState(["shuriken_kaze"]);
+    const shurikenPool = generateUpgradeChoices({
+      buffState: shurikenBuff,
+      weaponMap: WEAPON_MASTER_MAP,
+      allWeapons: WEAPON_MASTERS,
+      choiceCount: 100,
+    });
+    const proj1 = shurikenPool.find(
+      (c) => c.id === "projectile_plus_1_shuriken_kaze",
+    );
+    const proj2 = shurikenPool.find(
+      (c) => c.id === "projectile_plus_2_shuriken_kaze",
+    );
+    expect(proj1 && proj2).toBeTruthy();
+    if (!proj1 || !proj2) return;
+    expect(getUpgradeOptionTier(proj1)).toBe("major_benefit");
+    expect(getUpgradeOptionWeight(proj1)).toBe(2);
+    expect(getUpgradeOptionTier(proj2)).toBe("major_benefit");
+    expect(getUpgradeOptionWeight(proj2)).toBe(1);
+
+    const swordBuff = createBaseBuffState(["sword_hamon"]);
+    const swordPool = generateUpgradeChoices({
+      buffState: swordBuff,
+      weaponMap: WEAPON_MASTER_MAP,
+      allWeapons: WEAPON_MASTERS,
+      choiceCount: 100,
+    });
+    const combo1 = swordPool.find((c) => c.id === "sword_combo_1_sword_hamon");
+    const combo2 = swordPool.find((c) => c.id === "sword_combo_2_sword_hamon");
+    expect(combo1 && combo2).toBeTruthy();
+    if (!combo1 || !combo2) return;
+    expect(getUpgradeOptionTier(combo1)).toBe("major_benefit");
+    expect(getUpgradeOptionWeight(combo1)).toBe(2);
+    expect(getUpgradeOptionTier(combo2)).toBe("major_benefit");
+    expect(getUpgradeOptionWeight(combo2)).toBe(1);
   });
 });

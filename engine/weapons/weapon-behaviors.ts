@@ -48,7 +48,10 @@ export const fireWeaponByGenre = (ctx: WeaponFireContext): boolean => {
     target.x - BARRIER_CENTER_X,
   );
   const { genre, genreParams } = ctx.weapon;
-  const rangeMult = Math.max(0.5, ctx.rangeMultiplier ?? 1);
+  const rangeMult = Math.max(
+    0.5,
+    ctx.rangeMultiplier ?? ctx.modifier?.rangeMultiplier ?? 1,
+  );
   const pMod = resolveCommonProjectileMod(ctx);
 
   switch (genre) {
@@ -79,10 +82,11 @@ export const fireWeaponByGenre = (ctx: WeaponFireContext): boolean => {
       );
       return true;
     case "shuriken": {
-      const count = Math.max(
+      const baseCount = Math.max(
         1,
         readGenreParam(genreParams, "projectileCount", 3),
       );
+      const count = Math.min(10, baseCount + pMod.extraCount);
       fireFanProjectiles(
         ctx,
         baseAngle,

@@ -162,4 +162,52 @@
   .animate-spirit-float {
     animation: game-spirit-float 3.6s ease-in-out infinite;
   }
+
+  /* 強化選択肢カード：恩恵大（金色もやもや）＆新武器解放（翡翠色もやもや） */
+  @keyframes game-aura-major-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 10px 1px color-mix(in oklab, var(--accent) 42%, transparent),
+        0 0 20px 3px color-mix(in oklab, var(--accent) 22%, transparent),
+        inset 0 0 10px color-mix(in oklab, var(--accent) 16%, transparent);
+    }
+    50% {
+      box-shadow:
+        0 0 16px 3px color-mix(in oklab, var(--accent) 68%, transparent),
+        0 0 30px 6px color-mix(in oklab, var(--accent) 34%, transparent),
+        inset 0 0 14px color-mix(in oklab, var(--accent) 26%, transparent);
+    }
+  }
+
+  @keyframes game-aura-unlock-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 8px 0 color-mix(in oklab, var(--hisui) 34%, transparent),
+        0 0 16px 2px color-mix(in oklab, var(--hisui) 16%, transparent);
+    }
+    50% {
+      box-shadow:
+        0 0 13px 2px color-mix(in oklab, var(--hisui) 54%, transparent),
+        0 0 22px 4px color-mix(in oklab, var(--hisui) 26%, transparent);
+    }
+  }
+
+  .game-choice-aura-major {
+    border-color: var(--accent);
+    animation: game-aura-major-pulse 2.2s ease-in-out infinite;
+  }
+
+  .game-choice-aura-unlock {
+    border-color: var(--hisui);
+    animation: game-aura-unlock-pulse 2.8s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .game-choice-aura-major,
+    .game-choice-aura-unlock {
+      animation: none;
+    }
+  }
 }

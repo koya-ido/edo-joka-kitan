@@ -28,7 +28,7 @@ import type {
 } from "@/types";
 
 const COMBO_BURST_INTERVAL_MS = 110;
-const RAPID_FIRE_GENRES = new Set(["bow", "shuriken", "matchlock"]);
+const RAPID_FIRE_GENRES = new Set(["bow", "matchlock"]);
 
 export interface SimulationStepContext {
   readonly dtMs: number;

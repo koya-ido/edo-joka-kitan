@@ -27,10 +27,11 @@ export const buildProjectileCountOpts = (
   weapon: WeaponMaster,
   mod: WeaponModifierState | undefined,
   label: string,
+  maxExtra: number = WEAPON_UPGRADE_CAPS.maxExtraProjectiles,
 ): InGameUpgradeOption[] => {
   const cur = mod?.extraProjectiles ?? 0;
   const opts: InGameUpgradeOption[] = [];
-  if (cur < WEAPON_UPGRADE_CAPS.maxExtraProjectiles) {
+  if (cur < maxExtra) {
     opts.push(
       makeWeaponStatOpt(
         weapon,
@@ -42,7 +43,7 @@ export const buildProjectileCountOpts = (
       ),
     );
   }
-  if (cur + 2 <= WEAPON_UPGRADE_CAPS.maxExtraProjectiles) {
+  if (cur + 2 <= maxExtra) {
     opts.push(
       makeWeaponStatOpt(
         weapon,

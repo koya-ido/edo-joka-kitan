@@ -95,6 +95,13 @@ export interface ExplosionEntity {
 }
 
 /** 鏡系照射ビーム */
+export interface BeamSegment {
+  readonly x1: number;
+  readonly y1: number;
+  readonly x2: number;
+  readonly y2: number;
+}
+
 export interface BeamEntity {
   readonly id: number;
   readonly colorToken: WeaponColorToken;
@@ -109,6 +116,9 @@ export interface BeamEntity {
   endY: number;
   readonly bounceRemaining: number;
   readonly explosionRadius: number;
+  readonly widthMultiplier?: number;
+  readonly angleOffsetRad?: number;
+  segments?: readonly BeamSegment[];
   chainPoints?: readonly { readonly x: number; readonly y: number }[];
 }
 

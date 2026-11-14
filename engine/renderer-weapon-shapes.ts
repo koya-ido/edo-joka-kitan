@@ -122,57 +122,45 @@ export const drawMirrorBeam = (
   palette: BattlePalette,
 ): void => {
   const pulse = 1 + Math.sin(beam.remainingLifeMs * 0.04) * 0.18;
+  const widthScale = beam.widthMultiplier ?? 1;
+  const segments = beam.segments ?? [
+    {
+      x1: BARRIER_CENTER_X,
+      y1: BARRIER_CENTER_Y,
+      x2: beam.endX,
+      y2: beam.endY,
+    },
+  ];
+  const traceSegments = (): void => {
+    ctx.beginPath();
+    for (const seg of segments) {
+      ctx.moveTo(seg.x1, seg.y1);
+      ctx.lineTo(seg.x2, seg.y2);
+    }
+    ctx.stroke();
+  };
+
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
   ctx.lineCap = "round";
 
   ctx.globalAlpha = 0.3;
   ctx.strokeStyle = color;
-  ctx.lineWidth = 12 * pulse;
-  ctx.beginPath();
-  ctx.moveTo(BARRIER_CENTER_X, BARRIER_CENTER_Y);
-  ctx.lineTo(beam.endX, beam.endY);
-  ctx.stroke();
+  ctx.lineWidth = 12 * pulse * widthScale;
+  traceSegments();
 
   ctx.globalAlpha = 0.95;
   ctx.strokeStyle = color;
-  ctx.lineWidth = 4 * pulse;
-  ctx.beginPath();
-  ctx.moveTo(BARRIER_CENTER_X, BARRIER_CENTER_Y);
-  ctx.lineTo(beam.endX, beam.endY);
-  ctx.stroke();
+  ctx.lineWidth = 4 * pulse * widthScale;
+  traceSegments();
 
   ctx.globalAlpha = 1;
   ctx.strokeStyle = palette.foreground;
-  ctx.lineWidth = 1.8;
-  ctx.beginPath();
-  ctx.moveTo(BARRIER_CENTER_X, BARRIER_CENTER_Y);
-  ctx.lineTo(beam.endX, beam.endY);
-  ctx.stroke();
+  ctx.lineWidth = 1.8 * widthScale;
+  traceSegments();
 
-  drawStarFlare(
-    ctx,
-    beam.endX,
-    beam.endY,
-    12 * pulse,
-    color,
-    palette.foreground,
-  );
-
-  for (const cp of beam.chainPoints ?? []) {
-    ctx.globalAlpha = 0.8;
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(beam.endX, beam.endY);
-    ctx.lineTo(cp.x, cp.y);
-    ctx.stroke();
-
-    ctx.strokeStyle = palette.foreground;
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
-
-    drawStarFlare(ctx, cp.x, cp.y, 7.5, color, palette.foreground);
+  for (const seg of segments) {
+    drawStarFlare(ctx, seg.x2, seg.y2, 10 * pulse, color, palette.foreground);
   }
 
   ctx.restore();

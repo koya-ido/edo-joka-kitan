@@ -371,9 +371,9 @@ describe("engine/weapons (all 8 weapon genres)", () => {
     expect(children[0].visualScale).toBeCloseTo(0.75, 5);
   });
 
-  it("deals 75% chain damage for mirror beams", () => {
+  it("pierces enemies to the wall with no distance falloff and bounces off walls", () => {
     const e1 = makeEnemy(1, BARRIER_CENTER_X, BARRIER_CENTER_Y - 90, 200);
-    const e2 = makeEnemy(2, BARRIER_CENTER_X + 35, BARRIER_CENTER_Y - 95, 200);
+    const e2 = makeEnemy(2, BARRIER_CENTER_X, 40, 200);
     const enemies = [e1, e2];
     const beams: BeamEntity[] = [];
     let seq = 900;
@@ -395,6 +395,9 @@ describe("engine/weapons (all 8 weapon genres)", () => {
       onDamageEnemy: () => {},
     });
 
+    expect(beams[0].segments).toHaveLength(2);
+    expect(beams[0].segments?.[0].y2).toBeCloseTo(0, 4);
+
     beams[0].tickTimerMs = 0;
     updateWeaponEffects({
       dtMs: 16,
@@ -409,6 +412,181 @@ describe("engine/weapons (all 8 weapon genres)", () => {
     });
 
     expect(e1.hp).toBe(160);
-    expect(e2.hp).toBe(170);
+    expect(e2.hp).toBe(160);
+  });
+
+  it("hits the locked-on target with at least one beam when mirror beam count is even", () => {
+    const e1 = makeEnemy(1, BARRIER_CENTER_X, BARRIER_CENTER_Y - 90, 200);
+    const beams: BeamEntity[] = [];
+    let seq = 950;
+
+    fireWeaponByGenre({
+      weapon: WEAPON_MASTER_MAP.mirror_yata,
+      damage: 30,
+      isCrit: false,
+      durationMs: 900,
+      modifier: {
+        ...createDefaultWeaponModifier(),
+        extraProjectiles: 1,
+      },
+      enemies: [e1],
+      projectiles: [],
+      slashArcs: [],
+      beams,
+      nextEntityId: () => seq++,
+      onDamageEnemy: () => {},
+    });
+
+    expect(beams).toHaveLength(2);
+    expect(beams.some((b) => Math.abs(b.angleOffsetRad ?? 1) < 1e-6)).toBe(
+      true,
+    );
+  });
+
+  it("fires shurikens in up to 10 directions capped at 130 degrees and hits main target on even counts", () => {
+    const e1 = makeEnemy(1, BARRIER_CENTER_X, BARRIER_CENTER_Y - 120, 200);
+    const evenProjectiles: ProjectileEntity[] = [];
+    let seq = 1000;
+
+    fireWeaponByGenre({
+      weapon: WEAPON_MASTER_MAP.shuriken_kaze,
+      damage: 20,
+      isCrit: false,
+      durationMs: 400,
+      modifier: {
+        ...createDefaultWeaponModifier(),
+        extraProjectiles: 1,
+      },
+      enemies: [e1],
+      projectiles: evenProjectiles,
+      slashArcs: [],
+      beams: [],
+      nextEntityId: () => seq++,
+      onDamageEnemy: () => {},
+    });
+    expect(evenProjectiles).toHaveLength(4);
+    const baseAngle = -Math.PI / 2;
+    expect(
+      evenProjectiles.some(
+        (p) => Math.abs(Math.atan2(p.vy, p.vx) - baseAngle) < 1e-5,
+      ),
+    ).toBe(true);
+
+    const maxProjectiles: ProjectileEntity[] = [];
+    fireWeaponByGenre({
+      weapon: WEAPON_MASTER_MAP.shuriken_kaze,
+      damage: 20,
+      isCrit: false,
+      durationMs: 400,
+      modifier: {
+        ...createDefaultWeaponModifier(),
+        extraProjectiles: 10,
+      },
+      enemies: [e1],
+      projectiles: maxProjectiles,
+      slashArcs: [],
+      beams: [],
+      nextEntityId: () => seq++,
+      onDamageEnemy: () => {},
+    });
+    expect(maxProjectiles).toHaveLength(10);
+    const angles = maxProjectiles
+      .map((p) => Math.atan2(p.vy, p.vx))
+      .sort((a, b) => a - b);
+    const totalDeg = ((angles[angles.length - 1] - angles[0]) * 180) / Math.PI;
+    expect(totalDeg).toBeCloseTo(130, 4);
+  });
+
+  it("widens mirror beam hitbox with rangeMultiplier and deals full damage after wall bounce", () => {
+    // 壁に斜め反射して2本目の線分上にも敵が来る配置（減衰なし確認）
+    const e1 = makeEnemy(
+      1,
+      BARRIER_CENTER_X + 100,
+      BARRIER_CENTER_Y - 100,
+      200,
+    );
+    const eWide = makeEnemy(
+      2,
+      BARRIER_CENTER_X + 24,
+      BARRIER_CENTER_Y - 100,
+      200,
+    );
+    const beams: BeamEntity[] = [];
+    let seq = 1100;
+
+    fireWeaponByGenre({
+      weapon: WEAPON_MASTER_MAP.mirror_yata,
+      damage: 40,
+      isCrit: false,
+      durationMs: 900,
+      rangeMultiplier: 2,
+      modifier: {
+        ...createDefaultWeaponModifier(),
+        bounceBonus: 1,
+      },
+      enemies: [e1],
+      projectiles: [],
+      slashArcs: [],
+      beams,
+      nextEntityId: () => seq++,
+      onDamageEnemy: () => {},
+    });
+
+    expect(beams[0].widthMultiplier).toBe(2);
+    const seg1 = beams[0].segments?.[1];
+    expect(seg1).toBeDefined();
+    if (!seg1) return;
+    const eBounced = makeEnemy(
+      3,
+      (seg1.x1 + seg1.x2) / 2,
+      (seg1.y1 + seg1.y2) / 2,
+      200,
+    );
+    beams[0].tickTimerMs = 0;
+    updateWeaponEffects({
+      dtMs: 16,
+      enemies: [e1, eBounced],
+      projectiles: [],
+      slashArcs: [],
+      beams,
+      nextEntityId: () => seq++,
+      onDamageEnemy: (target, dmg) => {
+        target.hp -= dmg;
+      },
+    });
+
+    expect(e1.hp).toBe(160);
+    expect(eBounced.hp).toBe(160);
+
+    // 垂直上向きの敵に太さ2倍レーザーを当てて、通常幅では外れる横24pxの敵にヒットすることを確認
+    const eCenter = makeEnemy(4, BARRIER_CENTER_X, BARRIER_CENTER_Y - 100, 200);
+    const wideBeams: BeamEntity[] = [];
+    fireWeaponByGenre({
+      weapon: WEAPON_MASTER_MAP.mirror_yata,
+      damage: 40,
+      isCrit: false,
+      durationMs: 900,
+      rangeMultiplier: 2,
+      modifier: createDefaultWeaponModifier(),
+      enemies: [eCenter, eWide],
+      projectiles: [],
+      slashArcs: [],
+      beams: wideBeams,
+      nextEntityId: () => seq++,
+      onDamageEnemy: () => {},
+    });
+    wideBeams[0].tickTimerMs = 0;
+    updateWeaponEffects({
+      dtMs: 16,
+      enemies: [eCenter, eWide],
+      projectiles: [],
+      slashArcs: [],
+      beams: wideBeams,
+      nextEntityId: () => seq++,
+      onDamageEnemy: (target, dmg) => {
+        target.hp -= dmg;
+      },
+    });
+    expect(eWide.hp).toBe(160);
   });
 });

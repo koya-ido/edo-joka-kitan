@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { Text } from "@/components/ui/Typography";
+import { cn } from "@/components/ui/cn";
+import { getUpgradeOptionTier, type UpgradeWeightTier } from "@/domain";
 import type { InGameUpgradeCategory, InGameUpgradeOption } from "@/types";
 import { RefreshCw, Sparkles } from "lucide-react";
 
@@ -29,6 +31,12 @@ const CATEGORY_LABEL_MAP: Readonly<
   base_stat: { label: "基礎強化", variant: "default" },
   weapon_stat: { label: "武器強化", variant: "accent" },
   weapon_unlock: { label: "新武器開放", variant: "success" },
+};
+
+const TIER_CARD_AURA_MAP: Readonly<Record<UpgradeWeightTier, string>> = {
+  major_benefit: "game-choice-aura-major",
+  weapon_unlock: "game-choice-aura-unlock",
+  minor_benefit: "border-border",
 };
 
 export const LevelUpChoiceModal = ({
@@ -81,15 +89,22 @@ export const LevelUpChoiceModal = ({
           ) : (
             choices.map((option) => {
               const meta = CATEGORY_LABEL_MAP[option.category];
+              const tier = isInitialWeapon
+                ? "minor_benefit"
+                : getUpgradeOptionTier(option);
               return (
                 <button
                   key={option.id}
                   type="button"
+                  data-upgrade-tier={tier}
                   disabled={isRerolling}
                   onClick={() => {
                     onSelectChoice(option.id);
                   }}
-                  className="w-full min-h-14 rounded-lg border border-border bg-card p-3 text-left transition-colors hover:border-primary hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 touch-manipulation"
+                  className={cn(
+                    "w-full min-h-14 rounded-lg border bg-card p-3 text-left transition-colors hover:border-primary hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 touch-manipulation",
+                    TIER_CARD_AURA_MAP[tier],
+                  )}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <Text size="label" className="font-bold">

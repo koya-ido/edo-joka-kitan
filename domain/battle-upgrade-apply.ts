@@ -3,6 +3,7 @@ import { err, ok } from "@/domain/result";
 import type {
   DomainResult,
   InGameUpgradeOption,
+  WeaponMaster,
   WeaponModifierState,
 } from "@/types";
 
@@ -20,6 +21,7 @@ const addCapped = (
 export const applyWeaponModifierOption = (
   existing: WeaponModifierState,
   option: InGameUpgradeOption,
+  weapon?: WeaponMaster,
 ): DomainResult<WeaponModifierState> => {
   const nextMod: WeaponModifierState = { ...existing };
   const st = option.statType;
@@ -75,10 +77,14 @@ export const applyWeaponModifierOption = (
     nextMod.comboBonus = r.data;
     nextMod.damageMultiplier *= st === "sword_combo_1" ? 0.85 : 0.75;
   } else if (st === "projectile_plus_1" || st === "projectile_plus_2") {
+    const maxExtra =
+      weapon?.genre === "shuriken"
+        ? WEAPON_UPGRADE_CAPS.maxShurikenExtraProjectiles
+        : WEAPON_UPGRADE_CAPS.maxExtraProjectiles;
     const r = addCapped(
       nextMod.extraProjectiles,
       option.multiplierOrDelta,
-      WEAPON_UPGRADE_CAPS.maxExtraProjectiles,
+      maxExtra,
       "追加数は上限です。",
     );
     if (!r.ok) return r;

@@ -233,4 +233,62 @@ describe("features/battle Slice 7 modals (5-State, Double-Submit, Disabled)", ()
     fireEvent.click(screen.getByRole("button", { name: "ステージ選択へ戻る" }));
     expect(onExit).toHaveBeenCalledTimes(2);
   });
+
+  it("applies weight-tier aura classes in level_up mode and suppresses them in initial_weapon mode", () => {
+    const tierChoices: readonly InGameUpgradeOption[] = [
+      {
+        id: "split_unlock_bow_azusa",
+        category: "weapon_stat",
+        targetWeaponId: "bow_azusa",
+        statType: "split_unlock",
+        title: "破魔の梓弓・分裂弾",
+        description: "命中で2発に分裂",
+        multiplierOrDelta: 1,
+      },
+      ...SAMPLE_CHOICES.slice(0, 1),
+      SAMPLE_CHOICES[2],
+    ];
+
+    const { rerender } = render(
+      <LevelUpChoiceModal
+        open
+        mode="level_up"
+        level={3}
+        choices={tierChoices}
+        currentMagatama={100}
+        rerollCostMagatama={30}
+        isRerolling={false}
+        onSelectChoice={vi.fn()}
+        onReroll={vi.fn()}
+        onFallbackContinue={vi.fn()}
+      />,
+    );
+
+    const majorBtn = screen.getByRole("button", { name: /破魔の梓弓・分裂弾/ });
+    const minorBtn = screen.getByRole("button", { name: /霊力増幅/ });
+    const unlockBtn = screen.getByRole("button", { name: /新武器開放：破魔の梓弓/ });
+    expect(majorBtn.className).toContain("game-choice-aura-major");
+    expect(minorBtn.className).not.toContain("game-choice-aura-");
+    expect(unlockBtn.className).toContain("game-choice-aura-unlock");
+
+    rerender(
+      <LevelUpChoiceModal
+        open
+        mode="initial_weapon"
+        level={1}
+        choices={[SAMPLE_CHOICES[2]]}
+        currentMagatama={100}
+        rerollCostMagatama={30}
+        isRerolling={false}
+        onSelectChoice={vi.fn()}
+        onReroll={vi.fn()}
+        onFallbackContinue={vi.fn()}
+      />,
+    );
+
+    const initialUnlockBtn = screen.getByRole("button", {
+      name: /新武器開放：破魔の梓弓/,
+    });
+    expect(initialUnlockBtn.className).not.toContain("game-choice-aura-");
+  });
 });

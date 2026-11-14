@@ -27,6 +27,22 @@ const buildBallisticOpts = (
   ...buildUniqueExplosionOpts(weapon, mod),
 ];
 
+const buildShurikenOpts = (
+  weapon: WeaponMaster,
+  mod: WeaponModifierState | undefined,
+): readonly InGameUpgradeOption[] => [
+  ...buildProjectileCountOpts(
+    weapon,
+    mod,
+    "同時射出数",
+    WEAPON_UPGRADE_CAPS.maxShurikenExtraProjectiles,
+  ),
+  ...buildPierceOpts(weapon, mod),
+  ...buildBounceOpts(weapon, mod),
+  ...buildSplitOpts(weapon, mod),
+  ...buildUniqueExplosionOpts(weapon, mod),
+];
+
 const buildMirrorOpts = (
   weapon: WeaponMaster,
   mod?: WeaponModifierState,
@@ -128,7 +144,7 @@ export const GENRE_UPGRADE_BUILDERS: Readonly<
 > = {
   bow: buildBallisticOpts,
   sword: buildSwordOptions,
-  shuriken: buildBallisticOpts,
+  shuriken: buildShurikenOpts,
   mirror: buildMirrorOpts,
   talisman: buildTalismanOpts,
   matchlock: buildBallisticOpts,

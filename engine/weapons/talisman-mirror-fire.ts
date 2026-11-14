@@ -4,8 +4,14 @@ import {
   readGenreParam,
   type EnemyEntity,
 } from "@/engine/types";
+import {
+  computeFanAngles,
+  computeWallBounceSegments,
+} from "@/engine/weapons/beam-geometry";
 import { applyEnemyDebuff } from "@/engine/weapons/debuff";
 import type { WeaponFireContext } from "@/engine/weapons/weapon-fire-helpers";
+
+const MIRROR_BEAM_SPREAD_DEG = 12;
 
 const sortEnemiesByBarrierDist = (enemies: readonly EnemyEntity[]) =>
   enemies
@@ -16,7 +22,7 @@ const sortEnemiesByBarrierDist = (enemies: readonly EnemyEntity[]) =>
         Math.hypot(b.x - BARRIER_CENTER_X, b.y - BARRIER_CENTER_Y),
     );
 
-/** 鏡系：複数ターゲット照射＋反射・爆発ビームを生成する */
+/** 鏡系：最寄り敵をロックオンし壁面まで貫通・壁反射するレーザー群を生成する */
 export const fireMirrorBeams = (
   ctx: WeaponFireContext,
   rangeMult: number,
@@ -24,33 +30,55 @@ export const fireMirrorBeams = (
   bounceBonus: number,
   explosionRadius: number,
 ): boolean => {
+  const targets = sortEnemiesByBarrierDist(ctx.enemies);
+  if (targets.length === 0) return false;
+  const nearest = targets[0];
+
   const { genreParams } = ctx.weapon;
   const mirrorRange = readGenreParam(genreParams, "range", 240) * rangeMult;
-  const targets = sortEnemiesByBarrierDist(ctx.enemies).slice(
-    0,
-    1 + extraCount,
+  const baseAngle = Math.atan2(
+    nearest.y - BARRIER_CENTER_Y,
+    nearest.x - BARRIER_CENTER_X,
   );
-  for (const t of targets) {
+  const angles = computeFanAngles(
+    baseAngle,
+    1 + extraCount,
+    MIRROR_BEAM_SPREAD_DEG,
+  );
+  const tickIntervalMs = Math.max(
+    80,
+    readGenreParam(genreParams, "tickIntervalMs", 180),
+  );
+  const remainingLifeMs = Math.max(300, ctx.durationMs);
+
+  for (const angle of angles) {
+    const segments = computeWallBounceSegments(
+      BARRIER_CENTER_X,
+      BARRIER_CENTER_Y,
+      angle,
+      bounceBonus,
+    );
+    const lastSeg = segments[segments.length - 1];
     ctx.beams.push({
       id: ctx.nextEntityId(),
       colorToken: ctx.weapon.colorToken,
-      targetEnemyId: t.id,
+      targetEnemyId: nearest.id,
       damagePerTick: ctx.damage,
       isCrit: ctx.isCrit,
       range: mirrorRange,
-      tickIntervalMs: Math.max(
-        80,
-        readGenreParam(genreParams, "tickIntervalMs", 180),
-      ),
+      tickIntervalMs,
       tickTimerMs: 0,
-      remainingLifeMs: Math.max(300, ctx.durationMs),
-      endX: t.x,
-      endY: t.y,
+      remainingLifeMs,
+      endX: lastSeg.x2,
+      endY: lastSeg.y2,
       bounceRemaining: bounceBonus,
       explosionRadius,
+      widthMultiplier: rangeMult,
+      angleOffsetRad: angle - baseAngle,
+      segments,
     });
   }
-  return targets.length > 0;
+  return true;
 };
 
 /** 呪符系：敵位置への直接召喚＋連鎖＋デバフ攻撃を発動する */
