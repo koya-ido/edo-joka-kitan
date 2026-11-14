@@ -5,6 +5,8 @@ import {
   seedEnhanceInsufficientMagatamaSave,
   seedEnhanceMaxedStatSave,
   seedEnhanceMidProgressSave,
+  seedFormationMultiOwnedSave,
+  seedFormationSingleOwnedSave,
   seedGachaInsufficientHisuiSave,
   seedGachaMaxedPoolSave,
   seedGachaReadySave,
@@ -175,6 +177,45 @@ describe("storage/seed (Slice 1 migration & seed verification)", () => {
         loaded.data.save.ownedCharacters.white_fox_miko.awakeningLevel,
       ).toBe(5);
       expect(loaded.data.save.ownedWeapons.bow_azusa.refineLevel).toBe(5);
+    }
+  });
+
+  it("seeds multi-owned and single-owned saves for Slice 4 formation testing", async () => {
+    const multi = await seedFormationMultiOwnedSave();
+    expect(multi.ok).toBe(true);
+
+    const loadedMulti = await loadOrInitializeSave();
+    expect(loadedMulti.ok).toBe(true);
+    if (loadedMulti.ok) {
+      expect(loadedMulti.data.save.equippedCharacterId).toBe(
+        "apprentice_onmyoji",
+      );
+      expect(loadedMulti.data.save.equippedWeaponId).toBe("sword_hamon");
+      expect(Object.keys(loadedMulti.data.save.ownedCharacters).sort()).toEqual(
+        ["apprentice_onmyoji", "white_fox_miko"],
+      );
+      expect(Object.keys(loadedMulti.data.save.ownedWeapons).sort()).toEqual([
+        "bow_azusa",
+        "shuriken_kaze",
+        "sword_hamon",
+      ]);
+      expect(
+        Object.hasOwn(loadedMulti.data.save.ownedCharacters, "shadow_shinobi"),
+      ).toBe(false);
+    }
+
+    const single = await seedFormationSingleOwnedSave();
+    expect(single.ok).toBe(true);
+
+    const loadedSingle = await loadOrInitializeSave();
+    expect(loadedSingle.ok).toBe(true);
+    if (loadedSingle.ok) {
+      expect(Object.keys(loadedSingle.data.save.ownedCharacters)).toEqual([
+        "apprentice_onmyoji",
+      ]);
+      expect(Object.keys(loadedSingle.data.save.ownedWeapons)).toEqual([
+        "sword_hamon",
+      ]);
     }
   });
 });

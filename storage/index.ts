@@ -1,4 +1,5 @@
 export { enhancePermanentStat } from "./enhance-repository";
+export { updateFormation } from "./formation-repository";
 export { executeGachaPull } from "./gacha-repository";
 export { claimLoginBonus } from "./login-bonus-repository";
 export { applyDbMigrations } from "./migrations";
@@ -23,3 +24,7 @@ export {
   seedResettableProgressSave,
   seedUnclaimedLoginBonusSave,
 } from "./seed";
+export {
+  seedFormationMultiOwnedSave,
+  seedFormationSingleOwnedSave,
+} from "./seed-formation";

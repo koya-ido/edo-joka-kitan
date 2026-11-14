@@ -13,6 +13,7 @@ const BATTLE_ROUTE_PATTERN = /^\/battle\/([^/]+)$/;
 export interface ParsedRoute {
   readonly path: string;
   readonly battleStageId?: string;
+  readonly from?: string;
 }
 
 const normalizeHashPath = (rawHash: string): string => {
@@ -21,13 +22,23 @@ const normalizeHashPath = (rawHash: string): string => {
 };
 
 export const parseAppRoute = (rawHash: string): ParsedRoute | null => {
-  const path = normalizeHashPath(rawHash);
+  const normalized = normalizeHashPath(rawHash);
+  const queryIndex = normalized.indexOf("?");
+  const path = queryIndex >= 0 ? normalized.slice(0, queryIndex) : normalized;
+  const search = queryIndex >= 0 ? normalized.slice(queryIndex + 1) : "";
+  const fromParam = search
+    ? (new URLSearchParams(search).get("from") ?? undefined)
+    : undefined;
+
   if (STATIC_ROUTES.has(path)) {
-    return { path };
+    return fromParam ? { path, from: fromParam } : { path };
   }
   const battleMatch = BATTLE_ROUTE_PATTERN.exec(path);
   if (battleMatch) {
-    return { path, battleStageId: decodeURIComponent(battleMatch[1]) };
+    const stageId = decodeURIComponent(battleMatch[1]);
+    return fromParam
+      ? { path, battleStageId: stageId, from: fromParam }
+      : { path, battleStageId: stageId };
   }
   return null;
 };

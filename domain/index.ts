@@ -7,6 +7,18 @@ export {
   type TotalMetaStats,
 } from "./enhance";
 export {
+  applyFormationChange,
+  getOwnedCharacterEntries,
+  getOwnedWeaponEntries,
+  getPassiveEffectValue,
+  getWeaponEffectiveDamage,
+  guardEquipmentSelection,
+  WEAPON_GENRE_LABELS,
+  type FormationSelectionInput,
+  type OwnedCharacterEntry,
+  type OwnedWeaponEntry,
+} from "./formation";
+export {
   getGachaCost,
   getGachaDropRates,
   guardGachaPullable,

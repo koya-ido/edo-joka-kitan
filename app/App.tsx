@@ -10,6 +10,7 @@ import { Tooltip } from "@/components/ui/Tooltip";
 import { Heading, Text } from "@/components/ui/Typography";
 import { guardProtectedRouteAccess } from "@/domain";
 import { EnhanceScreen, useEnhanceActions } from "@/features/enhance";
+import { FormationScreen, useFormationActions } from "@/features/formation";
 import { GachaScreen, useGachaActions } from "@/features/gacha";
 import { HomeHeaderActions, HomeScreen, useHomeActions } from "@/features/home";
 import { useEffect } from "react";
@@ -37,10 +38,12 @@ const AppShellContent = () => {
   const isHomeRoute = route.path === "/";
   const isEnhanceRoute = route.path === "/enhance";
   const isGachaRoute = route.path === "/gacha";
+  const isFormationRoute = route.path === "/formation";
   const isBattleRoute = route.battleStageId !== undefined;
   const homeActions = useHomeActions(isHomeRoute);
   const enhanceActions = useEnhanceActions();
   const gachaActions = useGachaActions();
+  const formationActions = useFormationActions();
 
   useEffect(() => {
     if (status !== "success" || !save || !route.battleStageId) {
@@ -71,7 +74,11 @@ const AppShellContent = () => {
     isPending ||
     homeActions.isMutating ||
     enhanceActions.isMutating ||
-    gachaActions.isMutating;
+    gachaActions.isMutating ||
+    formationActions.isMutating;
+
+  const backTarget =
+    isFormationRoute && route.from === "stages" ? "/stages" : "/";
 
   return (
     <AppShell
@@ -84,7 +91,7 @@ const AppShellContent = () => {
       onBack={
         !isHomeRoute
           ? () => {
-            navigate("/");
+            navigate(backTarget);
           }
           : undefined
       }
@@ -131,6 +138,15 @@ const AppShellContent = () => {
             save={save}
             actions={gachaActions}
             isSessionPending={isPending}
+          />
+        ) : isFormationRoute && save ? (
+          <FormationScreen
+            save={save}
+            actions={formationActions}
+            isSessionPending={isPending}
+            onNavigate={(to) => {
+              navigate(to);
+            }}
           />
         ) : (
           <Card.Root>
