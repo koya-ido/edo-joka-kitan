@@ -55,10 +55,13 @@ export const BattleScreen = ({
 
   const phase = viewState?.hud.phase;
   const isPaused = phase === "paused" && !isRetreatConfirmOpen;
+  const isSelectingInitialWeapon =
+    phase === "selecting_initial_weapon" && fatalError === null;
   const isLevelUp = phase === "level_up_modal" && fatalError === null;
   const isOutcomeReached = phase === "victory" || phase === "defeat";
   const controlsDisabled =
     isInitializing ||
+    phase === "selecting_initial_weapon" ||
     phase === "paused" ||
     phase === "level_up_modal" ||
     isRetreatConfirmOpen ||
@@ -134,7 +137,8 @@ export const BattleScreen = ({
           />
 
           <LevelUpChoiceModal
-            open={isLevelUp}
+            open={isLevelUp || isSelectingInitialWeapon}
+            mode={isSelectingInitialWeapon ? "initial_weapon" : "level_up"}
             level={viewState.hud.level}
             choices={viewState.hud.pendingUpgradeChoices}
             currentMagatama={save.currencies.magatama}

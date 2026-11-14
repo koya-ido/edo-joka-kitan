@@ -9,6 +9,7 @@ import { RefreshCw, Sparkles } from "lucide-react";
 
 export interface LevelUpChoiceModalProps {
   readonly open: boolean;
+  readonly mode?: "level_up" | "initial_weapon";
   readonly level: number;
   readonly choices: readonly InGameUpgradeOption[];
   readonly currentMagatama: number;
@@ -32,6 +33,7 @@ const CATEGORY_LABEL_MAP: Readonly<
 
 export const LevelUpChoiceModal = ({
   open,
+  mode = "level_up",
   choices,
   currentMagatama,
   rerollCostMagatama,
@@ -40,6 +42,7 @@ export const LevelUpChoiceModal = ({
   onReroll,
   onFallbackContinue,
 }: LevelUpChoiceModalProps) => {
+  const isInitialWeapon = mode === "initial_weapon";
   const canAffordReroll = currentMagatama >= rerollCostMagatama;
   const shortage = Math.max(0, rerollCostMagatama - currentMagatama);
 
@@ -49,10 +52,14 @@ export const LevelUpChoiceModal = ({
         <Dialog.Header>
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-accent" aria-hidden="true" />
-            <Dialog.Title>霊力昇華</Dialog.Title>
+            <Dialog.Title>
+              {isInitialWeapon ? "初期武器選択" : "霊力昇華"}
+            </Dialog.Title>
           </div>
           <Dialog.Description>
-            獲得する術式を1つ選択してください。
+            {isInitialWeapon
+              ? "出撃時に使用する武器を1つ選択してください。"
+              : "獲得する術式を1つ選択してください。"}
           </Dialog.Description>
         </Dialog.Header>
 
@@ -99,37 +106,39 @@ export const LevelUpChoiceModal = ({
           )}
         </div>
 
-        <Dialog.Footer className="mt-5 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2">
-            <Text size="caption" tone="muted">
-              所持:
-            </Text>
-            <CurrencyPill
-              type="magatama"
-              amount={currentMagatama}
-              requiredAmount={rerollCostMagatama}
-            />
-          </div>
-          <div className="flex flex-col items-end gap-1">
-            <Button
-              type="button"
-              variant="secondary"
-              isPending={isRerolling}
-              disabled={!canAffordReroll || isRerolling || choices.length === 0}
-              onClick={onReroll}
-            >
-              <RefreshCw className="h-4 w-4" aria-hidden="true" />
-              <span>再抽選</span>
-              <MagatamaIcon className="h-4 w-4 text-magatama" aria-hidden="true" />
-              <span className="tabular-nums">×{rerollCostMagatama}</span>
-            </Button>
-            {!canAffordReroll ? (
-              <Text size="caption" tone="destructive">
-                勾玉が {shortage} 個不足しています
+        {!isInitialWeapon ? (
+          <Dialog.Footer className="mt-5 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2">
+              <Text size="caption" tone="muted">
+                所持:
               </Text>
-            ) : null}
-          </div>
-        </Dialog.Footer>
+              <CurrencyPill
+                type="magatama"
+                amount={currentMagatama}
+                requiredAmount={rerollCostMagatama}
+              />
+            </div>
+            <div className="flex flex-col items-end gap-1">
+              <Button
+                type="button"
+                variant="secondary"
+                isPending={isRerolling}
+                disabled={!canAffordReroll || isRerolling || choices.length === 0}
+                onClick={onReroll}
+              >
+                <RefreshCw className="h-4 w-4" aria-hidden="true" />
+                <span>再抽選</span>
+                <MagatamaIcon className="h-4 w-4 text-magatama" aria-hidden="true" />
+                <span className="tabular-nums">×{rerollCostMagatama}</span>
+              </Button>
+              {!canAffordReroll ? (
+                <Text size="caption" tone="destructive">
+                  勾玉が {shortage} 個不足しています
+                </Text>
+              ) : null}
+            </div>
+          </Dialog.Footer>
+        ) : null}
       </Dialog.Content>
     </Dialog.Root>
   );

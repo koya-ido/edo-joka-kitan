@@ -33,11 +33,8 @@ export const guardBattleSortie = (
   if (!save.unlockedStageIds.includes(stageId)) {
     return err("STAGE_LOCKED", "このステージはまだ解放されていません。");
   }
-  if (save.equippedWeaponId.trim().length === 0) {
-    return err("EMPTY_WEAPON_SELECTION", "持ち込み武器を1つ選択してください。");
-  }
-  if (!Object.hasOwn(save.ownedWeapons, save.equippedWeaponId)) {
-    return err("UNOWNED_WEAPON", "装備中の武器が所持データに見つかりません。");
+  if (Object.keys(save.ownedWeapons).length === 0) {
+    return err("EMPTY_WEAPON_SELECTION", "所持武器が1つもありません。");
   }
   if (
     save.equippedCharacterId.trim().length === 0 ||

@@ -42,18 +42,16 @@ describe("domain/formation (Slice 4 formation logic & 403 guards)", () => {
 
     const result = applyFormationChange(
       save,
-      { characterId: "white_fox_miko", weaponId: "bow_azusa" },
+      { characterId: "white_fox_miko" },
       nextNow,
     );
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data.equippedCharacterId).toBe("white_fox_miko");
-      expect(result.data.equippedWeaponId).toBe("bow_azusa");
       expect(result.data.updatedAt).toBe("2026-11-14T15:00:00.000Z");
 
       // 元データは不変
       expect(save.equippedCharacterId).toBe("apprentice_onmyoji");
-      expect(save.equippedWeaponId).toBe("sword_hamon");
 
       // white_fox_miko (Lv.1: HP 100+15, ATK 22+5, LUK 12+2) + permanent (hpLv2: +40, atkLv1: +3, lukLv1: +1)
       const stats = calculateTotalMetaStats(
@@ -84,12 +82,7 @@ describe("domain/formation (Slice 4 formation logic & 403 guards)", () => {
       "sword_hamon",
       "bow_azusa",
     ]);
-    expect(weapons.find((w) => w.master.id === "sword_hamon")?.isEquipped).toBe(
-      true,
-    );
-    expect(weapons.find((w) => w.master.id === "bow_azusa")?.isEquipped).toBe(
-      false,
-    );
+    expect(weapons.every((w) => !w.isEquipped)).toBe(true);
   });
 
   it("computes passive effect value and weapon effective damage", () => {
@@ -113,71 +106,30 @@ describe("domain/formation (Slice 4 formation logic & 403 guards)", () => {
     }
   });
 
-  it("rejects empty weapon selection with EMPTY_WEAPON_SELECTION (403 guard)", () => {
+  it("rejects empty, unowned, unknown, or prototype-key character with UNOWNED_CHARACTER (403 guard)", () => {
     const save = buildMultiOwnedSave();
 
-    const emptyRes = guardEquipmentSelection(save, "apprentice_onmyoji", "");
+    const emptyRes = guardEquipmentSelection(save, "");
     expect(emptyRes.ok).toBe(false);
     if (!emptyRes.ok) {
-      expect(emptyRes.error.code).toBe("EMPTY_WEAPON_SELECTION");
+      expect(emptyRes.error.code).toBe("UNOWNED_CHARACTER");
     }
-
-    const whitespaceRes = applyFormationChange(save, {
-      characterId: "apprentice_onmyoji",
-      weaponId: "   ",
-    });
-    expect(whitespaceRes.ok).toBe(false);
-    if (!whitespaceRes.ok) {
-      expect(whitespaceRes.error.code).toBe("EMPTY_WEAPON_SELECTION");
-    }
-  });
-
-  it("rejects unowned or unknown character with UNOWNED_CHARACTER (403 guard)", () => {
-    const save = buildMultiOwnedSave();
 
     const unownedRes = applyFormationChange(save, {
       characterId: "shadow_shinobi",
-      weaponId: "sword_hamon",
     });
     expect(unownedRes.ok).toBe(false);
     if (!unownedRes.ok) {
       expect(unownedRes.error.code).toBe("UNOWNED_CHARACTER");
     }
 
-    const unknownRes = guardEquipmentSelection(
-      save,
-      "unknown_char",
-      "sword_hamon",
-    );
+    const unknownRes = guardEquipmentSelection(save, "unknown_char");
     expect(unknownRes.ok).toBe(false);
     if (!unknownRes.ok) {
       expect(unknownRes.error.code).toBe("UNOWNED_CHARACTER");
     }
-  });
 
-  it("rejects unowned, unknown, or prototype-key weapon with UNOWNED_WEAPON (403 guard)", () => {
-    const save = buildMultiOwnedSave();
-
-    const unownedRes = applyFormationChange(save, {
-      characterId: "apprentice_onmyoji",
-      weaponId: "shuriken_kaze",
-    });
-    expect(unownedRes.ok).toBe(false);
-    if (!unownedRes.ok) {
-      expect(unownedRes.error.code).toBe("UNOWNED_WEAPON");
-    }
-
-    const protoWeapon = guardEquipmentSelection(
-      save,
-      "apprentice_onmyoji",
-      "toString",
-    );
-    expect(protoWeapon.ok).toBe(false);
-    if (!protoWeapon.ok) {
-      expect(protoWeapon.error.code).toBe("UNOWNED_WEAPON");
-    }
-
-    const protoChar = guardEquipmentSelection(save, "__proto__", "sword_hamon");
+    const protoChar = guardEquipmentSelection(save, "__proto__");
     expect(protoChar.ok).toBe(false);
     if (!protoChar.ok) {
       expect(protoChar.error.code).toBe("UNOWNED_CHARACTER");

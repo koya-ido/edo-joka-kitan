@@ -37,7 +37,6 @@ export const seedFormationMultiOwnedSave = async (
       },
     },
     equippedCharacterId: "apprentice_onmyoji",
-    equippedWeaponId: "sword_hamon",
   });
 };
 

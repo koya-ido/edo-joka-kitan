@@ -22,15 +22,17 @@ export interface BattleLaunchContext {
   readonly stage: StageMaster;
   readonly character: CharacterMaster;
   readonly ownedCharacter: OwnedCharacterState;
-  readonly weapon: WeaponMaster;
-  readonly ownedWeapon: OwnedWeaponState;
+  readonly ownedWeaponList: readonly {
+    readonly master: WeaponMaster;
+    readonly state: OwnedWeaponState;
+  }[];
   readonly metaStats: TotalMetaStats;
 }
 
 /**
  * 401/403相当ガードを実行し、バトル起動用の検証済みコンテキストを生成する。
  * - 401相当: save 未確立・スキーマ破損 (`SAVE_CORRUPTED`)
- * - 403相当: ステージ不正/未解放、武器未選択/未所持、主人公未所持
+ * - 403相当: ステージ不正/未解放、所持武器0件、主人公未所持
  */
 export const prepareBattleSession = (
   save: PlayerSaveData | null | undefined,
@@ -52,9 +54,6 @@ export const prepareBattleSession = (
   if (!Object.hasOwn(characterMap, verifiedSave.equippedCharacterId)) {
     return err("UNOWNED_CHARACTER", "装備中の主人公マスタが見つかりません。");
   }
-  if (!Object.hasOwn(weaponMap, verifiedSave.equippedWeaponId)) {
-    return err("UNOWNED_WEAPON", "装備中の武器マスタが見つかりません。");
-  }
 
   if (
     !Object.hasOwn(
@@ -64,18 +63,21 @@ export const prepareBattleSession = (
   ) {
     return err("UNOWNED_CHARACTER", "装備中の主人公が未所持です。");
   }
-  if (
-    !Object.hasOwn(verifiedSave.ownedWeapons, verifiedSave.equippedWeaponId)
-  ) {
-    return err("UNOWNED_WEAPON", "装備中の武器が未所持です。");
+
+  const ownedWeaponList = Object.values(verifiedSave.ownedWeapons)
+    .filter((owned) => Object.hasOwn(weaponMap, owned.weaponId))
+    .map((owned) => ({
+      master: weaponMap[owned.weaponId],
+      state: owned,
+    }));
+
+  if (ownedWeaponList.length === 0) {
+    return err("EMPTY_WEAPON_SELECTION", "所持武器が1つもありません。");
   }
 
   const ownedCharacter =
     verifiedSave.ownedCharacters[verifiedSave.equippedCharacterId];
-  const ownedWeapon = verifiedSave.ownedWeapons[verifiedSave.equippedWeaponId];
-
   const character = characterMap[verifiedSave.equippedCharacterId];
-  const weapon = weaponMap[verifiedSave.equippedWeaponId];
   const metaStats = calculateTotalMetaStats(verifiedSave, character);
 
   return ok({
@@ -83,8 +85,7 @@ export const prepareBattleSession = (
     stage,
     character,
     ownedCharacter,
-    weapon,
-    ownedWeapon,
+    ownedWeaponList,
     metaStats,
   });
 };

@@ -42,7 +42,6 @@ export interface PlayerSaveData {
   ownedCharacters: Record<CharacterId, OwnedCharacterState>;
   ownedWeapons: Record<WeaponId, OwnedWeaponState>;
   equippedCharacterId: CharacterId;
-  equippedWeaponId: WeaponId; // バトル持ち込み主武器（1枠必須）
   unlockedStageIds: StageId[];
   clearedStageIds: StageId[];
   lastLoginBonusDate: string | null; // "YYYY-MM-DD"（ローカル時刻基準）

@@ -1,4 +1,11 @@
 import type { BattlePalette } from "@/engine/palette";
+import {
+  drawBossShuten,
+  drawBossTamamo,
+  drawChochinObake,
+  drawGashadokuroMini,
+  drawKashaWheel,
+} from "@/engine/renderer-enemies-extra";
 import type { EnemyEntity } from "@/engine/types";
 
 const drawDropShadow = (
@@ -197,20 +204,57 @@ export const drawEnemyUnits = (
 
     const bodyColor = isFlashing
       ? palette.foreground
-      : enemy.isBoss
-        ? palette.primary
-        : enemy.enemyId === "kappa_stray"
-          ? palette.magatama
-          : palette.destructive;
+      : enemy.enemyId === "boss_tamamo"
+        ? palette.magatama
+        : enemy.isBoss
+          ? palette.primary
+          : enemy.enemyId === "kappa_stray"
+            ? palette.magatama
+            : enemy.enemyId === "chochin_obake"
+              ? palette.accent
+              : enemy.enemyId === "kasha_wheel"
+                ? palette.primary
+                : palette.destructive;
 
     ctx.save();
     ctx.translate(enemy.x, enemy.y + bobY);
     ctx.scale(1 + squash, 1 - squash);
 
-    if (enemy.enemyId === "boss_nue" || enemy.isBoss) {
+    if (enemy.enemyId === "boss_tamamo") {
+      drawBossTamamo(
+        ctx,
+        enemy.radius,
+        bodyColor,
+        palette,
+        elapsedMs,
+        isFlashing,
+      );
+    } else if (enemy.enemyId === "boss_shuten") {
+      drawBossShuten(
+        ctx,
+        enemy.radius,
+        bodyColor,
+        palette,
+        elapsedMs,
+        isFlashing,
+      );
+    } else if (enemy.enemyId === "boss_nue" || enemy.isBoss) {
       drawBossNue(ctx, enemy.radius, bodyColor, palette, elapsedMs, isFlashing);
     } else if (enemy.enemyId === "kappa_stray") {
       drawKappaStray(ctx, enemy.radius, bodyColor, palette, isFlashing);
+    } else if (enemy.enemyId === "chochin_obake") {
+      drawChochinObake(ctx, enemy.radius, bodyColor, palette, isFlashing);
+    } else if (enemy.enemyId === "kasha_wheel") {
+      drawKashaWheel(
+        ctx,
+        enemy.radius,
+        bodyColor,
+        palette,
+        elapsedMs,
+        isFlashing,
+      );
+    } else if (enemy.enemyId === "gashadokuro_mini") {
+      drawGashadokuroMini(ctx, enemy.radius, bodyColor, palette, isFlashing);
     } else {
       drawOniImp(ctx, enemy.radius, bodyColor, palette, isFlashing);
     }

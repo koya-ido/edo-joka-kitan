@@ -190,7 +190,6 @@ describe("storage/seed (Slice 1 migration & seed verification)", () => {
       expect(loadedMulti.data.save.equippedCharacterId).toBe(
         "apprentice_onmyoji",
       );
-      expect(loadedMulti.data.save.equippedWeaponId).toBe("sword_hamon");
       expect(Object.keys(loadedMulti.data.save.ownedCharacters).sort()).toEqual(
         ["apprentice_onmyoji", "white_fox_miko"],
       );

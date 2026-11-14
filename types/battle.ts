@@ -2,6 +2,7 @@ import type { StageId, WeaponId } from "./common";
 
 /** バトルフェーズ状態マシン */
 export type BattlePhase =
+  | "selecting_initial_weapon"
   | "preparing"
   | "playing"
   | "paused"

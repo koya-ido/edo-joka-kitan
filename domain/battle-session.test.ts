@@ -13,7 +13,9 @@ describe("domain/battle-session (401/403 guards & launch context)", () => {
     if (result.ok) {
       expect(result.data.stage.id).toBe("stage_1_bamboo");
       expect(result.data.character.id).toBe("apprentice_onmyoji");
-      expect(result.data.weapon.id).toBe("sword_hamon");
+      expect(result.data.ownedWeaponList.map((w) => w.master.id)).toEqual([
+        "sword_hamon",
+      ]);
       expect(result.data.metaStats).toEqual({
         hp: 120,
         atk: 20,
@@ -70,11 +72,11 @@ describe("domain/battle-session (401/403 guards & launch context)", () => {
     }
   });
 
-  it("rejects empty weapon selection with SAVE_CORRUPTED or EMPTY_WEAPON_SELECTION (401/403 guard)", () => {
+  it("rejects empty ownedWeapons with SAVE_CORRUPTED or EMPTY_WEAPON_SELECTION (401/403 guard)", () => {
     const base = createInitialPlayerSave(FIXED_NOW);
     const noWeaponSave: PlayerSaveData = {
       ...base,
-      equippedWeaponId: "",
+      ownedWeapons: {} as PlayerSaveData["ownedWeapons"],
     };
 
     const result = prepareBattleSession(noWeaponSave, "stage_1_bamboo");

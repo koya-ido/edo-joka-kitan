@@ -80,7 +80,6 @@ describe("features/formation/FormationScreen (5-State, Double-Submit Guard, Inte
     updateSpy.mockRestore();
     const committed = await realUpdate({
       characterId: "white_fox_miko",
-      weaponId: "sword_hamon",
     });
     resolveUpdate(committed);
 
@@ -95,35 +94,18 @@ describe("features/formation/FormationScreen (5-State, Double-Submit Guard, Inte
     });
   });
 
-  it("switches to weapon tab, changes equipped weapon, and supports /stages navigation", async () => {
+  it("renders character selection without weapon tab and supports /stages navigation", async () => {
     await storage.seedFormationMultiOwnedSave();
 
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByRole("tab", { name: "持ち込み武器" })).toBeTruthy();
+      expect(screen.getAllByText("安倍 晴明（見習い）").length).toBeGreaterThan(0);
     });
 
-    const weaponTab = screen.getByRole("tab", { name: "持ち込み武器" });
-    fireEvent.mouseDown(weaponTab);
-    fireEvent.click(weaponTab);
+    expect(screen.queryByRole("tab", { name: "持ち込み武器" })).toBeNull();
 
-    await waitFor(() => {
-      expect(screen.getByText("破魔の梓弓")).toBeTruthy();
-    });
-
-    const bowRadio = screen.getByRole<HTMLButtonElement>("radio", {
-      name: /破魔の梓弓/,
-    });
-    fireEvent.click(bowRadio);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText("持ち込み武器を「破魔の梓弓」に変更しました"),
-      ).toBeTruthy();
-    });
-
-    const stagesBtn = screen.getByRole("button", { name: "ステージ選択へ" });
+    const stagesBtn = screen.getByRole("button", { name: "この編成で出撃準備へ" });
     fireEvent.click(stagesBtn);
 
     await waitFor(() => {
@@ -163,7 +145,7 @@ describe("features/formation/FormationScreen (5-State, Double-Submit Guard, Inte
       await store.put(
         {
           ...existing,
-          equippedWeaponId: "",
+          ownedWeapons: {} as typeof existing.ownedWeapons,
         },
         SAVE_RECORD_KEY,
       );

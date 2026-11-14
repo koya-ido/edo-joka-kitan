@@ -6,14 +6,12 @@ import { Heading, Text } from "@/components/ui/Typography";
 export interface BattlePlaceholderCardProps {
   readonly title: string;
   readonly equippedCharacterId?: string;
-  readonly equippedWeaponId?: string;
   readonly onBackToStages: () => void;
 }
 
 export const BattlePlaceholderCard = ({
   title,
   equippedCharacterId,
-  equippedWeaponId,
   onBackToStages,
 }: BattlePlaceholderCardProps) => (
   <Card.Root>
@@ -26,8 +24,6 @@ export const BattlePlaceholderCard = ({
     <Card.Content className="flex flex-col gap-3">
       <Text>
         主人公: <span className="font-semibold">{equippedCharacterId}</span>
-        {" / "}
-        主武器: <span className="font-semibold">{equippedWeaponId}</span>
       </Text>
       <Button
         type="button"

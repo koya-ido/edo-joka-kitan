@@ -15,6 +15,7 @@ export {
 export {
   applyUpgradeOption,
   createDefaultWeaponModifier,
+  generateInitialWeaponChoices,
   generateUpgradeChoices,
   MAX_ACTIVE_WEAPONS_IN_RUN,
   type GenerateUpgradeChoicesInput,

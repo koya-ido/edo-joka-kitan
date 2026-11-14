@@ -1,4 +1,7 @@
-import { createDefaultWeaponModifier } from "@/domain";
+import {
+  createDefaultWeaponModifier,
+  generateInitialWeaponChoices,
+} from "@/domain";
 import type { BattleAudioPort } from "@/engine/audio";
 import {
   calculateExpToNextLevel,
@@ -78,10 +81,24 @@ export const createInitialBattleState = (
 ): MutableBattleState => {
   const { launchContext } = config;
   const stage = config.stageOverride ?? launchContext.stage;
-  const weaponId = launchContext.weapon.id;
+  const rng = config.rng ?? Math.random;
+  const ownedWeapons = launchContext.ownedWeaponList.map(
+    (entry) => entry.master,
+  );
+  const isSingleWeapon = ownedWeapons.length <= 1;
+  const initialWeaponId = isSingleWeapon ? ownedWeapons[0]?.id : undefined;
+  const initialChoices = isSingleWeapon
+    ? []
+    : generateInitialWeaponChoices(ownedWeapons, rng, 3);
+  const initialWeaponModifiers = (
+    initialWeaponId ? { [initialWeaponId]: createDefaultWeaponModifier() } : {}
+  ) as Record<WeaponId, WeaponModifierState>;
+  const initialCooldowns = initialWeaponId
+    ? new Map<WeaponId, number>([[initialWeaponId, 0]])
+    : new Map<WeaponId, number>();
 
   return {
-    phase: "preparing",
+    phase: isSingleWeapon ? "preparing" : "selecting_initial_weapon",
     preparingElapsedMs: 0,
     gameSpeed: 1,
     barrierHp: launchContext.metaStats.hp,
@@ -90,7 +107,7 @@ export const createInitialBattleState = (
     exp: 0,
     expToNextLevel: calculateExpToNextLevel(1),
     pendingLevelUps: 0,
-    pendingUpgradeChoices: [],
+    pendingUpgradeChoices: initialChoices,
     stage,
     passive: resolveCharacterPassive(
       launchContext.character,
@@ -100,10 +117,8 @@ export const createInitialBattleState = (
       atkMultiplier: 1,
       critRateBonusPct: 0,
       critDamageMultiplier: 1.5,
-      unlockedWeaponIds: [weaponId],
-      weaponModifiers: {
-        [weaponId]: createDefaultWeaponModifier(),
-      } as Record<WeaponId, WeaponModifierState>,
+      unlockedWeaponIds: initialWeaponId ? [initialWeaponId] : [],
+      weaponModifiers: initialWeaponModifiers,
     },
     spawner: {
       currentWave: 1,
@@ -118,7 +133,7 @@ export const createInitialBattleState = (
     explosions: [],
     particles: [],
     floatingTexts: [],
-    weaponCooldowns: new Map<WeaponId, number>([[weaponId, 0]]),
+    weaponCooldowns: initialCooldowns,
     weaponBursts: new Map<WeaponId, WeaponBurstState>(),
     orbAngles: new Map<WeaponId, number>(),
     orbHitCooldowns: new Map<WeaponId, Map<number, number>>(),

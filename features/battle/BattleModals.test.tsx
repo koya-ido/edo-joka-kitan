@@ -27,7 +27,7 @@ const SAMPLE_CHOICES: readonly InGameUpgradeOption[] = [
     category: "weapon_unlock",
     targetWeaponId: "bow_azusa",
     title: "新武器開放：破魔の梓弓",
-    description: "破魔の梓弓をバトル中スキルに追加",
+    description: "破魔の梓弓を獲得",
     multiplierOrDelta: 1,
   },
 ];

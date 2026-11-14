@@ -109,7 +109,7 @@ export const buildWeaponUnlockOptions = (
       category: "weapon_unlock" as const,
       targetWeaponId: weapon.id,
       title: `新武器開放：${weapon.name}`,
-      description: `${weapon.name}をバトル中スキルに追加`,
+      description: `${weapon.name}を獲得`,
       multiplierOrDelta: 1,
     }));
 };

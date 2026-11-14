@@ -49,7 +49,6 @@ describe("storage/seed-battle (Slice 6 migration & battle seed verification)", (
     expect(loaded.ok).toBe(true);
     if (loaded.ok) {
       expect(loaded.data.save.equippedCharacterId).toBe("apprentice_onmyoji");
-      expect(loaded.data.save.equippedWeaponId).toBe("sword_hamon");
       const guard = guardBattleSortie(loaded.data.save, "stage_1_bamboo");
       expect(guard.ok).toBe(true);
     }
@@ -87,7 +86,6 @@ describe("storage/seed-battle (Slice 6 migration & battle seed verification)", (
       expect(Object.keys(loaded.data.save.ownedWeapons)).toHaveLength(8);
       expect(Object.keys(loaded.data.save.ownedCharacters)).toHaveLength(3);
       expect(loaded.data.save.equippedCharacterId).toBe("white_fox_miko");
-      expect(loaded.data.save.equippedWeaponId).toBe("orb_magatama");
       const guard = guardBattleSortie(loaded.data.save, "stage_3_shrine");
       expect(guard.ok).toBe(true);
     }

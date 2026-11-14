@@ -9,7 +9,7 @@ describe("validatePlayerSaveData", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data.equippedCharacterId).toBe("apprentice_onmyoji");
-      expect(result.data.equippedWeaponId).toBe("sword_hamon");
+      expect(Object.keys(result.data.ownedWeapons)).toEqual(["sword_hamon"]);
       expect(result.data.currencies).toEqual({ magatama: 100, hisui: 5 });
     }
   });
@@ -34,13 +34,12 @@ describe("validatePlayerSaveData", () => {
     if (!r2.ok) expect(r2.error.code).toBe("SAVE_CORRUPTED");
   });
 
-  it("rejects unknown or unowned equipped IDs with SAVE_CORRUPTED", () => {
+  it("rejects unknown/unowned character or empty ownedWeapons with SAVE_CORRUPTED", () => {
     const base = createInitialPlayerSave();
-    const unknownWeapon = { ...base, equippedWeaponId: "unknown_sword" };
     const unownedChar = { ...base, equippedCharacterId: "white_fox_miko" };
-    const emptyWeapon = { ...base, equippedWeaponId: "" };
+    const noWeapons = { ...base, ownedWeapons: {} };
 
-    for (const candidate of [unknownWeapon, unownedChar, emptyWeapon]) {
+    for (const candidate of [unownedChar, noWeapons]) {
       const result = validatePlayerSaveData(candidate);
       expect(result.ok).toBe(false);
       if (!result.ok) expect(result.error.code).toBe("SAVE_CORRUPTED");

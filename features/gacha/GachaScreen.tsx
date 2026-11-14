@@ -67,6 +67,7 @@ export const GachaScreen = ({ save, actions, isSessionPending }: Props) => {
 
       <GachaSummonAnimationOverlay
         open={actions.isAnimating}
+        result={actions.pendingResult}
         onSkip={actions.skipAnimation}
       />
 

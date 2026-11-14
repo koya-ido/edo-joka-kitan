@@ -48,7 +48,7 @@ export const seedBattleMidProgressSave = async (
  */
 export const seedBattleAllWeaponsReadySave = async (
   equippedCharacterId: CharacterId = "apprentice_onmyoji",
-  equippedWeaponId: WeaponId = "sword_hamon",
+  _legacyWeaponId?: WeaponId,
   now: Date = new Date(),
 ): Promise<DomainResult<PlayerSaveData>> => {
   const base = createInitialPlayerSave(now);
@@ -79,9 +79,6 @@ export const seedBattleAllWeaponsReadySave = async (
   const resolvedCharId = Object.hasOwn(ownedCharacters, equippedCharacterId)
     ? equippedCharacterId
     : "apprentice_onmyoji";
-  const resolvedWeaponId = Object.hasOwn(ownedWeapons, equippedWeaponId)
-    ? equippedWeaponId
-    : "sword_hamon";
 
   return seedPlayerSave({
     ...base,
@@ -90,7 +87,6 @@ export const seedBattleAllWeaponsReadySave = async (
     ownedCharacters,
     ownedWeapons,
     equippedCharacterId: resolvedCharId,
-    equippedWeaponId: resolvedWeaponId,
     unlockedStageIds: ["stage_1_bamboo", "stage_2_old_road", "stage_3_shrine"],
     clearedStageIds: ["stage_1_bamboo", "stage_2_old_road"],
   });

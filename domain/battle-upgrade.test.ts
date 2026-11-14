@@ -269,4 +269,51 @@ describe("domain/battle-upgrade", () => {
     expect(finalMod.slashWaveSizeMultiplier).toBeCloseTo(1.3, 6);
     expect(finalMod.slashWavePierceBonus).toBe(3);
   });
+
+  it("uses updated unlock description '{武器名}を獲得' and weights weapon_unlock > minor > major", () => {
+    const initial = createBaseBuffState(["bow_azusa"]);
+    const allChoices = generateUpgradeChoices({
+      buffState: initial,
+      weaponMap: WEAPON_MASTER_MAP,
+      allWeapons: WEAPON_MASTERS,
+      ownedWeaponIds: ["bow_azusa", "sword_hamon"],
+      choiceCount: 50,
+    });
+    const unlockChoice = allChoices.find(
+      (c) => c.id === "weapon_unlock_sword_hamon",
+    );
+    expect(unlockChoice?.description).toBe("銘刀・波紋を獲得");
+
+    // 決定論的RNGで先頭出現頻度を比較: weapon_unlock(10) > minor(5) > major(2)
+    let unlockFirst = 0;
+    let minorFirst = 0;
+    let majorFirst = 0;
+    const samples = 200;
+    for (let i = 0; i < samples; i += 1) {
+      const r = i / samples;
+      const picked = generateUpgradeChoices({
+        buffState: initial,
+        weaponMap: WEAPON_MASTER_MAP,
+        allWeapons: WEAPON_MASTERS,
+        ownedWeaponIds: ["bow_azusa", "sword_hamon"],
+        choiceCount: 1,
+        rng: () => r,
+      })[0];
+      if (picked.category === "weapon_unlock") {
+        unlockFirst += 1;
+      } else if (
+        picked.statType === "split_unlock" ||
+        picked.statType === "projectile_plus_2" ||
+        picked.statType === "pierce_plus_2" ||
+        picked.statType === "bounce_plus_2" ||
+        picked.statType === "explosion_unlock"
+      ) {
+        majorFirst += 1;
+      } else {
+        minorFirst += 1;
+      }
+    }
+    expect(unlockFirst).toBeGreaterThan(0);
+    expect(minorFirst).toBeGreaterThan(majorFirst);
+  });
 });

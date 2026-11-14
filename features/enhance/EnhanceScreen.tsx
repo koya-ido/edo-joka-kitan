@@ -97,7 +97,7 @@ export const EnhanceScreen = ({
               <EnhanceWeaponCard
                 key={entry.master.id}
                 entry={entry}
-                isEquipped={save.equippedWeaponId === entry.master.id}
+                isEquipped={false}
                 magatamaBalance={save.currencies.magatama}
                 refiningWeaponId={actions.refiningWeaponId}
                 isAnyPending={isAnyPending}

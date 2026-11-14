@@ -170,13 +170,8 @@ export const validatePlayerSaveData = (
   ) {
     return corrupted("装備キャラクター整合性エラー");
   }
-  if (
-    typeof raw.equippedWeaponId !== "string" ||
-    raw.equippedWeaponId.length === 0 ||
-    !Object.hasOwn(ownedWeapons, raw.equippedWeaponId) ||
-    !Object.hasOwn(masters.weapons, raw.equippedWeaponId)
-  ) {
-    return corrupted("装備武器整合性エラー");
+  if (Object.keys(ownedWeapons).length === 0) {
+    return corrupted("所持武器が0件です");
   }
   const stageCheck = validateStageArrays(
     raw.unlockedStageIds,

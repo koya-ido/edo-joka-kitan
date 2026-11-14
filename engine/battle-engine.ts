@@ -174,6 +174,21 @@ export const createBattleEngine = (
       return ok;
     },
     applyUpgradeChoice: (optionId) => {
+      if (state.phase === "selecting_initial_weapon") {
+        const chosen = state.pendingUpgradeChoices.find(
+          (c) => c.id === optionId,
+        );
+        if (!chosen?.targetWeaponId) return false;
+        const unlocked = unlockEngineWeaponInRun(
+          state,
+          chosen.targetWeaponId,
+          weaponMap,
+        );
+        if (!unlocked) return false;
+        state.pendingUpgradeChoices = [];
+        setPhase("preparing");
+        return true;
+      }
       const outcome = applyEngineUpgradeChoice(
         state,
         optionId,

@@ -28,69 +28,53 @@ describe("storage/formation-repository (Slice 4 atomic formation & 401/403 guard
     await clearDatabase();
   });
 
-  it("commits equipped character and weapon change atomically in one transaction", async () => {
+  it("commits equipped character change atomically in one transaction", async () => {
     await seedFormationMultiOwnedSave();
 
     const res = await updateFormation({
       characterId: "white_fox_miko",
-      weaponId: "bow_azusa",
     });
     expect(res.ok).toBe(true);
     if (res.ok) {
       expect(res.data.equippedCharacterId).toBe("white_fox_miko");
-      expect(res.data.equippedWeaponId).toBe("bow_azusa");
     }
 
     const loaded = await loadOrInitializeSave();
     expect(loaded.ok).toBe(true);
     if (loaded.ok) {
       expect(loaded.data.save.equippedCharacterId).toBe("white_fox_miko");
-      expect(loaded.data.save.equippedWeaponId).toBe("bow_azusa");
     }
   });
 
-  it("rejects unowned character, unowned weapon, and empty weapon without mutating DB (403 guard)", async () => {
+  it("rejects unowned and empty character without mutating DB (403 guard)", async () => {
     await seedFormationMultiOwnedSave();
 
     const unownedCharRes = await updateFormation({
       characterId: "shadow_shinobi",
-      weaponId: "sword_hamon",
     });
     expect(unownedCharRes.ok).toBe(false);
     if (!unownedCharRes.ok) {
       expect(unownedCharRes.error.code).toBe("UNOWNED_CHARACTER");
     }
 
-    const unownedWeaponRes = await updateFormation({
-      characterId: "apprentice_onmyoji",
-      weaponId: "unknown_weapon",
+    const emptyCharRes = await updateFormation({
+      characterId: "",
     });
-    expect(unownedWeaponRes.ok).toBe(false);
-    if (!unownedWeaponRes.ok) {
-      expect(unownedWeaponRes.error.code).toBe("UNOWNED_WEAPON");
-    }
-
-    const emptyWeaponRes = await updateFormation({
-      characterId: "apprentice_onmyoji",
-      weaponId: "",
-    });
-    expect(emptyWeaponRes.ok).toBe(false);
-    if (!emptyWeaponRes.ok) {
-      expect(emptyWeaponRes.error.code).toBe("EMPTY_WEAPON_SELECTION");
+    expect(emptyCharRes.ok).toBe(false);
+    if (!emptyCharRes.ok) {
+      expect(emptyCharRes.error.code).toBe("UNOWNED_CHARACTER");
     }
 
     const loaded = await loadOrInitializeSave();
     expect(loaded.ok).toBe(true);
     if (loaded.ok) {
       expect(loaded.data.save.equippedCharacterId).toBe("apprentice_onmyoji");
-      expect(loaded.data.save.equippedWeaponId).toBe("sword_hamon");
     }
   });
 
   it("rejects missing or corrupted save record without overwriting DB (401 guard)", async () => {
     const missingRes = await updateFormation({
       characterId: "apprentice_onmyoji",
-      weaponId: "sword_hamon",
     });
     expect(missingRes.ok).toBe(false);
     if (!missingRes.ok) {
@@ -111,7 +95,6 @@ describe("storage/formation-repository (Slice 4 atomic formation & 401/403 guard
 
     const corruptedRes = await updateFormation({
       characterId: "apprentice_onmyoji",
-      weaponId: "sword_hamon",
     });
     expect(corruptedRes.ok).toBe(false);
     if (!corruptedRes.ok) {

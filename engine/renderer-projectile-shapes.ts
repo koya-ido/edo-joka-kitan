@@ -9,6 +9,7 @@ export const drawProjectileByGenre = (
   palette: BattlePalette,
 ): void => {
   const angle = Math.atan2(p.vy, p.vx);
+  const scale = p.visualScale ?? 1;
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
   ctx.translate(p.x, p.y);
@@ -39,6 +40,7 @@ export const drawProjectileByGenre = (
     }
     case "bow": {
       ctx.rotate(angle);
+      ctx.scale(scale, scale);
       ctx.strokeStyle = color;
       ctx.globalAlpha = 0.48;
       ctx.lineWidth = 3;
@@ -67,6 +69,7 @@ export const drawProjectileByGenre = (
     case "shuriken": {
       const spin = (p.remainingLifeMs * 0.025) % (Math.PI * 2);
       ctx.rotate(spin);
+      ctx.scale(scale, scale);
       ctx.globalAlpha = 0.32;
       ctx.strokeStyle = color;
       ctx.lineWidth = 2;
@@ -96,6 +99,7 @@ export const drawProjectileByGenre = (
     }
     case "talisman": {
       ctx.rotate(angle);
+      ctx.scale(scale, scale);
       ctx.globalAlpha = 0.38;
       ctx.strokeStyle = color;
       ctx.lineWidth = 5;
@@ -122,10 +126,10 @@ export const drawProjectileByGenre = (
       ctx.fillStyle = color;
       ctx.globalAlpha = 0.55;
       ctx.beginPath();
-      ctx.moveTo(-24, -2.5);
+      ctx.moveTo(-24 * scale, -2.5 * scale);
       ctx.lineTo(0, -p.radius * 0.8);
       ctx.lineTo(0, p.radius * 0.8);
-      ctx.lineTo(-24, 2.5);
+      ctx.lineTo(-24 * scale, 2.5 * scale);
       ctx.closePath();
       ctx.fill();
 

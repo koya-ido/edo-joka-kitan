@@ -4,6 +4,7 @@ import {
   buildWeaponStatOptions,
   buildWeaponUnlockOptions,
 } from "@/domain/battle-upgrade-pool";
+import { sampleWeightedUpgradeOptions } from "@/domain/battle-upgrade-weights";
 import { err, ok } from "@/domain/result";
 import type {
   DomainResult,
@@ -79,14 +80,7 @@ export const generateUpgradeChoices = (
     ),
   ];
 
-  for (let i = pool.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(rng() * (i + 1));
-    const tmp = pool[i];
-    pool[i] = pool[j];
-    pool[j] = tmp;
-  }
-
-  return pool.slice(0, Math.min(choiceCount, pool.length));
+  return sampleWeightedUpgradeOptions(pool, choiceCount, rng);
 };
 
 /**
@@ -157,4 +151,24 @@ export const applyUpgradeOption = (
       [targetId]: modResult.data,
     },
   });
+};
+
+/**
+ * バトル開始時の初期武器選択肢を生成する。
+ * 所持武器が2個以上の場合に最大3個までランダムに抽出する。
+ */
+export const generateInitialWeaponChoices = (
+  ownedWeapons: readonly WeaponMaster[],
+  rng: () => number = Math.random,
+  maxChoices = 3,
+): readonly InGameUpgradeOption[] => {
+  const shuffled = [...ownedWeapons];
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rng() * (i + 1));
+    const tmp = shuffled[i];
+    shuffled[i] = shuffled[j];
+    shuffled[j] = tmp;
+  }
+  const picked = shuffled.slice(0, Math.min(maxChoices, shuffled.length));
+  return buildWeaponUnlockOptions([], picked, maxChoices);
 };

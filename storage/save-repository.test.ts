@@ -42,7 +42,6 @@ describe("storage/save-repository & IndexedDB migration", () => {
     if (first.ok) {
       expect(first.data.isInitial).toBe(true);
       expect(first.data.save.equippedCharacterId).toBe("apprentice_onmyoji");
-      expect(first.data.save.equippedWeaponId).toBe("sword_hamon");
       expect(first.data.save.currencies).toEqual({ magatama: 100, hisui: 5 });
       expect(first.data.save.unlockedStageIds).toEqual(["stage_1_bamboo"]);
     }

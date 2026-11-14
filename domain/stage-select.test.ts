@@ -11,7 +11,7 @@ describe("domain/stage-select (Slice 5 stage list & 401/403 sortie guards)", () 
     const save = createInitialPlayerSave(new Date("2026-11-14T00:00:00.000Z"));
     const items = buildStageSelectItems(save);
 
-    expect(items).toHaveLength(3);
+    expect(items).toHaveLength(10);
     expect(items[0].master.id).toBe("stage_1_bamboo");
     expect(items[0].status).toBe("unverified");
     expect(items[0].isUnlocked).toBe(true);
@@ -52,7 +52,7 @@ describe("domain/stage-select (Slice 5 stage list & 401/403 sortie guards)", () 
     expect(res.ok).toBe(true);
     if (res.ok) {
       expect(res.data.stage.id).toBe("stage_1_bamboo");
-      expect(res.data.save.equippedWeaponId).toBe("sword_hamon");
+      expect(res.data.save.equippedCharacterId).toBe("apprentice_onmyoji");
     }
   });
 
@@ -77,25 +77,16 @@ describe("domain/stage-select (Slice 5 stage list & 401/403 sortie guards)", () 
     }
   });
 
-  it("403-equivalent: rejects empty weapon selection and unowned equipment", () => {
+  it("403-equivalent: rejects empty ownedWeapons and unowned character", () => {
     const base = createInitialPlayerSave();
 
     const emptyWeaponRes = guardBattleSortie(
-      { ...base, equippedWeaponId: "   " },
+      { ...base, ownedWeapons: {} as typeof base.ownedWeapons },
       "stage_1_bamboo",
     );
     expect(emptyWeaponRes.ok).toBe(false);
     if (!emptyWeaponRes.ok) {
       expect(emptyWeaponRes.error.code).toBe("EMPTY_WEAPON_SELECTION");
-    }
-
-    const unownedWeaponRes = guardBattleSortie(
-      { ...base, equippedWeaponId: "bow_azusa" },
-      "stage_1_bamboo",
-    );
-    expect(unownedWeaponRes.ok).toBe(false);
-    if (!unownedWeaponRes.ok) {
-      expect(unownedWeaponRes.error.code).toBe("UNOWNED_WEAPON");
     }
 
     const unownedCharRes = guardBattleSortie(

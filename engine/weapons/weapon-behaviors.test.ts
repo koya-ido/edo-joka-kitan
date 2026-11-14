@@ -367,5 +367,48 @@ describe("engine/weapons (all 8 weapon genres)", () => {
       -Math.PI * 0.5,
       5,
     );
+    expect(children[0].radius).toBeCloseTo(6 * 0.75, 5);
+    expect(children[0].visualScale).toBeCloseTo(0.75, 5);
+  });
+
+  it("deals 75% chain damage for mirror beams", () => {
+    const e1 = makeEnemy(1, BARRIER_CENTER_X, BARRIER_CENTER_Y - 90, 200);
+    const e2 = makeEnemy(2, BARRIER_CENTER_X + 35, BARRIER_CENTER_Y - 95, 200);
+    const enemies = [e1, e2];
+    const beams: BeamEntity[] = [];
+    let seq = 900;
+
+    fireWeaponByGenre({
+      weapon: WEAPON_MASTER_MAP.mirror_yata,
+      damage: 40,
+      isCrit: false,
+      durationMs: 900,
+      modifier: {
+        ...createDefaultWeaponModifier(),
+        bounceBonus: 1,
+      },
+      enemies,
+      projectiles: [],
+      slashArcs: [],
+      beams,
+      nextEntityId: () => seq++,
+      onDamageEnemy: () => {},
+    });
+
+    beams[0].tickTimerMs = 0;
+    updateWeaponEffects({
+      dtMs: 16,
+      enemies,
+      projectiles: [],
+      slashArcs: [],
+      beams,
+      nextEntityId: () => seq++,
+      onDamageEnemy: (target, dmg) => {
+        target.hp -= dmg;
+      },
+    });
+
+    expect(e1.hp).toBe(160);
+    expect(e2.hp).toBe(170);
   });
 });

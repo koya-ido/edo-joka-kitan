@@ -6,32 +6,22 @@ import { Card } from "@/components/ui/Card";
 import { Popover } from "@/components/ui/Popover";
 import { Separator } from "@/components/ui/Separator";
 import { Heading, Text } from "@/components/ui/Typography";
-import {
-  WEAPON_GENRE_LABELS,
-  getPassiveEffectValue,
-  getWeaponEffectiveDamage,
-  type TotalMetaStats,
-} from "@/domain";
-import type { CharacterMaster, WeaponMaster } from "@/types";
+import { getPassiveEffectValue, type TotalMetaStats } from "@/domain";
+import type { CharacterMaster } from "@/types";
 import { Info } from "lucide-react";
 
 export interface FormationSummaryCardProps {
   characterMaster: CharacterMaster;
   awakeningLevel: number;
-  weaponMaster: WeaponMaster;
-  refineLevel: number;
   totalStats: TotalMetaStats;
 }
 
 export const FormationSummaryCard = ({
   characterMaster,
   awakeningLevel,
-  weaponMaster,
-  refineLevel,
   totalStats,
 }: FormationSummaryCardProps) => {
   const passiveValue = getPassiveEffectValue(characterMaster, awakeningLevel);
-  const weaponDamage = getWeaponEffectiveDamage(weaponMaster, refineLevel);
 
   return (
     <div className="flex flex-col gap-3">
@@ -39,7 +29,7 @@ export const FormationSummaryCard = ({
         <Card.Header className="pb-2">
           <div className="flex items-center justify-between gap-2">
             <Heading as="h2">現在の出撃編成</Heading>
-            <Badge variant="accent">1名 + 主武器1枠</Badge>
+            <Badge variant="accent">主人公1名</Badge>
           </div>
         </Card.Header>
         <Separator />
@@ -91,42 +81,14 @@ export const FormationSummaryCard = ({
               </Popover.Content>
             </Popover.Root>
           </div>
-
-          <Separator />
-
-          <div className="flex items-center gap-3">
-            <ItemAvatar
-              kind="weapon"
-              name={weaponMaster.name}
-              badgeLabel={`精錬 Lv.${String(refineLevel)}`}
-              size="md"
-            />
-            <div className="min-w-0 flex-1">
-              <Text size="caption" tone="muted">
-                持ち込み主武器
-              </Text>
-              <Text size="label" className="truncate text-foreground">
-                {weaponMaster.name}
-              </Text>
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="muted">
-                  {WEAPON_GENRE_LABELS[weaponMaster.genre]}
-                </Badge>
-                <Text size="caption" tone="muted" tabularNums>
-                  基本威力 {String(weaponDamage)}
-                </Text>
-              </div>
-            </div>
-          </div>
         </Card.Content>
       </Card.Root>
 
       <StatSummaryGrid
+        title="合成出撃ステータス"
         hp={totalStats.hp}
         atk={totalStats.atk}
         luk={totalStats.luk}
-        title="合算基礎ステータス"
-        subtitle={characterMaster.name}
       />
     </div>
   );

@@ -5,7 +5,7 @@ import { executeGachaPull } from "@/storage";
 import type { GachaPoolType } from "@/types";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const SUMMON_ANIMATION_DURATION_MS = 1200;
+const SUMMON_ANIMATION_DURATION_MS = 1800;
 
 export interface GachaActionsState {
   readonly activePool: GachaPoolType;

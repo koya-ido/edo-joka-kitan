@@ -16,8 +16,7 @@ export const EquippedSummaryBar = ({
   isDisabled,
   onOpenFormation,
 }: EquippedSummaryBarProps) => {
-  const { characterMaster, awakeningLevel, weaponMaster, refineLevel } =
-    summary;
+  const { characterMaster, awakeningLevel } = summary;
 
   return (
     <Card.Root>
@@ -38,7 +37,7 @@ export const EquippedSummaryBar = ({
         </div>
       </Card.Header>
 
-      <Card.Content className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <Card.Content>
         <div className="flex items-center gap-3 rounded-md border border-border bg-background/60 p-3">
           {characterMaster ? (
             <>
@@ -60,31 +59,6 @@ export const EquippedSummaryBar = ({
           ) : (
             <Text size="caption" tone="destructive">
               主人公が未設定です
-            </Text>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3 rounded-md border border-border bg-background/60 p-3">
-          {weaponMaster ? (
-            <>
-              <ItemAvatar
-                kind="weapon"
-                name={weaponMaster.name}
-                badgeLabel={`精錬Lv.${String(refineLevel)}`}
-                size="sm"
-              />
-              <div className="min-w-0">
-                <Text size="caption" tone="muted">
-                  持ち込み武器
-                </Text>
-                <Text size="label" className="truncate">
-                  {weaponMaster.name}
-                </Text>
-              </div>
-            </>
-          ) : (
-            <Text size="caption" tone="destructive">
-              武器を1つ以上編成してください
             </Text>
           )}
         </div>

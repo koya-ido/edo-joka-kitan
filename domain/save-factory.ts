@@ -47,7 +47,6 @@ export const createInitialPlayerSave = (
     ownedCharacters,
     ownedWeapons,
     equippedCharacterId: INITIAL_CHARACTER_ID,
-    equippedWeaponId: INITIAL_WEAPON_ID,
     unlockedStageIds: [INITIAL_STAGE_ID],
     clearedStageIds: [],
     lastLoginBonusDate: null,

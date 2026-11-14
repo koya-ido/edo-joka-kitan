@@ -1,10 +1,5 @@
 import { useAppToast } from "@/components/shared/AppToastProvider";
-import {
-  CHARACTER_MASTER_MAP,
-  STAGE_MASTER_MAP,
-  STAGE_MASTERS,
-  WEAPON_MASTER_MAP,
-} from "@/data";
+import { CHARACTER_MASTER_MAP, STAGE_MASTER_MAP, STAGE_MASTERS } from "@/data";
 import {
   buildStageSelectItems,
   guardBattleSortie,
@@ -15,7 +10,6 @@ import type {
   DomainError,
   PlayerSaveData,
   StageMaster,
-  WeaponMaster,
 } from "@/types";
 import { useCallback, useMemo, useRef, useState } from "react";
 
@@ -29,8 +23,6 @@ export interface UseStageSelectOptions {
 export interface EquippedFormationSummary {
   readonly characterMaster?: CharacterMaster;
   readonly awakeningLevel: number;
-  readonly weaponMaster?: WeaponMaster;
-  readonly refineLevel: number;
 }
 
 export interface StageSelectViewState {
@@ -69,25 +61,14 @@ export const useStageSelect = ({
       ? CHARACTER_MASTER_MAP[save.equippedCharacterId]
       : undefined;
 
-    const weaponMaster = Object.hasOwn(WEAPON_MASTER_MAP, save.equippedWeaponId)
-      ? WEAPON_MASTER_MAP[save.equippedWeaponId]
-      : undefined;
-
     const awakeningLevel =
       characterMaster && Object.hasOwn(save.ownedCharacters, characterMaster.id)
         ? save.ownedCharacters[characterMaster.id].awakeningLevel
         : 0;
 
-    const refineLevel =
-      weaponMaster && Object.hasOwn(save.ownedWeapons, weaponMaster.id)
-        ? save.ownedWeapons[weaponMaster.id].refineLevel
-        : 0;
-
     return {
       characterMaster,
       awakeningLevel,
-      weaponMaster,
-      refineLevel,
     };
   }, [save]);
 

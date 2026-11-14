@@ -179,4 +179,59 @@ describe("engine/battle-engine (loop, phases, speed, pause, error safety)", () =
 
     errorSpy.mockRestore();
   });
+
+  it("handles initial weapon selection: 1 owned -> preparing immediately, 2 owned -> 2 choices, 3+ owned -> 3 choices", () => {
+    const base = createInitialPlayerSave();
+    const nowIso = "2026-11-15T00:00:00.000Z";
+
+    // 2 weapons -> 2 choices in selecting_initial_weapon
+    const twoSave = {
+      ...base,
+      ownedWeapons: {
+        ...base.ownedWeapons,
+        bow_azusa: {
+          weaponId: "bow_azusa" as const,
+          refineLevel: 0,
+          obtainedAt: nowIso,
+        },
+      },
+    };
+    const twoLaunch = prepareBattleSession(twoSave, "stage_1_bamboo");
+    expect(twoLaunch.ok).toBe(true);
+    if (!twoLaunch.ok) return;
+    const engine2 = createBattleEngine({ launchContext: twoLaunch.data });
+    const view2 = engine2.getViewState();
+    expect(view2.hud.phase).toBe("selecting_initial_weapon");
+    expect(view2.hud.pendingUpgradeChoices).toHaveLength(2);
+    expect(view2.buffState.unlockedWeaponIds).toEqual([]);
+
+    const chosenId = view2.hud.pendingUpgradeChoices[0].id;
+    expect(engine2.applyUpgradeChoice(chosenId)).toBe(true);
+    expect(engine2.getViewState().hud.phase).toBe("preparing");
+    expect(engine2.getViewState().buffState.unlockedWeaponIds).toHaveLength(1);
+
+    // 4 weapons -> 3 choices
+    const fourSave = {
+      ...twoSave,
+      ownedWeapons: {
+        ...twoSave.ownedWeapons,
+        shuriken_kaze: {
+          weaponId: "shuriken_kaze" as const,
+          refineLevel: 0,
+          obtainedAt: nowIso,
+        },
+        mirror_yata: {
+          weaponId: "mirror_yata" as const,
+          refineLevel: 0,
+          obtainedAt: nowIso,
+        },
+      },
+    };
+    const fourLaunch = prepareBattleSession(fourSave, "stage_1_bamboo");
+    expect(fourLaunch.ok).toBe(true);
+    if (!fourLaunch.ok) return;
+    const engine4 = createBattleEngine({ launchContext: fourLaunch.data });
+    expect(engine4.getViewState().hud.phase).toBe("selecting_initial_weapon");
+    expect(engine4.getViewState().hud.pendingUpgradeChoices).toHaveLength(3);
+  });
 });

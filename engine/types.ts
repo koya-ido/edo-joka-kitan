@@ -57,6 +57,7 @@ export interface ProjectileEntity {
   readonly damage: number;
   readonly isCrit: boolean;
   readonly radius: number;
+  readonly visualScale?: number;
   remainingLifeMs: number;
   remainingPierce: number;
   readonly explosionRadius: number;

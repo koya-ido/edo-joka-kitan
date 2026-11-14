@@ -81,7 +81,7 @@ const updateBeams = (ctx: WeaponEffectsUpdateContext): void => {
               ctx.nextEntityId,
             );
           }
-          const chainDmg = Math.max(1, Math.round(beam.damagePerTick * 0.7));
+          const chainDmg = Math.max(1, Math.round(beam.damagePerTick * 0.75));
           for (const ct of chainTargets) {
             ctx.onDamageEnemy(ct, chainDmg, beam.isCrit);
           }

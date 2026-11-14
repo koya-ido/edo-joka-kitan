@@ -65,7 +65,6 @@ describe("features/stage-select/StageSelectScreen (5-State, Route Guard, Integra
 
     // 現在の出撃編成サマリー
     expect(screen.getByText("安倍 晴明（見習い）")).toBeTruthy();
-    expect(screen.getByText("銘刀・波紋")).toBeTruthy();
 
     // 解放済みボタンは 2つ有効、未解放ボタンは非表示
     expect(
