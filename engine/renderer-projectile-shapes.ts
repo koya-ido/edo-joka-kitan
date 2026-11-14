@@ -10,6 +10,7 @@ export const drawProjectileByGenre = (
 ): void => {
   const angle = Math.atan2(p.vy, p.vx);
   ctx.save();
+  ctx.globalCompositeOperation = "lighter";
   ctx.translate(p.x, p.y);
 
   switch (p.genre) {
@@ -39,10 +40,10 @@ export const drawProjectileByGenre = (
     case "bow": {
       ctx.rotate(angle);
       ctx.strokeStyle = color;
-      ctx.globalAlpha = 0.4;
-      ctx.lineWidth = 2;
+      ctx.globalAlpha = 0.48;
+      ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.moveTo(-18, 0);
+      ctx.moveTo(-26, 0);
       ctx.lineTo(-4, 0);
       ctx.stroke();
 
@@ -53,9 +54,9 @@ export const drawProjectileByGenre = (
       ctx.lineTo(6, 0);
       ctx.stroke();
 
-      ctx.fillStyle = color;
+      ctx.fillStyle = palette.foreground;
       ctx.beginPath();
-      ctx.moveTo(11, 0);
+      ctx.moveTo(12, 0);
       ctx.lineTo(3, -4);
       ctx.lineTo(5, 0);
       ctx.lineTo(3, 4);
@@ -66,11 +67,19 @@ export const drawProjectileByGenre = (
     case "shuriken": {
       const spin = (p.remainingLifeMs * 0.025) % (Math.PI * 2);
       ctx.rotate(spin);
+      ctx.globalAlpha = 0.32;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, 0, 9.5, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.globalAlpha = 1;
       ctx.fillStyle = color;
       ctx.beginPath();
       for (let i = 0; i < 4; i += 1) {
         const a = (Math.PI / 2) * i;
-        ctx.lineTo(Math.cos(a) * 8, Math.sin(a) * 8);
+        ctx.lineTo(Math.cos(a) * 8.5, Math.sin(a) * 8.5);
         ctx.lineTo(
           Math.cos(a + Math.PI / 4) * 2.5,
           Math.sin(a + Math.PI / 4) * 2.5,
@@ -79,7 +88,7 @@ export const drawProjectileByGenre = (
       ctx.closePath();
       ctx.fill();
 
-      ctx.fillStyle = palette.surfaceDeep;
+      ctx.fillStyle = palette.foreground;
       ctx.beginPath();
       ctx.arc(0, 0, 2, 0, Math.PI * 2);
       ctx.fill();
@@ -87,9 +96,18 @@ export const drawProjectileByGenre = (
     }
     case "talisman": {
       ctx.rotate(angle);
+      ctx.globalAlpha = 0.38;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(-22, 0);
+      ctx.lineTo(-6, 0);
+      ctx.stroke();
+
+      ctx.globalAlpha = 1;
       ctx.fillStyle = color;
       ctx.strokeStyle = palette.foreground;
-      ctx.lineWidth = 1.2;
+      ctx.lineWidth = 1.4;
       ctx.fillRect(-8, -4.5, 16, 9);
       ctx.strokeRect(-8, -4.5, 16, 9);
 
@@ -102,12 +120,12 @@ export const drawProjectileByGenre = (
     case "matchlock": {
       ctx.rotate(angle);
       ctx.fillStyle = color;
-      ctx.globalAlpha = 0.45;
+      ctx.globalAlpha = 0.55;
       ctx.beginPath();
-      ctx.moveTo(-16, -2.5);
-      ctx.lineTo(0, -p.radius * 0.7);
-      ctx.lineTo(0, p.radius * 0.7);
-      ctx.lineTo(-16, 2.5);
+      ctx.moveTo(-24, -2.5);
+      ctx.lineTo(0, -p.radius * 0.8);
+      ctx.lineTo(0, p.radius * 0.8);
+      ctx.lineTo(-24, 2.5);
       ctx.closePath();
       ctx.fill();
 

@@ -4,10 +4,35 @@ import {
   BARRIER_CENTER_Y,
   type BeamEntity,
   type SlashArcEntity,
-  type TalismanStrikeEntity,
 } from "@/engine/types";
 
-/** 刀剣系：外側が濃く内側が薄い放射グラデーションの斬撃弧＋白刃エッジを描画する */
+const drawStarFlare = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  radius: number,
+  color: string,
+  coreColor: string,
+): void => {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.moveTo(-radius, 0);
+  ctx.lineTo(radius, 0);
+  ctx.moveTo(0, -radius);
+  ctx.lineTo(0, radius);
+  ctx.stroke();
+
+  ctx.fillStyle = coreColor;
+  ctx.beginPath();
+  ctx.arc(0, 0, radius * 0.35, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+};
+
+/** 刀剣系：加算合成＋放射グラデーションの斬撃弧＋白刃エッジを描画する */
 export const drawSwordSlash = (
   ctx: CanvasRenderingContext2D,
   arc: SlashArcEntity,
@@ -28,11 +53,12 @@ export const drawSwordSlash = (
     outerRadius,
   );
   grad.addColorStop(0, `color-mix(in srgb, ${color} 0%, transparent)`);
-  grad.addColorStop(0.55, `color-mix(in srgb, ${color} 32%, transparent)`);
-  grad.addColorStop(0.88, `color-mix(in srgb, ${color} 85%, transparent)`);
+  grad.addColorStop(0.55, `color-mix(in srgb, ${color} 38%, transparent)`);
+  grad.addColorStop(0.88, `color-mix(in srgb, ${color} 90%, transparent)`);
   grad.addColorStop(1, color);
 
   ctx.save();
+  ctx.globalCompositeOperation = "lighter";
   ctx.globalAlpha = alpha;
   ctx.fillStyle = grad;
   ctx.beginPath();
@@ -42,16 +68,24 @@ export const drawSwordSlash = (
   ctx.fill();
 
   ctx.lineCap = "round";
-  ctx.globalAlpha = alpha * 0.9;
+  ctx.globalAlpha = alpha * 0.95;
   ctx.strokeStyle = palette.foreground;
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.arc(arc.x, arc.y, outerRadius - 1, startAngle + 0.06, endAngle - 0.06);
+  ctx.arc(arc.x, arc.y, outerRadius - 1, startAngle + 0.05, endAngle - 0.05);
+  ctx.stroke();
+
+  // 内側の追従残像エッジ
+  ctx.globalAlpha = alpha * 0.45;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(arc.x, arc.y, outerRadius * 0.78, startAngle + 0.12, endAngle - 0.12);
   ctx.stroke();
   ctx.restore();
 };
 
-/** 扇・軍配系：三重の風圧ウェーブ弧を描画する */
+/** 扇・軍配系：加算合成の三重風圧ウェーブ弧を描画する */
 export const drawFanGust = (
   ctx: CanvasRenderingContext2D,
   arc: SlashArcEntity,
@@ -63,10 +97,11 @@ export const drawFanGust = (
   const rings = [
     { scale: 0.54, width: 3, opacity: 0.45 },
     { scale: 0.74, width: 5, opacity: 0.75 },
-    { scale: 0.94, width: 7, opacity: 0.9 },
+    { scale: 0.94, width: 7, opacity: 0.95 },
   ];
 
   ctx.save();
+  ctx.globalCompositeOperation = "lighter";
   ctx.lineCap = "round";
   ctx.strokeStyle = color;
   for (const ring of rings) {
@@ -79,19 +114,21 @@ export const drawFanGust = (
   ctx.restore();
 };
 
-/** 鏡系：二重構造の照射ビーム＋着弾フレアを描画する */
+/** 鏡系：加算合成の3層照射ビーム＋着弾十字フレアを描画する */
 export const drawMirrorBeam = (
   ctx: CanvasRenderingContext2D,
   beam: BeamEntity,
   color: string,
   palette: BattlePalette,
 ): void => {
+  const pulse = 1 + Math.sin(beam.remainingLifeMs * 0.04) * 0.18;
   ctx.save();
+  ctx.globalCompositeOperation = "lighter";
   ctx.lineCap = "round";
 
-  ctx.globalAlpha = 0.28;
+  ctx.globalAlpha = 0.3;
   ctx.strokeStyle = color;
-  ctx.lineWidth = 10;
+  ctx.lineWidth = 12 * pulse;
   ctx.beginPath();
   ctx.moveTo(BARRIER_CENTER_X, BARRIER_CENTER_Y);
   ctx.lineTo(beam.endX, beam.endY);
@@ -99,79 +136,49 @@ export const drawMirrorBeam = (
 
   ctx.globalAlpha = 0.95;
   ctx.strokeStyle = color;
-  ctx.lineWidth = 3.5;
+  ctx.lineWidth = 4 * pulse;
   ctx.beginPath();
   ctx.moveTo(BARRIER_CENTER_X, BARRIER_CENTER_Y);
   ctx.lineTo(beam.endX, beam.endY);
   ctx.stroke();
 
+  ctx.globalAlpha = 1;
   ctx.strokeStyle = palette.foreground;
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 1.8;
   ctx.beginPath();
   ctx.moveTo(BARRIER_CENTER_X, BARRIER_CENTER_Y);
   ctx.lineTo(beam.endX, beam.endY);
   ctx.stroke();
 
-  ctx.fillStyle = color;
-  ctx.globalAlpha = 0.7;
-  ctx.beginPath();
-  ctx.arc(beam.endX, beam.endY, 7, 0, Math.PI * 2);
-  ctx.fill();
+  drawStarFlare(
+    ctx,
+    beam.endX,
+    beam.endY,
+    12 * pulse,
+    color,
+    palette.foreground,
+  );
 
   for (const cp of beam.chainPoints ?? []) {
-    ctx.globalAlpha = 0.75;
+    ctx.globalAlpha = 0.8;
     ctx.strokeStyle = color;
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(beam.endX, beam.endY);
     ctx.lineTo(cp.x, cp.y);
     ctx.stroke();
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(cp.x, cp.y, 4.5, 0, Math.PI * 2);
-    ctx.fill();
-  }
 
-  ctx.restore();
-};
-
-/** 呪符系：敵頭上への召喚落雷・霊風＋連鎖アークを描画する */
-export const drawTalismanStrike = (
-  ctx: CanvasRenderingContext2D,
-  strike: TalismanStrikeEntity,
-  color: string,
-  palette: BattlePalette,
-): void => {
-  const alpha = Math.max(0.15, strike.remainingLifeMs / strike.maxLifeMs);
-  ctx.save();
-  ctx.globalAlpha = alpha;
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.moveTo(strike.x - 6, strike.y - 44);
-  ctx.lineTo(strike.x + 5, strike.y - 20);
-  ctx.lineTo(strike.x - 4, strike.y - 8);
-  ctx.lineTo(strike.x, strike.y);
-  ctx.stroke();
-
-  ctx.strokeStyle = palette.foreground;
-  ctx.lineWidth = 1.8;
-  ctx.beginPath();
-  ctx.arc(strike.x, strike.y, 16 * (1.2 - alpha * 0.4), 0, Math.PI * 2);
-  ctx.stroke();
-
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 2;
-  for (const line of strike.chainLines) {
-    ctx.beginPath();
-    ctx.moveTo(line.fromX, line.fromY);
-    ctx.lineTo(line.toX, line.toY);
+    ctx.strokeStyle = palette.foreground;
+    ctx.lineWidth = 1.2;
     ctx.stroke();
+
+    drawStarFlare(ctx, cp.x, cp.y, 7.5, color, palette.foreground);
   }
+
   ctx.restore();
 };
 
-/** 霊珠・勾玉系：オーラを纏う旋回霊珠を描画する */
+/** 霊珠・勾玉系：加算合成オーラを纏う旋回霊珠を描画する */
 export const drawOrbNode = (
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -180,20 +187,29 @@ export const drawOrbNode = (
   palette: BattlePalette,
 ): void => {
   ctx.save();
+  ctx.globalCompositeOperation = "lighter";
   ctx.fillStyle = color;
-  ctx.globalAlpha = 0.3;
+  ctx.globalAlpha = 0.35;
   ctx.beginPath();
-  ctx.arc(x, y, 12, 0, Math.PI * 2);
+  ctx.arc(x, y, 14, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha = 0.95;
   ctx.beginPath();
   ctx.arc(x, y, 8, 0, Math.PI * 2);
   ctx.fill();
 
+  ctx.strokeStyle = palette.foreground;
+  ctx.lineWidth = 1.2;
+  ctx.globalAlpha = 0.7;
+  ctx.beginPath();
+  ctx.arc(x, y, 10.5, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.globalAlpha = 1;
   ctx.fillStyle = palette.foreground;
   ctx.beginPath();
-  ctx.arc(x - 2, y - 2, 2.5, 0, Math.PI * 2);
+  ctx.arc(x - 2, y - 2, 2.8, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 };

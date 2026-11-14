@@ -1,11 +1,11 @@
 import type { BattlePalette } from "@/engine/palette";
+import { drawTalismanStrike } from "@/engine/renderer-lightning";
 import { drawProjectileByGenre } from "@/engine/renderer-projectile-shapes";
 import {
   drawFanGust,
   drawMirrorBeam,
   drawOrbNode,
   drawSwordSlash,
-  drawTalismanStrike,
 } from "@/engine/renderer-weapon-shapes";
 import {
   BARRIER_CENTER_X,
@@ -67,23 +67,31 @@ export const drawWeaponEffects = (
     const alpha = Math.max(0, 1 - progress);
     const currentRadius = Math.max(8, exp.radius * (0.35 + 0.65 * progress));
     ctx.save();
-    ctx.globalAlpha = alpha * 0.35;
+    ctx.globalCompositeOperation = "lighter";
+    ctx.globalAlpha = alpha * 0.38;
     ctx.fillStyle = palette.primary;
     ctx.beginPath();
     ctx.arc(exp.x, exp.y, currentRadius, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.globalAlpha = alpha * 0.85;
+    ctx.globalAlpha = alpha * 0.9;
     ctx.strokeStyle = palette.accent;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 3.5;
     ctx.beginPath();
     ctx.arc(exp.x, exp.y, currentRadius, 0, Math.PI * 2);
     ctx.stroke();
 
+    // 内側の衝撃波リングと放射スパーク
     ctx.globalAlpha = alpha * 0.7;
+    ctx.strokeStyle = palette.foreground;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.arc(exp.x, exp.y, currentRadius * 0.68, 0, Math.PI * 2);
+    ctx.stroke();
+
     ctx.fillStyle = palette.foreground;
     ctx.beginPath();
-    ctx.arc(exp.x, exp.y, currentRadius * 0.35, 0, Math.PI * 2);
+    ctx.arc(exp.x, exp.y, currentRadius * 0.3, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
