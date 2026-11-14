@@ -79,11 +79,52 @@ describe("engine/battle-engine (loop, phases, speed, pause, error safety)", () =
     engine.setGameSpeed(2);
     for (let i = 0; i < 4000; i += 1) {
       engine.step(50);
+      const current = engine.getViewState();
+      if (current.hud.phase === "level_up_modal") {
+        const firstChoice = current.hud.pendingUpgradeChoices[0];
+        engine.applyUpgradeChoice(firstChoice.id);
+      }
       if (engine.getViewState().hud.phase === "victory") break;
     }
 
     expect(engine.getViewState().hud.phase).toBe("victory");
     expect(engine.getViewState().hud.currentWave).toBe(10);
+  });
+
+  it("pauses into level_up_modal on EXP threshold, supports reroll, and resumes playing on choice", () => {
+    const save = createInitialPlayerSave();
+    const launch = prepareBattleSession(save, "stage_1_bamboo");
+    expect(launch.ok).toBe(true);
+    if (!launch.ok) return;
+
+    const boosted = {
+      ...launch.data,
+      metaStats: { hp: 500, atk: 2000, luk: 100 },
+    };
+
+    const engine = createBattleEngine({
+      launchContext: boosted,
+      stageOverride: makeShortStage(),
+      rng: () => 0.4,
+    });
+
+    engine.setGameSpeed(2);
+    for (let i = 0; i < 2000; i += 1) {
+      engine.step(50);
+      if (engine.getViewState().hud.phase === "level_up_modal") break;
+    }
+
+    const modalState = engine.getViewState();
+    expect(modalState.hud.phase).toBe("level_up_modal");
+    expect(modalState.hud.pendingUpgradeChoices.length).toBeGreaterThan(0);
+
+    engine.rerollUpgradeChoices();
+    expect(engine.getViewState().hud.phase).toBe("level_up_modal");
+
+    const chosen = engine.getViewState().hud.pendingUpgradeChoices[0];
+    expect(chosen).toBeDefined();
+    expect(engine.applyUpgradeChoice(chosen.id)).toBe(true);
+    expect(engine.getViewState().hud.phase).toBe("playing");
   });
 
   it("reaches defeat when barrierHp drops to 0", () => {

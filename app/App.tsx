@@ -32,6 +32,7 @@ const AppShellContent = () => {
     isPending,
     reloadSession,
     resetSessionToInitial,
+    applyCommittedSave,
   } = usePlayerSession();
 
   const isHomeRoute = route.path === "/";
@@ -174,6 +175,7 @@ const AppShellContent = () => {
           <BattleScreen
             save={save}
             stageId={route.battleStageId}
+            onSaveCommitted={applyCommittedSave}
             onExitToStages={() => {
               navigate("/stages", true);
             }}

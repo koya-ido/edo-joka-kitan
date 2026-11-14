@@ -1,12 +1,13 @@
+import { useAppToast } from "@/components/shared/AppToastProvider";
 import { ConfirmAlertDialog } from "@/components/shared/ConfirmAlertDialog";
 import { AspectRatio } from "@/components/ui/AspectRatio";
-import { Button } from "@/components/ui/Button";
-import { Dialog } from "@/components/ui/Dialog";
 import { Text } from "@/components/ui/Typography";
 import { BATTLE_FIELD_HEIGHT, BATTLE_FIELD_WIDTH } from "@/engine";
 import { BattleErrorModal } from "@/features/battle/components/BattleErrorModal";
 import { BattleHudOverlay } from "@/features/battle/components/BattleHudOverlay";
 import { BattlePauseModal } from "@/features/battle/components/BattlePauseModal";
+import { BattleResultModal } from "@/features/battle/components/BattleResultModal";
+import { LevelUpChoiceModal } from "@/features/battle/components/LevelUpChoiceModal";
 import { useBattleEngine } from "@/features/battle/hooks/useBattleEngine";
 import type { PlayerSaveData } from "@/types";
 import { Loader2 } from "lucide-react";
@@ -14,14 +15,17 @@ import { Loader2 } from "lucide-react";
 export interface BattleScreenProps {
   readonly save: PlayerSaveData;
   readonly stageId: string;
+  readonly onSaveCommitted?: (nextSave: PlayerSaveData) => void;
   readonly onExitToStages: () => void;
 }
 
 export const BattleScreen = ({
   save,
   stageId,
+  onSaveCommitted,
   onExitToStages,
 }: BattleScreenProps) => {
+  const { showErrorToast } = useAppToast();
   const {
     canvasRef,
     launchContext,
@@ -30,22 +34,36 @@ export const BattleScreen = ({
     isInitializing,
     isRetreatConfirmOpen,
     isExiting,
+    isRerolling,
+    isCommitting,
+    committedReward,
+    commitError,
     setRetreatConfirmOpen,
     toggleSpeed,
     pauseBattle,
     resumeBattle,
+    selectUpgradeChoice,
+    rerollChoices,
+    retryCommitResult,
     confirmExitToStages,
-  } = useBattleEngine(save, stageId);
+  } = useBattleEngine(save, stageId, {
+    onSaveCommitted,
+    onNotifyError: showErrorToast,
+  });
 
   const phase = viewState?.hud.phase;
   const isPaused = phase === "paused" && !isRetreatConfirmOpen;
+  const isLevelUp = phase === "level_up_modal" && fatalError === null;
   const isOutcomeReached = phase === "victory" || phase === "defeat";
   const controlsDisabled =
     isInitializing ||
     phase === "paused" ||
+    phase === "level_up_modal" ||
     isRetreatConfirmOpen ||
     fatalError !== null ||
     isOutcomeReached ||
+    isRerolling ||
+    isCommitting ||
     isExiting;
 
   return (
@@ -64,7 +82,10 @@ export const BattleScreen = ({
 
         {isInitializing ? (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-battle-surface-deep/90 text-battle-foreground">
-            <Loader2 className="h-7 w-7 animate-spin text-primary" aria-hidden="true" />
+            <Loader2
+              className="h-7 w-7 animate-spin text-primary"
+              aria-hidden="true"
+            />
             <Text size="caption" className="text-battle-foreground">
               結界を展開中…
             </Text>
@@ -83,16 +104,52 @@ export const BattleScreen = ({
       </div>
 
       {launchContext && viewState ? (
-        <BattlePauseModal
-          open={isPaused}
-          isPending={isExiting}
-          launchContext={launchContext}
-          viewState={viewState}
-          onResume={resumeBattle}
-          onRequestRetreat={() => {
-            setRetreatConfirmOpen(true);
-          }}
-        />
+        <>
+          <BattlePauseModal
+            open={isPaused}
+            isPending={isExiting}
+            launchContext={launchContext}
+            viewState={viewState}
+            onResume={resumeBattle}
+            onRequestRetreat={() => {
+              setRetreatConfirmOpen(true);
+            }}
+          />
+
+          <LevelUpChoiceModal
+            open={isLevelUp}
+            level={viewState.hud.level}
+            choices={viewState.hud.pendingUpgradeChoices}
+            currentMagatama={save.currencies.magatama}
+            rerollCostMagatama={viewState.hud.rerollCostMagatama}
+            isRerolling={isRerolling}
+            onSelectChoice={selectUpgradeChoice}
+            onReroll={() => {
+              void rerollChoices();
+            }}
+            onFallbackContinue={resumeBattle}
+          />
+
+          <BattleResultModal
+            open={isOutcomeReached && fatalError === null}
+            phase={
+              phase === "victory" || phase === "defeat" ? phase : null
+            }
+            stageName={launchContext.stage.name}
+            reachedWave={viewState.hud.currentWave}
+            totalWaves={viewState.hud.totalWaves}
+            isCommitting={isCommitting}
+            committedReward={committedReward}
+            commitError={commitError}
+            isExiting={isExiting}
+            onRetryCommit={() => {
+              void retryCommitResult();
+            }}
+            onExitToStages={() => {
+              confirmExitToStages(onExitToStages);
+            }}
+          />
+        </>
       ) : null}
 
       <ConfirmAlertDialog
@@ -120,34 +177,6 @@ export const BattleScreen = ({
           confirmExitToStages(onExitToStages);
         }}
       />
-
-      <Dialog.Root open={isOutcomeReached && fatalError === null}>
-        <Dialog.Content isPending={isExiting} hideCloseButton>
-          <Dialog.Header>
-            <Dialog.Title>
-              {phase === "victory" ? "ステージ浄化完了" : "結界決壊"}
-            </Dialog.Title>
-            <Dialog.Description>
-              {phase === "victory"
-                ? "すべての妖怪を祓いました。"
-                : "守護結界が破られました。"}
-            </Dialog.Description>
-          </Dialog.Header>
-          <Dialog.Footer className="mt-6">
-            <Button
-              type="button"
-              variant="primary"
-              isPending={isExiting}
-              disabled={isExiting}
-              onClick={() => {
-                confirmExitToStages(onExitToStages);
-              }}
-            >
-              ステージ選択へ戻る
-            </Button>
-          </Dialog.Footer>
-        </Dialog.Content>
-      </Dialog.Root>
     </section>
   );
 };

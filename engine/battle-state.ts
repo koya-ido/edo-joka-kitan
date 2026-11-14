@@ -19,6 +19,7 @@ import {
 import type {
   BattlePhase,
   InGameBuffState,
+  InGameUpgradeOption,
   StageMaster,
   WeaponId,
   WeaponModifierState,
@@ -33,9 +34,11 @@ export interface MutableBattleState {
   level: number;
   exp: number;
   expToNextLevel: number;
+  pendingLevelUps: number;
+  pendingUpgradeChoices: readonly InGameUpgradeOption[];
   readonly stage: StageMaster;
   readonly passive: ResolvedPassiveBonus;
-  readonly buffState: InGameBuffState;
+  buffState: InGameBuffState;
   readonly spawner: WaveSpawnerState;
   readonly enemies: EnemyEntity[];
   readonly projectiles: ProjectileEntity[];
@@ -66,6 +69,8 @@ export const createInitialBattleState = (
     level: 1,
     exp: 0,
     expToNextLevel: calculateExpToNextLevel(1),
+    pendingLevelUps: 0,
+    pendingUpgradeChoices: [],
     stage,
     passive: resolveCharacterPassive(
       launchContext.character,
@@ -118,7 +123,7 @@ export const toBattleViewState = (
     expToNextLevel: state.expToNextLevel,
     gameSpeed: state.gameSpeed,
     rerollCostMagatama: DEFAULT_REROLL_COST_MAGATAMA,
-    pendingUpgradeChoices: [],
+    pendingUpgradeChoices: state.pendingUpgradeChoices,
   },
   buffState: {
     ...state.buffState,
@@ -136,6 +141,7 @@ export const buildViewSignature = (view: BattleViewState): string =>
     String(view.hud.exp),
     String(view.hud.gameSpeed),
     String(view.buffState.unlockedWeaponIds.length),
+    view.hud.pendingUpgradeChoices.map((c) => c.id).join(","),
   ].join(":");
 
 export const applyDamageToEnemy = (
@@ -165,6 +171,7 @@ export const applyDamageToEnemy = (
     while (state.exp >= state.expToNextLevel) {
       state.exp -= state.expToNextLevel;
       state.level += 1;
+      state.pendingLevelUps += 1;
       state.expToNextLevel = calculateExpToNextLevel(state.level);
       audio.playLevelUp();
     }

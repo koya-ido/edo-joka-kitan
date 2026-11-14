@@ -1,5 +1,11 @@
 import { WEAPON_MASTER_MAP } from "@/data";
 import { createNoopBattleAudio } from "@/engine/audio";
+import {
+  applyEngineUpgradeChoice,
+  buildEngineUpgradeChoices,
+  renderEngineFrame,
+  unlockEngineWeaponInRun,
+} from "@/engine/battle-engine-helpers";
 import { advanceCombatSimulation } from "@/engine/battle-simulation";
 import {
   applyDamageToEnemy,
@@ -8,14 +14,12 @@ import {
   toBattleViewState,
 } from "@/engine/battle-state";
 import { resolveBattlePalette } from "@/engine/palette";
-import { renderBattleFrame } from "@/engine/renderer";
 import {
   advanceWaveSpawns,
   buildWaveSpawnQueue,
   updateEnemiesMovement,
 } from "@/engine/spawner";
 import {
-  MAX_ACTIVE_WEAPONS,
   PREPARING_DURATION_MS,
   type BattleEngineConfig,
   type BattleViewState,
@@ -32,6 +36,8 @@ export interface BattleEngine {
   readonly resume: () => void;
   readonly setGameSpeed: (speed: 1 | 2) => void;
   readonly unlockWeaponInRun: (weaponId: WeaponId) => boolean;
+  readonly applyUpgradeChoice: (optionId: string) => boolean;
+  readonly rerollUpgradeChoices: () => void;
   readonly getViewState: () => BattleViewState;
 }
 
@@ -88,27 +94,7 @@ export const createBattleEngine = (
   };
 
   const renderCurrentFrame = (): void => {
-    if (!canvasCtx) return;
-    const orbitalWeapons = state.buffState.unlockedWeaponIds
-      .filter(
-        (id) => Object.hasOwn(weaponMap, id) && weaponMap[id].genre === "orb",
-      )
-      .map((id) => ({
-        weapon: weaponMap[id],
-        angleRad: state.orbAngles.get(id) ?? 0,
-      }));
-    renderBattleFrame(canvasCtx, {
-      palette,
-      barrierHp: state.barrierHp,
-      barrierMaxHp: state.barrierMaxHp,
-      enemies: state.enemies,
-      projectiles: state.projectiles,
-      slashArcs: state.slashArcs,
-      beams: state.beams,
-      bellWaves: state.bellWaves,
-      floatingTexts: state.floatingTexts,
-      orbitalWeapons,
-    });
+    renderEngineFrame(canvasCtx, state, weaponMap, palette);
   };
 
   const step = (rawDtMs: number): void => {
@@ -172,21 +158,37 @@ export const createBattleEngine = (
         audio.playDefeat();
         setPhase("defeat");
         stop();
-      } else if (
-        state.spawner.spawnQueue.length === 0 &&
-        state.enemies.length === 0
-      ) {
-        if (state.spawner.currentWave < state.stage.waves.length) {
-          state.spawner.currentWave += 1;
-          state.spawner.spawnQueue = buildWaveSpawnQueue(
-            state.stage.waves[state.spawner.currentWave - 1],
+      } else {
+        const isVictory =
+          state.spawner.spawnQueue.length === 0 &&
+          state.enemies.length === 0 &&
+          state.spawner.currentWave >= state.stage.waves.length;
+
+        if (
+          state.spawner.spawnQueue.length === 0 &&
+          state.enemies.length === 0
+        ) {
+          if (state.spawner.currentWave < state.stage.waves.length) {
+            state.spawner.currentWave += 1;
+            state.spawner.spawnQueue = buildWaveSpawnQueue(
+              state.stage.waves[state.spawner.currentWave - 1],
+            );
+            state.spawner.spawnTimerMs = 0;
+            audio.playWaveStart(state.spawner.currentWave);
+          } else {
+            audio.playVictory();
+            setPhase("victory");
+            stop();
+          }
+        }
+
+        if (!isVictory && state.pendingLevelUps > 0) {
+          state.pendingUpgradeChoices = buildEngineUpgradeChoices(
+            state,
+            weaponMap,
+            rng,
           );
-          state.spawner.spawnTimerMs = 0;
-          audio.playWaveStart(state.spawner.currentWave);
-        } else {
-          audio.playVictory();
-          setPhase("victory");
-          stop();
+          setPhase("level_up_modal");
         }
       }
       renderCurrentFrame();
@@ -235,22 +237,25 @@ export const createBattleEngine = (
       emitViewStateIfChanged(true);
     },
     unlockWeaponInRun: (weaponId) => {
-      if (state.buffState.unlockedWeaponIds.length >= MAX_ACTIVE_WEAPONS)
-        return false;
-      if (
-        state.buffState.unlockedWeaponIds.includes(weaponId) ||
-        !Object.hasOwn(weaponMap, weaponId)
-      )
-        return false;
-      state.buffState.unlockedWeaponIds.push(weaponId);
-      state.buffState.weaponModifiers[weaponId] = {
-        damageMultiplier: 1,
-        cooldownMultiplier: 1,
-        durationMultiplier: 1,
-      };
-      state.weaponCooldowns.set(weaponId, 0);
-      emitViewStateIfChanged(true);
+      const ok = unlockEngineWeaponInRun(state, weaponId, weaponMap);
+      if (ok) emitViewStateIfChanged(true);
+      return ok;
+    },
+    applyUpgradeChoice: (optionId) => {
+      const outcome = applyEngineUpgradeChoice(state, optionId, weaponMap, rng);
+      if (outcome === "invalid") return false;
+      if (outcome === "next_level_up") emitViewStateIfChanged(true);
+      else setPhase("playing");
       return true;
+    },
+    rerollUpgradeChoices: () => {
+      if (state.phase !== "level_up_modal") return;
+      state.pendingUpgradeChoices = buildEngineUpgradeChoices(
+        state,
+        weaponMap,
+        rng,
+      );
+      emitViewStateIfChanged(true);
     },
     getViewState: () => toBattleViewState(state),
   };

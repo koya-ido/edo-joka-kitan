@@ -1,7 +1,23 @@
 export {
+  applyBattleRerollCost,
+  applyBattleResultToSave,
+  calculateBattleRewards,
+  DEFAULT_BATTLE_REROLL_COST,
+  WAVE_RESCUE_MAGATAMA,
+  type AppliedBattleResult,
+  type CalculateBattleRewardsInput,
+  type CommitBattleResultInput,
+} from "./battle-reward";
+export {
   prepareBattleSession,
   type BattleLaunchContext,
 } from "./battle-session";
+export {
+  applyUpgradeOption,
+  generateUpgradeChoices,
+  MAX_ACTIVE_WEAPONS_IN_RUN,
+  type GenerateUpgradeChoicesInput,
+} from "./battle-upgrade";
 export { guardCurrencySufficient } from "./currency-guard";
 export {
   applyEnhanceStat,

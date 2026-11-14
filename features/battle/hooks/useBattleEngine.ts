@@ -6,8 +6,19 @@ import {
   type BattleEngine,
   type BattleViewState,
 } from "@/engine";
-import type { PlayerSaveData } from "@/types";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useBattlePersistence } from "@/features/battle/hooks/useBattlePersistence";
+import type {
+  BattleResultPayload,
+  DomainError,
+  DomainResult,
+  PlayerSaveData,
+} from "@/types";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+export interface UseBattleEngineOptions {
+  readonly onSaveCommitted?: (nextSave: PlayerSaveData) => void;
+  readonly onNotifyError?: (error: DomainError) => void;
+}
 
 export interface UseBattleEngineResult {
   readonly canvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -17,42 +28,66 @@ export interface UseBattleEngineResult {
   readonly isInitializing: boolean;
   readonly isRetreatConfirmOpen: boolean;
   readonly isExiting: boolean;
+  readonly isRerolling: boolean;
+  readonly isCommitting: boolean;
+  readonly committedReward: BattleResultPayload | null;
+  readonly commitError: string | null;
   readonly setRetreatConfirmOpen: (open: boolean) => void;
   readonly toggleSpeed: () => void;
   readonly pauseBattle: () => void;
   readonly resumeBattle: () => void;
+  readonly selectUpgradeChoice: (optionId: string) => void;
+  readonly rerollChoices: () => Promise<void>;
+  readonly retryCommitResult: () => Promise<void>;
   readonly confirmExitToStages: (onExit: () => void) => void;
 }
 
 export const useBattleEngine = (
   save: PlayerSaveData,
   stageId: string,
+  options: UseBattleEngineOptions = {},
 ): UseBattleEngineResult => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const engineRef = useRef<BattleEngine | null>(null);
+  const stableLaunchRef = useRef<{
+    stageId: string;
+    result: DomainResult<BattleLaunchContext>;
+  } | null>(null);
 
-  const launchResult = useMemo(
-    () => prepareBattleSession(save, stageId),
-    [save, stageId],
-  );
+  if (!stableLaunchRef.current || stableLaunchRef.current.stageId !== stageId) {
+    stableLaunchRef.current = {
+      stageId,
+      result: prepareBattleSession(save, stageId),
+    };
+  }
+  const launchResult = stableLaunchRef.current.result;
 
   const [viewState, setViewState] = useState<BattleViewState | null>(null);
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
   const [isRetreatConfirmOpen, setRetreatConfirmOpen] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
+  const persistence = useBattlePersistence({
+    stageId,
+    phase: viewState?.hud.phase,
+    currentWave: viewState?.hud.currentWave ?? 1,
+    rerollCostMagatama: viewState?.hud.rerollCostMagatama ?? 30,
+    engineRef,
+    onSaveCommitted: options.onSaveCommitted,
+    onNotifyError: options.onNotifyError,
+  });
+
+  const resetPersistenceRef = useRef(persistence.resetPersistenceState);
+  resetPersistenceRef.current = persistence.resetPersistenceState;
+
   const fatalError = !launchResult.ok
     ? launchResult.error.message
     : runtimeError;
 
   useEffect(() => {
-    if (!launchResult.ok) {
-      return;
-    }
+    if (!launchResult.ok) return;
     const canvas = canvasRef.current;
-    if (!canvas) {
-      return;
-    }
+    if (!canvas) return;
 
     canvas.width = BATTLE_FIELD_WIDTH;
     canvas.height = BATTLE_FIELD_HEIGHT;
@@ -62,6 +97,8 @@ export const useBattleEngine = (
       setRuntimeError("描画領域（Canvas 2D）の初期化に失敗しました。");
       return;
     }
+
+    resetPersistenceRef.current();
 
     const engine = createBattleEngine({
       launchContext: launchResult.data,
@@ -89,8 +126,7 @@ export const useBattleEngine = (
   const toggleSpeed = useCallback(() => {
     const engine = engineRef.current;
     if (!engine) return;
-    const current = engine.getViewState().hud.gameSpeed;
-    engine.setGameSpeed(current === 1 ? 2 : 1);
+    engine.setGameSpeed(engine.getViewState().hud.gameSpeed === 1 ? 2 : 1);
   }, []);
 
   const pauseBattle = useCallback(() => {
@@ -101,14 +137,22 @@ export const useBattleEngine = (
     engineRef.current?.resume();
   }, []);
 
+  const selectUpgradeChoice = useCallback(
+    (optionId: string) => {
+      if (persistence.isRerolling || persistence.isCommitting) return;
+      engineRef.current?.applyUpgradeChoice(optionId);
+    },
+    [persistence.isRerolling, persistence.isCommitting],
+  );
+
   const confirmExitToStages = useCallback(
     (onExit: () => void) => {
-      if (isExiting) return;
+      if (isExiting || persistence.isCommitting) return;
       setIsExiting(true);
       engineRef.current?.stop();
       onExit();
     },
-    [isExiting],
+    [isExiting, persistence.isCommitting],
   );
 
   return {
@@ -120,10 +164,17 @@ export const useBattleEngine = (
       launchResult.ok && viewState === null && fatalError === null,
     isRetreatConfirmOpen,
     isExiting,
+    isRerolling: persistence.isRerolling,
+    isCommitting: persistence.isCommitting,
+    committedReward: persistence.committedReward,
+    commitError: persistence.commitError,
     setRetreatConfirmOpen,
     toggleSpeed,
     pauseBattle,
     resumeBattle,
+    selectUpgradeChoice,
+    rerollChoices: persistence.rerollChoices,
+    retryCommitResult: persistence.retryCommitResult,
     confirmExitToStages,
   };
 };

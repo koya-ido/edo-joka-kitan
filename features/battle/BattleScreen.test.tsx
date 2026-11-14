@@ -1,3 +1,4 @@
+import { AppToastProvider } from "@/components/shared/AppToastProvider";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { createInitialPlayerSave } from "@/domain";
 import { BattleScreen } from "@/features/battle";
@@ -35,11 +36,13 @@ const renderBattle = (
     onExitToStages,
     ...render(
       <Tooltip.Provider>
-        <BattleScreen
-          save={save}
-          stageId={stageId}
-          onExitToStages={onExitToStages}
-        />
+        <AppToastProvider>
+          <BattleScreen
+            save={save}
+            stageId={stageId}
+            onExitToStages={onExitToStages}
+          />
+        </AppToastProvider>
       </Tooltip.Provider>,
     ),
   };

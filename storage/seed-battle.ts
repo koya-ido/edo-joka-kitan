@@ -95,3 +95,52 @@ export const seedBattleAllWeaponsReadySave = async (
     clearedStageIds: ["stage_1_bamboo", "stage_2_old_road"],
   });
 };
+
+/**
+ * Slice 7 テスト・動作確認用:
+ * 3択リロール実行可能（勾玉 60 = 30×2回分）・第壱節初回クリア報酬検証用セーブを投入する。
+ */
+export const seedBattleRerollReadySave = async (
+  now: Date = new Date(),
+): Promise<DomainResult<PlayerSaveData>> => {
+  const base = createInitialPlayerSave(now);
+  return seedPlayerSave({
+    ...base,
+    currencies: { magatama: 60, hisui: 5 },
+    unlockedStageIds: ["stage_1_bamboo"],
+    clearedStageIds: [],
+  });
+};
+
+/**
+ * Slice 7 テスト・動作確認用:
+ * 3択リロール費用（30）未満の勾玉（20）のみ保持し、再抽選 Disabled / 403相当拒否を検証するセーブを投入する。
+ */
+export const seedBattleInsufficientRerollSave = async (
+  now: Date = new Date(),
+): Promise<DomainResult<PlayerSaveData>> => {
+  const base = createInitialPlayerSave(now);
+  return seedPlayerSave({
+    ...base,
+    currencies: { magatama: 20, hisui: 5 },
+    unlockedStageIds: ["stage_1_bamboo"],
+    clearedStageIds: [],
+  });
+};
+
+/**
+ * Slice 7 テスト・動作確認用:
+ * 第壱節クリア済み・第弐節未クリア状態で、第弐節初回クリアによる第参節解放を検証するセーブを投入する。
+ */
+export const seedBattleStage2FirstClearReadySave = async (
+  now: Date = new Date(),
+): Promise<DomainResult<PlayerSaveData>> => {
+  const base = createInitialPlayerSave(now);
+  return seedPlayerSave({
+    ...base,
+    currencies: { magatama: 150, hisui: 10 },
+    permanentStats: { hpLevel: 2, atkLevel: 2, lukLevel: 1 },
+    unlockedStageIds: ["stage_1_bamboo", "stage_2_old_road"],
+    clearedStageIds: ["stage_1_bamboo"],
+  });
+};

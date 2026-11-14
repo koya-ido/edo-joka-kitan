@@ -1,10 +1,13 @@
 import { WEAPON_MASTERS } from "@/data";
-import { guardBattleSortie } from "@/domain";
+import { guardBattleSortie, guardCurrencySufficient } from "@/domain";
 import {
   loadOrInitializeSave,
   openPlayerDb,
   seedBattleAllWeaponsReadySave,
+  seedBattleInsufficientRerollSave,
   seedBattleMidProgressSave,
+  seedBattleRerollReadySave,
+  seedBattleStage2FirstClearReadySave,
   seedBattleStarterSave,
 } from "@/storage";
 import { DB_NAME, DB_VERSION } from "@/types";
@@ -86,6 +89,52 @@ describe("storage/seed-battle (Slice 6 migration & battle seed verification)", (
       expect(loaded.data.save.equippedCharacterId).toBe("white_fox_miko");
       expect(loaded.data.save.equippedWeaponId).toBe("orb_magatama");
       const guard = guardBattleSortie(loaded.data.save, "stage_3_shrine");
+      expect(guard.ok).toBe(true);
+    }
+  });
+
+  it("seeds Slice 7 reroll-ready save and passes magatama currency guard", async () => {
+    const seeded = await seedBattleRerollReadySave();
+    expect(seeded.ok).toBe(true);
+
+    const loaded = await loadOrInitializeSave();
+    expect(loaded.ok).toBe(true);
+    if (loaded.ok) {
+      expect(loaded.data.save.currencies.magatama).toBe(60);
+      const guard = guardCurrencySufficient(loaded.data.save, "magatama", 30);
+      expect(guard.ok).toBe(true);
+    }
+  });
+
+  it("seeds Slice 7 insufficient-reroll save and rejects reroll guard with INSUFFICIENT_MAGATAMA", async () => {
+    const seeded = await seedBattleInsufficientRerollSave();
+    expect(seeded.ok).toBe(true);
+
+    const loaded = await loadOrInitializeSave();
+    expect(loaded.ok).toBe(true);
+    if (loaded.ok) {
+      expect(loaded.data.save.currencies.magatama).toBe(20);
+      const guard = guardCurrencySufficient(loaded.data.save, "magatama", 30);
+      expect(guard.ok).toBe(false);
+      if (!guard.ok) {
+        expect(guard.error.code).toBe("INSUFFICIENT_MAGATAMA");
+      }
+    }
+  });
+
+  it("seeds Slice 7 stage 2 first-clear-ready save with stage_1_bamboo cleared and stage_2_old_road uncleared", async () => {
+    const seeded = await seedBattleStage2FirstClearReadySave();
+    expect(seeded.ok).toBe(true);
+
+    const loaded = await loadOrInitializeSave();
+    expect(loaded.ok).toBe(true);
+    if (loaded.ok) {
+      expect(loaded.data.save.clearedStageIds).toEqual(["stage_1_bamboo"]);
+      expect(loaded.data.save.unlockedStageIds).toEqual([
+        "stage_1_bamboo",
+        "stage_2_old_road",
+      ]);
+      const guard = guardBattleSortie(loaded.data.save, "stage_2_old_road");
       expect(guard.ok).toBe(true);
     }
   });

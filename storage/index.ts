@@ -1,3 +1,4 @@
+export { commitBattleResult, rerollBattleChoices } from "./battle-repository";
 export { enhancePermanentStat } from "./enhance-repository";
 export { updateFormation } from "./formation-repository";
 export { executeGachaPull } from "./gacha-repository";
@@ -26,7 +27,10 @@ export {
 } from "./seed";
 export {
   seedBattleAllWeaponsReadySave,
+  seedBattleInsufficientRerollSave,
   seedBattleMidProgressSave,
+  seedBattleRerollReadySave,
+  seedBattleStage2FirstClearReadySave,
   seedBattleStarterSave,
 } from "./seed-battle";
 export {
