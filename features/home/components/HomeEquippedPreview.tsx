@@ -55,10 +55,10 @@ export const HomeEquippedPreview = ({ save }: HomeEquippedPreviewProps) => {
           <Badge variant="accent" className="border border-accent-foreground/20 shadow-xs">
             現在の出撃編成
           </Badge>
-          <span className="inline-flex items-center gap-1 rounded-full border border-barrier/40 bg-battle-surface-deep/80 px-2.5 py-0.5 text-xs font-semibold text-battle-foreground">
+          <Badge className="rounded-full border-barrier/40 bg-battle-surface-deep/80 px-2.5 text-battle-foreground">
             <Shield className="h-3.5 w-3.5 text-barrier" aria-hidden="true" />
             <span>解放済: {save.unlockedStageIds.length} 節</span>
-          </span>
+          </Badge>
         </div>
 
         <div className="relative z-10 flex items-center justify-around gap-3 py-1">

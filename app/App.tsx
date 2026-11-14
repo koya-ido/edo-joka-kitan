@@ -10,6 +10,7 @@ import { Tooltip } from "@/components/ui/Tooltip";
 import { Heading, Text } from "@/components/ui/Typography";
 import { guardProtectedRouteAccess } from "@/domain";
 import { EnhanceScreen, useEnhanceActions } from "@/features/enhance";
+import { GachaScreen, useGachaActions } from "@/features/gacha";
 import { HomeHeaderActions, HomeScreen, useHomeActions } from "@/features/home";
 import { useEffect } from "react";
 
@@ -35,9 +36,11 @@ const AppShellContent = () => {
 
   const isHomeRoute = route.path === "/";
   const isEnhanceRoute = route.path === "/enhance";
+  const isGachaRoute = route.path === "/gacha";
   const isBattleRoute = route.battleStageId !== undefined;
   const homeActions = useHomeActions(isHomeRoute);
   const enhanceActions = useEnhanceActions();
+  const gachaActions = useGachaActions();
 
   useEffect(() => {
     if (status !== "success" || !save || !route.battleStageId) {
@@ -67,7 +70,8 @@ const AppShellContent = () => {
     status !== "success" ||
     isPending ||
     homeActions.isMutating ||
-    enhanceActions.isMutating;
+    enhanceActions.isMutating ||
+    gachaActions.isMutating;
 
   return (
     <AppShell
@@ -120,6 +124,12 @@ const AppShellContent = () => {
           <EnhanceScreen
             save={save}
             actions={enhanceActions}
+            isSessionPending={isPending}
+          />
+        ) : isGachaRoute && save ? (
+          <GachaScreen
+            save={save}
+            actions={gachaActions}
             isSessionPending={isPending}
           />
         ) : (

@@ -7,6 +7,16 @@ export {
   type TotalMetaStats,
 } from "./enhance";
 export {
+  getGachaCost,
+  getGachaDropRates,
+  guardGachaPullable,
+  resolveGachaPulls,
+  type GachaDropRateEntry,
+  type GachaExecutionOutput,
+  type GachaPullCount,
+  type GachaPullResultItem,
+} from "./gacha";
+export {
   applyLoginBonus,
   getLocalDateKey,
   guardLoginBonusClaimable,

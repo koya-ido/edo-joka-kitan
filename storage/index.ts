@@ -1,4 +1,5 @@
 export { enhancePermanentStat } from "./enhance-repository";
+export { executeGachaPull } from "./gacha-repository";
 export { claimLoginBonus } from "./login-bonus-repository";
 export { applyDbMigrations } from "./migrations";
 export { openPlayerDb } from "./player-db";
@@ -13,6 +14,10 @@ export {
   seedEnhanceInsufficientMagatamaSave,
   seedEnhanceMaxedStatSave,
   seedEnhanceMidProgressSave,
+  seedGachaInsufficientHisuiSave,
+  seedGachaMaxedPoolSave,
+  seedGachaReadySave,
+  seedGachaSingleOnlyHisuiSave,
   seedInitialPlayerSave,
   seedPlayerSave,
   seedResettableProgressSave,

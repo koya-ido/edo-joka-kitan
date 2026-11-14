@@ -5,6 +5,10 @@ import {
   seedEnhanceInsufficientMagatamaSave,
   seedEnhanceMaxedStatSave,
   seedEnhanceMidProgressSave,
+  seedGachaInsufficientHisuiSave,
+  seedGachaMaxedPoolSave,
+  seedGachaReadySave,
+  seedGachaSingleOnlyHisuiSave,
   seedResettableProgressSave,
   seedUnclaimedLoginBonusSave,
 } from "@/storage";
@@ -130,6 +134,47 @@ describe("storage/seed (Slice 1 migration & seed verification)", () => {
         atkLevel: 2,
         lukLevel: 1,
       });
+    }
+  });
+
+  it("seeds gacha-ready and insufficient-hisui saves for Slice 3 gacha testing", async () => {
+    const ready = await seedGachaReadySave();
+    expect(ready.ok).toBe(true);
+    const loadedReady = await loadOrInitializeSave();
+    expect(loadedReady.ok).toBe(true);
+    if (loadedReady.ok) {
+      expect(loadedReady.data.save.currencies.hisui).toBe(55);
+    }
+
+    const singleOnly = await seedGachaSingleOnlyHisuiSave();
+    expect(singleOnly.ok).toBe(true);
+    const loadedSingle = await loadOrInitializeSave();
+    expect(loadedSingle.ok).toBe(true);
+    if (loadedSingle.ok) {
+      expect(loadedSingle.data.save.currencies.hisui).toBe(12);
+    }
+
+    const insufficient = await seedGachaInsufficientHisuiSave();
+    expect(insufficient.ok).toBe(true);
+    const loadedInsufficient = await loadOrInitializeSave();
+    expect(loadedInsufficient.ok).toBe(true);
+    if (loadedInsufficient.ok) {
+      expect(loadedInsufficient.data.save.currencies.hisui).toBe(3);
+    }
+  });
+
+  it("seeds maxed-pool save for Slice 3 surplus magatama conversion testing", async () => {
+    const seeded = await seedGachaMaxedPoolSave();
+    expect(seeded.ok).toBe(true);
+
+    const loaded = await loadOrInitializeSave();
+    expect(loaded.ok).toBe(true);
+    if (loaded.ok) {
+      expect(loaded.data.save.currencies.hisui).toBe(50);
+      expect(
+        loaded.data.save.ownedCharacters.white_fox_miko.awakeningLevel,
+      ).toBe(5);
+      expect(loaded.data.save.ownedWeapons.bow_azusa.refineLevel).toBe(5);
     }
   });
 });

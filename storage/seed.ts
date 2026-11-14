@@ -1,11 +1,16 @@
+import { CHARACTER_MASTERS, WEAPON_MASTERS } from "@/data";
 import { err, ok } from "@/domain/result";
 import { createInitialPlayerSave } from "@/domain/save-factory";
 import { validatePlayerSaveData } from "@/domain/save-validator";
 import { openPlayerDb } from "@/storage/player-db";
 import {
   SAVE_RECORD_KEY,
+  type CharacterId,
   type DomainResult,
+  type OwnedCharacterState,
+  type OwnedWeaponState,
   type PlayerSaveData,
+  type WeaponId,
 } from "@/types";
 
 /** テスト・動作確認用に初期シードデータを IndexedDB へ投入する */
@@ -113,5 +118,72 @@ export const seedEnhanceMidProgressSave = async (
     ...base,
     currencies: { ...base.currencies, magatama: 300 },
     permanentStats: { hpLevel: 3, atkLevel: 2, lukLevel: 1 },
+  });
+};
+
+/** Slice 3 テスト・動作確認用: 単発・10連ガチャが実行可能な翡翠所持セーブを投入する */
+export const seedGachaReadySave = async (
+  now: Date = new Date(),
+): Promise<DomainResult<PlayerSaveData>> => {
+  const base = createInitialPlayerSave(now);
+  return seedPlayerSave({
+    ...base,
+    currencies: { ...base.currencies, hisui: 55 },
+  });
+};
+
+/** Slice 3 テスト・動作確認用: 翡翠不足状態（単発コスト5未満）のセーブを投入する */
+export const seedGachaInsufficientHisuiSave = async (
+  now: Date = new Date(),
+): Promise<DomainResult<PlayerSaveData>> => {
+  const base = createInitialPlayerSave(now);
+  return seedPlayerSave({
+    ...base,
+    currencies: { ...base.currencies, hisui: 3 },
+  });
+};
+
+/** Slice 3 テスト・動作確認用: 単発のみ実行可能・10連不可（翡翠12）のセーブを投入する */
+export const seedGachaSingleOnlyHisuiSave = async (
+  now: Date = new Date(),
+): Promise<DomainResult<PlayerSaveData>> => {
+  const base = createInitialPlayerSave(now);
+  return seedPlayerSave({
+    ...base,
+    currencies: { ...base.currencies, hisui: 12 },
+  });
+};
+
+/** Slice 3 テスト・動作確認用: 全キャラ・全武器が上限Lv到達済み（余剰勾玉変換確認用）のセーブを投入する */
+export const seedGachaMaxedPoolSave = async (
+  now: Date = new Date(),
+): Promise<DomainResult<PlayerSaveData>> => {
+  const base = createInitialPlayerSave(now);
+  const nowIso = now.toISOString();
+  const ownedCharacters = Object.fromEntries(
+    CHARACTER_MASTERS.map((character) => [
+      character.id,
+      {
+        characterId: character.id,
+        awakeningLevel: character.maxAwakeningLevel,
+        obtainedAt: nowIso,
+      },
+    ]),
+  ) as Record<CharacterId, OwnedCharacterState>;
+  const ownedWeapons = Object.fromEntries(
+    WEAPON_MASTERS.map((weapon) => [
+      weapon.id,
+      {
+        weaponId: weapon.id,
+        refineLevel: weapon.maxRefineLevel,
+        obtainedAt: nowIso,
+      },
+    ]),
+  ) as Record<WeaponId, OwnedWeaponState>;
+  return seedPlayerSave({
+    ...base,
+    currencies: { ...base.currencies, hisui: 50 },
+    ownedCharacters,
+    ownedWeapons,
   });
 };

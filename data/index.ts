@@ -5,6 +5,7 @@ export {
   ENHANCE_STAT_CONFIGS,
   type EnhanceStatKey,
 } from "./enhance-config";
+export { GACHA_CONFIG } from "./gacha-config";
 export { LOGIN_BONUS_CONFIG } from "./login-bonus-config";
 export { STAGE_MASTER_MAP, STAGE_MASTERS } from "./stage-master";
 export { WEAPON_MASTER_MAP, WEAPON_MASTERS } from "./weapon-master";
