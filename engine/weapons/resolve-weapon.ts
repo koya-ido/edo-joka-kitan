@@ -23,6 +23,7 @@ export interface WeaponEffectsUpdateContext {
   readonly talismanStrikes?: TalismanStrikeEntity[];
   readonly explosions?: ExplosionEntity[];
   readonly nextEntityId?: () => number;
+  readonly rng?: () => number;
   readonly onDamageEnemy: (
     enemy: EnemyEntity,
     damage: number,

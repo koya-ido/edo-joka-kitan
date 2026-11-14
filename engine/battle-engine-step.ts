@@ -5,11 +5,22 @@ import {
   type MutableBattleState,
 } from "@/engine/battle-state";
 import {
+  spawnBarrierHitParticles,
+  triggerScreenShake,
+  updateParticlesAndShake,
+} from "@/engine/particles";
+import {
   advanceWaveSpawns,
   buildWaveSpawnQueue,
   updateEnemiesMovement,
 } from "@/engine/spawner";
-import type { BattleEngineConfig, EnemyEntity } from "@/engine/types";
+import {
+  BARRIER_CENTER_X,
+  BARRIER_CENTER_Y,
+  BARRIER_RADIUS,
+  type BattleEngineConfig,
+  type EnemyEntity,
+} from "@/engine/types";
 import type { BattlePhase, WeaponMaster } from "@/types";
 
 export interface StepPlayingContext {
@@ -31,6 +42,7 @@ export const stepPlayingPhase = (
 ): void => {
   const { state, config, weaponMap, audio, rng, nextEntityId } = ctx;
   const { launchContext } = config;
+  state.elapsedMs += dtMs;
 
   if (
     state.passive.barrierRegenPerSec > 0 &&
@@ -48,6 +60,18 @@ export const stepPlayingPhase = (
   const barrierDamage = updateEnemiesMovement(state.enemies, dtMs);
   if (barrierDamage > 0) {
     state.barrierHp = Math.max(0, state.barrierHp - barrierDamage);
+    state.barrierHitPulseMs = 280;
+    triggerScreenShake(state, 5.5, 180);
+    spawnBarrierHitParticles(
+      state.particles,
+      BARRIER_CENTER_X,
+      BARRIER_CENTER_Y - BARRIER_RADIUS,
+      nextEntityId,
+      rng,
+    );
+  }
+  if (state.barrierHitPulseMs > 0) {
+    state.barrierHitPulseMs = Math.max(0, state.barrierHitPulseMs - dtMs);
   }
 
   advanceCombatSimulation({
@@ -72,9 +96,11 @@ export const stepPlayingPhase = (
     orbHitCooldowns: state.orbHitCooldowns,
     nextEntityId,
     onDamageEnemy: (enemy: EnemyEntity, dmg: number, isCrit: boolean) => {
-      applyDamageToEnemy(state, enemy, dmg, isCrit, audio, nextEntityId);
+      applyDamageToEnemy(state, enemy, dmg, isCrit, audio, nextEntityId, rng);
     },
   });
+
+  updateParticlesAndShake(state, dtMs);
 
   if (state.barrierHp <= 0) {
     audio.playDefeat();

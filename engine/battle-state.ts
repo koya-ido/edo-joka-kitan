@@ -4,6 +4,11 @@ import {
   calculateExpToNextLevel,
   resolveCharacterPassive,
 } from "@/engine/damage";
+import {
+  spawnHitSparkParticles,
+  spawnPurificationParticles,
+  triggerScreenShake,
+} from "@/engine/particles";
 import { buildWaveSpawnQueue, type WaveSpawnerState } from "@/engine/spawner";
 import {
   DEFAULT_REROLL_COST_MAGATAMA,
@@ -13,6 +18,7 @@ import {
   type EnemyEntity,
   type ExplosionEntity,
   type FloatingTextEntity,
+  type ParticleEntity,
   type ProjectileEntity,
   type ResolvedPassiveBonus,
   type SlashArcEntity,
@@ -53,12 +59,17 @@ export interface MutableBattleState {
   readonly beams: BeamEntity[];
   readonly talismanStrikes: TalismanStrikeEntity[];
   readonly explosions: ExplosionEntity[];
+  readonly particles: ParticleEntity[];
   readonly floatingTexts: FloatingTextEntity[];
   readonly weaponCooldowns: Map<WeaponId, number>;
   readonly weaponBursts: Map<WeaponId, WeaponBurstState>;
   readonly orbAngles: Map<WeaponId, number>;
   readonly orbHitCooldowns: Map<WeaponId, Map<number, number>>;
   regenAccumulator: number;
+  elapsedMs: number;
+  shakeRemainingMs: number;
+  shakeIntensity: number;
+  barrierHitPulseMs: number;
   entitySeq: number;
 }
 
@@ -105,12 +116,17 @@ export const createInitialBattleState = (
     beams: [],
     talismanStrikes: [],
     explosions: [],
+    particles: [],
     floatingTexts: [],
     weaponCooldowns: new Map<WeaponId, number>([[weaponId, 0]]),
     weaponBursts: new Map<WeaponId, WeaponBurstState>(),
     orbAngles: new Map<WeaponId, number>(),
     orbHitCooldowns: new Map<WeaponId, Map<number, number>>(),
     regenAccumulator: 0,
+    elapsedMs: 0,
+    shakeRemainingMs: 0,
+    shakeIntensity: 0,
+    barrierHitPulseMs: 0,
     entitySeq: 1,
   };
 };
@@ -158,6 +174,7 @@ export const applyDamageToEnemy = (
   isCrit: boolean,
   audio: BattleAudioPort,
   nextEntityId: () => number,
+  rng: () => number = Math.random,
 ): void => {
   if (enemy.hp <= 0) return;
   const vulnMult =
@@ -168,6 +185,15 @@ export const applyDamageToEnemy = (
   enemy.hp -= finalDmg;
   enemy.hitFlashMs = 90;
   audio.playHit(isCrit);
+  spawnHitSparkParticles(
+    state.particles,
+    enemy.x,
+    enemy.y,
+    isCrit,
+    nextEntityId,
+    rng,
+  );
+  if (isCrit) triggerScreenShake(state, 2.5, 90);
   state.floatingTexts.push({
     id: nextEntityId(),
     x: enemy.x,
@@ -179,6 +205,15 @@ export const applyDamageToEnemy = (
     maxLifeMs: 550,
   });
   if (enemy.hp <= 0) {
+    spawnPurificationParticles(
+      state.particles,
+      enemy.x,
+      enemy.y,
+      enemy.isBoss,
+      nextEntityId,
+      rng,
+    );
+    if (enemy.isBoss) triggerScreenShake(state, 8, 320);
     state.exp += enemy.expReward * state.passive.expMultiplier;
     while (state.exp >= state.expToNextLevel) {
       state.exp -= state.expToNextLevel;

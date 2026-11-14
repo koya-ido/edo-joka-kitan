@@ -322,4 +322,50 @@ describe("engine/weapons (all 8 weapon genres)", () => {
     expect(beams).toHaveLength(2);
     expect(beams[0].bounceRemaining).toBe(1);
   });
+
+  it("spawns split projectiles at completely random angles via rng", () => {
+    const enemies = [
+      makeEnemy(1, BARRIER_CENTER_X, BARRIER_CENTER_Y - 12, 1000),
+    ];
+    const projectiles: ProjectileEntity[] = [];
+    let seq = 800;
+    const rngValues = [0.25, 0.75];
+    let rngIdx = 0;
+
+    fireWeaponByGenre({
+      weapon: WEAPON_MASTER_MAP.bow_azusa,
+      damage: 40,
+      isCrit: false,
+      durationMs: 1200,
+      modifier: { ...createDefaultWeaponModifier(), splitEnabled: true },
+      enemies,
+      projectiles,
+      slashArcs: [],
+      beams: [],
+      nextEntityId: () => seq++,
+      onDamageEnemy: () => {},
+    });
+
+    updateWeaponEffects({
+      dtMs: 16,
+      enemies,
+      projectiles,
+      slashArcs: [],
+      beams: [],
+      nextEntityId: () => seq++,
+      rng: () => rngValues[rngIdx++] ?? 0,
+      onDamageEnemy: () => {},
+    });
+
+    const children = projectiles.filter((p) => p.id > 800);
+    expect(children).toHaveLength(2);
+    expect(Math.atan2(children[0].vy, children[0].vx)).toBeCloseTo(
+      Math.PI * 0.5,
+      5,
+    );
+    expect(Math.atan2(children[1].vy, children[1].vx)).toBeCloseTo(
+      -Math.PI * 0.5,
+      5,
+    );
+  });
 });

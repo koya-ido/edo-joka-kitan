@@ -16,6 +16,7 @@ export interface ProjectileUpdateContext {
   readonly projectiles: ProjectileEntity[];
   readonly explosions?: ExplosionEntity[];
   readonly nextEntityId?: () => number;
+  readonly rng?: () => number;
   readonly onDamageEnemy: (
     enemy: EnemyEntity,
     damage: number,
@@ -63,11 +64,10 @@ const spawnSplitProjectiles = (
   ctx: ProjectileUpdateContext,
 ): void => {
   if (p.splitCount <= 0 || !ctx.nextEntityId) return;
-  const baseAngle = Math.atan2(p.vy, p.vx);
-  const offsets = [-0.44, 0.44];
+  const rng = ctx.rng ?? Math.random;
   const childDamage = Math.max(1, Math.round(p.damage * 0.5));
-  for (const offset of offsets) {
-    const angle = baseAngle + offset;
+  for (let i = 0; i < p.splitCount; i += 1) {
+    const angle = rng() * Math.PI * 2;
     ctx.projectiles.push({
       id: ctx.nextEntityId(),
       genre: p.genre,

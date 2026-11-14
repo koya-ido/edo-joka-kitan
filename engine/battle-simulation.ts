@@ -191,6 +191,7 @@ export const advanceCombatSimulation = (ctx: SimulationStepContext): void => {
     talismanStrikes: ctx.talismanStrikes,
     explosions: ctx.explosions,
     nextEntityId: ctx.nextEntityId,
+    rng: ctx.rng,
     onDamageEnemy: ctx.onDamageEnemy,
   });
 

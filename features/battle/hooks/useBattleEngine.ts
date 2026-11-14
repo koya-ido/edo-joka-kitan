@@ -3,8 +3,10 @@ import {
   BATTLE_FIELD_HEIGHT,
   BATTLE_FIELD_WIDTH,
   createBattleEngine,
+  createWebBattleAudio,
   type BattleEngine,
   type BattleViewState,
+  type WebBattleAudioPort,
 } from "@/engine";
 import { useBattlePersistence } from "@/features/battle/hooks/useBattlePersistence";
 import type {
@@ -33,6 +35,8 @@ export interface UseBattleEngineResult {
   readonly committedReward: BattleResultPayload | null;
   readonly commitError: string | null;
   readonly setRetreatConfirmOpen: (open: boolean) => void;
+  readonly isMuted: boolean;
+  readonly toggleMute: () => void;
   readonly toggleSpeed: () => void;
   readonly pauseBattle: () => void;
   readonly resumeBattle: () => void;
@@ -50,6 +54,8 @@ export const useBattleEngine = (
 ): UseBattleEngineResult => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const engineRef = useRef<BattleEngine | null>(null);
+  const audioRef = useRef<WebBattleAudioPort | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
   const [attemptSeq, setAttemptSeq] = useState(0);
   const stableLaunchRef = useRef<{
     stageId: string;
@@ -107,9 +113,12 @@ export const useBattleEngine = (
     }
 
     resetPersistenceRef.current();
+    const audio = createWebBattleAudio(isMuted);
+    audioRef.current = audio;
 
     const engine = createBattleEngine({
       launchContext: launchResult.data,
+      audio,
       callbacks: {
         onViewStateChange: (nextState) => {
           setViewState(nextState);
@@ -127,9 +136,21 @@ export const useBattleEngine = (
 
     return () => {
       engine.stop();
+      audio.dispose();
+      audioRef.current = null;
       engineRef.current = null;
     };
+    // isMuted は toggleMute 経由で audioRef.current.setMuted により即時反映するため依存に含めない
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [launchResult]);
+
+  const toggleMute = useCallback(() => {
+    setIsMuted((prev) => {
+      const next = !prev;
+      audioRef.current?.setMuted(next);
+      return next;
+    });
+  }, []);
 
   const toggleSpeed = useCallback(() => {
     const engine = engineRef.current;
@@ -185,6 +206,8 @@ export const useBattleEngine = (
     committedReward: persistence.committedReward,
     commitError: persistence.commitError,
     setRetreatConfirmOpen,
+    isMuted,
+    toggleMute,
     toggleSpeed,
     pauseBattle,
     resumeBattle,

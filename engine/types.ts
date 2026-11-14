@@ -137,6 +137,30 @@ export interface ExplosionEntity {
   readonly maxLifeMs: number;
 }
 
+/** パーティクルの色トークンキー */
+export type ParticleColorKey =
+  | "primary"
+  | "accent"
+  | "hisui"
+  | "magatama"
+  | "destructive"
+  | "foreground"
+  | "exp";
+
+/** 汎用パーティクル（浄化粒子・火花・結界飛沫） */
+export interface ParticleEntity {
+  readonly id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  readonly size: number;
+  readonly colorKey: ParticleColorKey;
+  readonly gravity: number;
+  remainingLifeMs: number;
+  readonly maxLifeMs: number;
+}
+
 /** 浮遊ダメージ数値 */
 export interface FloatingTextEntity {
   readonly id: number;
@@ -145,16 +169,6 @@ export interface FloatingTextEntity {
   readonly text: string;
   readonly isCrit: boolean;
   readonly isHeal: boolean;
-  remainingLifeMs: number;
-  readonly maxLifeMs: number;
-}
-
-/** 爆発エフェクト */
-export interface ExplosionEntity {
-  readonly id: number;
-  readonly x: number;
-  readonly y: number;
-  readonly radius: number;
   remainingLifeMs: number;
   readonly maxLifeMs: number;
 }
@@ -194,4 +208,8 @@ export interface BattleEngineConfig {
 }
 
 /** 武器の genreParams から安全に数値を取得する */
-export const readGenreParam = (params: Readonly<Record<string, number>>, key: string, fallback: number): number => (Object.hasOwn(params, key) ? params[key] : fallback);
+export const readGenreParam = (
+  params: Readonly<Record<string, number>>,
+  key: string,
+  fallback: number,
+): number => (Object.hasOwn(params, key) ? params[key] : fallback);

@@ -4,11 +4,14 @@ import { Toggle } from "@/components/ui/Toggle";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { Text } from "@/components/ui/Typography";
 import type { BattleViewState } from "@/engine";
+import { Volume2, VolumeX } from "lucide-react";
 
 export interface BattleHudOverlayProps {
   readonly stageName: string;
   readonly viewState: BattleViewState;
   readonly controlsDisabled: boolean;
+  readonly isMuted: boolean;
+  readonly onToggleMute: () => void;
   readonly onToggleSpeed: () => void;
 }
 
@@ -16,6 +19,8 @@ export const BattleHudOverlay = ({
   stageName,
   viewState,
   controlsDisabled,
+  isMuted,
+  onToggleMute,
   onToggleSpeed,
 }: BattleHudOverlayProps) => {
   const { hud } = viewState;
@@ -47,6 +52,25 @@ export const BattleHudOverlay = ({
           </div>
 
           <div className="flex items-center gap-2">
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <Toggle
+                  pressed={isMuted}
+                  disabled={controlsDisabled}
+                  onPressedChange={() => {
+                    onToggleMute();
+                  }}
+                  aria-label="効果音ミュート切替"
+                >
+                  {isMuted ? (
+                    <VolumeX className="h-4 w-4" aria-hidden="true" />
+                  ) : (
+                    <Volume2 className="h-4 w-4" aria-hidden="true" />
+                  )}
+                </Toggle>
+              </Tooltip.Trigger>
+              <Tooltip.Content>効果音 ON / OFF</Tooltip.Content>
+            </Tooltip.Root>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <Toggle

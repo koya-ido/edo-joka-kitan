@@ -13,6 +13,7 @@ import {
   readGenreParam,
   type BeamEntity,
   type ExplosionEntity,
+  type ParticleEntity,
   type ProjectileEntity,
   type SlashArcEntity,
   type TalismanStrikeEntity,
@@ -25,6 +26,7 @@ export interface WeaponEffectsRenderData {
   readonly beams: readonly BeamEntity[];
   readonly talismanStrikes?: readonly TalismanStrikeEntity[];
   readonly explosions?: readonly ExplosionEntity[];
+  readonly particles?: readonly ParticleEntity[];
   readonly projectiles: readonly ProjectileEntity[];
   readonly orbitalWeapons: readonly {
     readonly weapon: WeaponMaster;
@@ -111,5 +113,17 @@ export const drawWeaponEffects = (
   for (const p of state.projectiles) {
     const color = palette.weaponColors[p.colorToken];
     drawProjectileByGenre(ctx, p, color, palette);
+  }
+
+  for (const pt of state.particles ?? []) {
+    const lifeRatio = Math.max(0, pt.remainingLifeMs / pt.maxLifeMs);
+    const radius = Math.max(0.8, pt.size * (0.35 + 0.65 * lifeRatio));
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, lifeRatio * 1.15);
+    ctx.fillStyle = palette[pt.colorKey];
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
   }
 };

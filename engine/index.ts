@@ -22,3 +22,4 @@ export {
   type BattleViewState,
   type ResolvedPassiveBonus,
 } from "./types";
+export { createWebBattleAudio, type WebBattleAudioPort } from "./web-audio";

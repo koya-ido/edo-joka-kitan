@@ -31,16 +31,29 @@ export const renderEngineFrame = (
         rangeMultiplier: mod?.rangeMultiplier ?? 1,
       };
     });
+  const isShaking = state.shakeRemainingMs > 0 && state.shakeIntensity > 0;
+  const shakeX = isShaking
+    ? Math.sin(state.elapsedMs * 0.11) * state.shakeIntensity
+    : 0;
+  const shakeY = isShaking
+    ? Math.cos(state.elapsedMs * 0.14) * state.shakeIntensity
+    : 0;
+
   renderBattleFrame(canvasCtx, {
     palette,
     barrierHp: state.barrierHp,
     barrierMaxHp: state.barrierMaxHp,
+    barrierHitPulseMs: state.barrierHitPulseMs,
+    elapsedMs: state.elapsedMs,
+    shakeX,
+    shakeY,
     enemies: state.enemies,
     projectiles: state.projectiles,
     slashArcs: state.slashArcs,
     beams: state.beams,
     talismanStrikes: state.talismanStrikes,
     explosions: state.explosions,
+    particles: state.particles,
     floatingTexts: state.floatingTexts,
     orbitalWeapons,
   });

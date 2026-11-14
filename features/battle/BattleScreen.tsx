@@ -38,6 +38,8 @@ export const BattleScreen = ({
     committedReward,
     commitError,
     setRetreatConfirmOpen,
+    isMuted,
+    toggleMute,
     toggleSpeed,
     pauseBattle,
     resumeBattle,
@@ -112,6 +114,8 @@ export const BattleScreen = ({
           stageName={launchContext.stage.name}
           viewState={viewState}
           controlsDisabled={controlsDisabled}
+          isMuted={isMuted}
+          onToggleMute={toggleMute}
           onToggleSpeed={toggleSpeed}
         />
       ) : null}
