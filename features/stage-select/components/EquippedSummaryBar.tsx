@@ -2,7 +2,6 @@ import { ItemAvatar } from "@/components/shared/ItemAvatar";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Heading, Text } from "@/components/ui/Typography";
-import { WEAPON_GENRE_LABELS } from "@/domain";
 import type { EquippedFormationSummary } from "@/features/stage-select/hooks/useStageSelect";
 import { Settings2 } from "lucide-react";
 
@@ -76,7 +75,7 @@ export const EquippedSummaryBar = ({
               />
               <div className="min-w-0">
                 <Text size="caption" tone="muted">
-                  持ち込み武器（{WEAPON_GENRE_LABELS[weaponMaster.genre]}）
+                  持ち込み武器
                 </Text>
                 <Text size="label" className="truncate">
                   {weaponMaster.name}

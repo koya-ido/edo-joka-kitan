@@ -1,3 +1,4 @@
+import { createDefaultWeaponModifier } from "@/domain";
 import type { BattleAudioPort } from "@/engine/audio";
 import {
   calculateExpToNextLevel,
@@ -9,12 +10,13 @@ import {
   type BattleEngineConfig,
   type BattleViewState,
   type BeamEntity,
-  type BellWaveEntity,
   type EnemyEntity,
+  type ExplosionEntity,
   type FloatingTextEntity,
   type ProjectileEntity,
   type ResolvedPassiveBonus,
   type SlashArcEntity,
+  type TalismanStrikeEntity,
 } from "@/engine/types";
 import type {
   BattlePhase,
@@ -24,6 +26,11 @@ import type {
   WeaponId,
   WeaponModifierState,
 } from "@/types";
+
+export interface WeaponBurstState {
+  remaining: number;
+  timerMs: number;
+}
 
 export interface MutableBattleState {
   phase: BattlePhase;
@@ -44,9 +51,11 @@ export interface MutableBattleState {
   readonly projectiles: ProjectileEntity[];
   readonly slashArcs: SlashArcEntity[];
   readonly beams: BeamEntity[];
-  readonly bellWaves: BellWaveEntity[];
+  readonly talismanStrikes: TalismanStrikeEntity[];
+  readonly explosions: ExplosionEntity[];
   readonly floatingTexts: FloatingTextEntity[];
   readonly weaponCooldowns: Map<WeaponId, number>;
+  readonly weaponBursts: Map<WeaponId, WeaponBurstState>;
   readonly orbAngles: Map<WeaponId, number>;
   readonly orbHitCooldowns: Map<WeaponId, Map<number, number>>;
   regenAccumulator: number;
@@ -82,11 +91,7 @@ export const createInitialBattleState = (
       critDamageMultiplier: 1.5,
       unlockedWeaponIds: [weaponId],
       weaponModifiers: {
-        [weaponId]: {
-          damageMultiplier: 1,
-          cooldownMultiplier: 1,
-          durationMultiplier: 1,
-        },
+        [weaponId]: createDefaultWeaponModifier(),
       } as Record<WeaponId, WeaponModifierState>,
     },
     spawner: {
@@ -98,9 +103,11 @@ export const createInitialBattleState = (
     projectiles: [],
     slashArcs: [],
     beams: [],
-    bellWaves: [],
+    talismanStrikes: [],
+    explosions: [],
     floatingTexts: [],
     weaponCooldowns: new Map<WeaponId, number>([[weaponId, 0]]),
+    weaponBursts: new Map<WeaponId, WeaponBurstState>(),
     orbAngles: new Map<WeaponId, number>(),
     orbHitCooldowns: new Map<WeaponId, Map<number, number>>(),
     regenAccumulator: 0,
@@ -153,14 +160,19 @@ export const applyDamageToEnemy = (
   nextEntityId: () => number,
 ): void => {
   if (enemy.hp <= 0) return;
-  enemy.hp -= dmg;
+  const vulnMult =
+    enemy.vulnerableRemainingMs && enemy.vulnerableRemainingMs > 0
+      ? (enemy.vulnerableMultiplier ?? 1)
+      : 1;
+  const finalDmg = Math.max(1, Math.round(dmg * vulnMult));
+  enemy.hp -= finalDmg;
   enemy.hitFlashMs = 90;
   audio.playHit(isCrit);
   state.floatingTexts.push({
     id: nextEntityId(),
     x: enemy.x,
     y: enemy.y - enemy.radius,
-    text: isCrit ? `${String(dmg)}!` : String(dmg),
+    text: isCrit ? `${String(finalDmg)}!` : String(finalDmg),
     isCrit,
     isHeal: false,
     remainingLifeMs: 550,

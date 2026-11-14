@@ -30,7 +30,7 @@ describe("features/stage-select/StageSelectScreen (5-State, Route Guard, Integra
     await clearDatabase();
   });
 
-  it("renders Loading then all 3 stages with cleared/unverified/locked statuses and formation link", async () => {
+  it("renders Loading then cleared and next unverified stages (hiding locked stages) with compact reward badge", async () => {
     await storageSeedMidProgress();
     render(<App />);
 
@@ -39,24 +39,38 @@ describe("features/stage-select/StageSelectScreen (5-State, Route Guard, Integra
     await waitFor(() => {
       expect(screen.getByText("第壱節：迷いの竹林")).toBeTruthy();
     });
-    expect(screen.getByText("第弐節：枯れ宿場の古道")).toBeTruthy();
-    expect(screen.getByText("第参節：穢れし古社")).toBeTruthy();
+    const stage1Heading = screen.getByText("第壱節：迷いの竹林");
+    const stage2Heading = screen.getByText("第弐節：枯れ宿場の古道");
+    const formationHeading = screen.getByText("現在の出撃編成");
+    expect(
+      formationHeading.compareDocumentPosition(stage2Heading) &
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      stage2Heading.compareDocumentPosition(stage1Heading) &
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    // 未解放ステージは非表示
+    expect(screen.queryByText("第参節：穢れし古社")).toBeNull();
+    expect(screen.queryByText("未解放")).toBeNull();
+    expect(screen.queryByText(/解放条件:/)).toBeNull();
+
     expect(screen.getByText("浄化済み")).toBeTruthy();
     expect(screen.getByText("未浄化")).toBeTruthy();
-    expect(screen.getAllByText("未解放")).toHaveLength(2);
-    expect(
-      screen.getByText("解放条件:「第弐節：枯れ宿場の古道」浄化で解放"),
-    ).toBeTruthy();
+
+    // 報酬が1つのバッジにまとまっている
+    expect(screen.getAllByText("報酬:")).toHaveLength(2);
+    expect(screen.getByText("+120")).toBeTruthy();
+    expect(screen.getByText("+2")).toBeTruthy();
 
     // 現在の出撃編成サマリー
     expect(screen.getByText("安倍 晴明（見習い）")).toBeTruthy();
     expect(screen.getByText("銘刀・波紋")).toBeTruthy();
 
-    // 未解放ボタンは Disabled、解放済みボタンは 2つ有効
-    const lockedBtn = screen.getByRole<HTMLButtonElement>("button", {
-      name: "未解放",
-    });
-    expect(lockedBtn.disabled).toBe(true);
+    // 解放済みボタンは 2つ有効、未解放ボタンは非表示
+    expect(
+      screen.queryByRole<HTMLButtonElement>("button", { name: "未解放" }),
+    ).toBeNull();
     const sortieBtns = screen.getAllByRole<HTMLButtonElement>("button", {
       name: "出撃する",
     });

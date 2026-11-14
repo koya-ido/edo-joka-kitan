@@ -46,7 +46,7 @@ export const HomeScreen = ({ save, actions, onNavigate }: HomeScreenProps) => (
         className="min-h-14 w-full gap-2.5 rounded-lg border-2 border-accent/60 font-display text-lg font-bold tracking-wider"
       >
         <Compass className="h-5 w-5" aria-hidden="true" />
-        出撃する（ステージ選択へ）
+        出撃する
       </Button>
       <Button
         variant="outline"

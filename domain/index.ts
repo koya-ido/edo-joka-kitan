@@ -14,6 +14,7 @@ export {
 } from "./battle-session";
 export {
   applyUpgradeOption,
+  createDefaultWeaponModifier,
   generateUpgradeChoices,
   MAX_ACTIVE_WEAPONS_IN_RUN,
   type GenerateUpgradeChoicesInput,
@@ -26,6 +27,12 @@ export {
   guardEnhanceable,
   type TotalMetaStats,
 } from "./enhance";
+export {
+  applyWeaponRefine,
+  calculateWeaponRefineCost,
+  guardWeaponRefineable,
+  type WeaponRefineCheckResult,
+} from "./enhance-weapon";
 export {
   applyFormationChange,
   getOwnedCharacterEntries,

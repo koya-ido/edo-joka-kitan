@@ -1,3 +1,4 @@
+import { HisuiIcon, MagatamaIcon } from "@/components/icons";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -55,11 +56,16 @@ export const StageCard = ({
         <Separator />
 
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="default" className="tabular-nums">
-            報酬: 勾玉 +{master.clearReward.magatama}
-          </Badge>
-          <Badge variant="default" className="tabular-nums">
-            翡翠 +{master.clearReward.hisui}
+          <Badge variant="default" className="gap-1.5 tabular-nums">
+            <span>報酬:</span>
+            <span className="inline-flex items-center gap-0.5">
+              <MagatamaIcon className="h-3.5 w-3.5 shrink-0 text-magatama" />
+              <span>+{master.clearReward.magatama}</span>
+            </span>
+            <span className="inline-flex items-center gap-0.5">
+              <HisuiIcon className="h-3.5 w-3.5 shrink-0 text-hisui" />
+              <span>+{master.clearReward.hisui}</span>
+            </span>
           </Badge>
           {isFirstClearBonusAvailable && (
             <Badge variant="accent" className="tabular-nums">

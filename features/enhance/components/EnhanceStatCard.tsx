@@ -41,7 +41,7 @@ export const EnhanceStatCard = ({
   const levelLabel = isMaxLevel
     ? `Lv.${String(currentLevel)}（最大）`
     : currentLevel === 0
-      ? "Lv.0（未強化）"
+      ? "Lv.0"
       : `Lv.${String(currentLevel)} / ${String(config.maxLevel)}`;
 
   const buttonLabel = isThisPending
@@ -79,19 +79,26 @@ export const EnhanceStatCard = ({
           )}
           {!isMaxLevel && (
             <div className="flex items-center gap-1 pt-0.5">
+              <Text
+                size="caption"
+                className={hasEnoughMagatama ? undefined : "text-warning"}
+              >
+                必要数:
+              </Text>
               <MagatamaIcon
                 className={
                   hasEnoughMagatama
                     ? "h-4 w-4 text-magatama"
                     : "h-4 w-4 text-warning"
                 }
+                aria-hidden="true"
               />
               <Text
                 size="caption"
                 tabularNums
                 className={hasEnoughMagatama ? undefined : "text-warning"}
               >
-                必要勾玉: {cost}
+                ×{cost}
               </Text>
             </div>
           )}

@@ -7,11 +7,12 @@ import {
   BATTLE_FIELD_HEIGHT,
   BATTLE_FIELD_WIDTH,
   type BeamEntity,
-  type BellWaveEntity,
   type EnemyEntity,
+  type ExplosionEntity,
   type FloatingTextEntity,
   type ProjectileEntity,
   type SlashArcEntity,
+  type TalismanStrikeEntity,
 } from "@/engine/types";
 import type { WeaponMaster } from "@/types";
 
@@ -23,11 +24,14 @@ export interface BattleRenderState {
   readonly projectiles: readonly ProjectileEntity[];
   readonly slashArcs: readonly SlashArcEntity[];
   readonly beams: readonly BeamEntity[];
-  readonly bellWaves: readonly BellWaveEntity[];
+  readonly talismanStrikes?: readonly TalismanStrikeEntity[];
+  readonly explosions?: readonly ExplosionEntity[];
   readonly floatingTexts: readonly FloatingTextEntity[];
   readonly orbitalWeapons: readonly {
     readonly weapon: WeaponMaster;
     readonly angleRad: number;
+    readonly extraOrbs?: number;
+    readonly rangeMultiplier?: number;
   }[];
 }
 
@@ -92,6 +96,21 @@ const drawEnemiesAndTexts = (
   const { palette } = state;
 
   for (const enemy of state.enemies) {
+    const hasSlow = (enemy.slowRemainingMs ?? 0) > 0;
+    const hasVulnerable = (enemy.vulnerableRemainingMs ?? 0) > 0;
+    const hasDebuff = hasSlow || hasVulnerable;
+
+    if (hasDebuff) {
+      ctx.save();
+      ctx.strokeStyle = palette.magatama;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.arc(enemy.x, enemy.y, enemy.radius + 4, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
     ctx.fillStyle =
       enemy.hitFlashMs > 0
         ? palette.foreground
@@ -102,6 +121,14 @@ const drawEnemiesAndTexts = (
     ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2);
     ctx.fill();
 
+    if (hasDebuff && enemy.hitFlashMs <= 0) {
+      ctx.save();
+      ctx.strokeStyle = hasSlow ? palette.exp : palette.magatama;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
+    }
+
     const barWidth = enemy.radius * 2;
     const barX = enemy.x - enemy.radius;
     const barY = enemy.y - enemy.radius - 8;
@@ -109,6 +136,19 @@ const drawEnemiesAndTexts = (
     ctx.fillRect(barX, barY, barWidth, 4);
     ctx.fillStyle = enemy.isBoss ? palette.accent : palette.barrier;
     ctx.fillRect(barX, barY, barWidth * Math.max(0, enemy.hp / enemy.maxHp), 4);
+
+    if (hasSlow) {
+      ctx.fillStyle = palette.exp;
+      ctx.beginPath();
+      ctx.arc(barX - 5, barY + 2, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    if (hasVulnerable) {
+      ctx.fillStyle = palette.magatama;
+      ctx.beginPath();
+      ctx.arc(barX + barWidth + 5, barY + 2, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   ctx.font = "bold 12px sans-serif";

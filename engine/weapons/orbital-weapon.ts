@@ -4,6 +4,7 @@ import {
   readGenreParam,
   type EnemyEntity,
 } from "@/engine/types";
+import { applyEnemyDebuff } from "@/engine/weapons/debuff";
 import type { WeaponMaster } from "@/types";
 
 /** 霊珠・勾玉系（orb）の旋回座標更新と接触ダメージ判定を行う */
@@ -16,12 +17,17 @@ export const updateOrbitalWeapon = (
   damage: number,
   isCrit: boolean,
   onDamageEnemy: (enemy: EnemyEntity, damage: number, isCrit: boolean) => void,
+  extraOrbCount = 0,
+  rangeMultiplier = 1,
+  debuffLevel = 0,
 ): number => {
   const orbCount = Math.max(
     1,
-    readGenreParam(weapon.genreParams, "orbCount", 3),
+    readGenreParam(weapon.genreParams, "orbCount", 3) + extraOrbCount,
   );
-  const orbitRadius = readGenreParam(weapon.genreParams, "orbitRadius", 88);
+  const orbitRadius =
+    readGenreParam(weapon.genreParams, "orbitRadius", 88) *
+    Math.max(0.5, rangeMultiplier);
   const angularSpeed = readGenreParam(weapon.genreParams, "angularSpeed", 2.8);
   const nextAngle = orbAngleRad + angularSpeed * (dtMs / 1000);
   const hitIntervalMs = Math.max(200, weapon.baseCooldownMs);
@@ -42,6 +48,7 @@ export const updateOrbitalWeapon = (
       const dist = Math.hypot(enemy.x - ox, enemy.y - oy);
       if (dist <= enemy.radius + 11) {
         hitCooldownMap.set(enemy.id, hitIntervalMs);
+        applyEnemyDebuff(enemy, debuffLevel);
         onDamageEnemy(enemy, damage, isCrit);
       }
     }

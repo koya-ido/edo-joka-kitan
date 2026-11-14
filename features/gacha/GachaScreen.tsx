@@ -1,5 +1,4 @@
 import { Tabs } from "@/components/ui/Tabs";
-import { Text } from "@/components/ui/Typography";
 import { GachaPoolPanel } from "@/features/gacha/components/GachaPoolPanel";
 import { GachaRatesModal } from "@/features/gacha/components/GachaRatesModal";
 import { GachaResultModal } from "@/features/gacha/components/GachaResultModal";
@@ -65,10 +64,6 @@ export const GachaScreen = ({ save, actions, isSessionPending }: Props) => {
           />
         </Tabs.Content>
       </Tabs.Root>
-
-      <Text size="caption" tone="muted" className="text-center">
-        ※ 召喚はローカルの IndexedDB に即時保存されます。
-      </Text>
 
       <GachaSummonAnimationOverlay
         open={actions.isAnimating}

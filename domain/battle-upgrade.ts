@@ -1,3 +1,4 @@
+import { applyWeaponModifierOption } from "@/domain/battle-upgrade-apply";
 import {
   buildBaseStatOptions,
   buildWeaponStatOptions,
@@ -19,15 +20,32 @@ export interface GenerateUpgradeChoicesInput {
   readonly buffState: InGameBuffState;
   readonly weaponMap: Readonly<Record<WeaponId, WeaponMaster>>;
   readonly allWeapons: readonly WeaponMaster[];
+  readonly ownedWeaponIds?: readonly WeaponId[];
   readonly maxActiveWeapons?: number;
   readonly choiceCount?: number;
   readonly rng?: () => number;
 }
 
-const createDefaultWeaponModifier = (): WeaponModifierState => ({
+export const createDefaultWeaponModifier = (): WeaponModifierState => ({
   damageMultiplier: 1,
   cooldownMultiplier: 1,
   durationMultiplier: 1,
+  rangeMultiplier: 1,
+  slashWaveEnabled: false,
+  slashWaveSizeMultiplier: 1,
+  slashWavePierceBonus: 0,
+  comboBonus: 0,
+  extraProjectiles: 0,
+  pierceBonus: 0,
+  bounceBonus: 0,
+  explosionEnabled: false,
+  explosionRadiusMultiplier: 1,
+  splitEnabled: false,
+  splitPierceBonus: 0,
+  splitBounceBonus: 0,
+  chainBonus: 0,
+  knockbackMultiplier: 1,
+  debuffLevel: 0,
 });
 
 /**
@@ -41,15 +59,22 @@ export const generateUpgradeChoices = (
   const choiceCount = Math.max(1, input.choiceCount ?? 3);
   const rng = input.rng ?? Math.random;
 
+  const unlockCandidateWeapons = input.ownedWeaponIds
+    ? input.allWeapons.filter((weapon) =>
+        input.ownedWeaponIds?.includes(weapon.id),
+      )
+    : input.allWeapons;
+
   const pool: InGameUpgradeOption[] = [
     ...buildBaseStatOptions(),
     ...buildWeaponStatOptions(
       input.buffState.unlockedWeaponIds,
       input.weaponMap,
+      input.buffState.weaponModifiers,
     ),
     ...buildWeaponUnlockOptions(
       input.buffState.unlockedWeaponIds,
-      input.allWeapons,
+      unlockCandidateWeapons,
       maxWeapons,
     ),
   ];
@@ -122,22 +147,14 @@ export const applyUpgradeOption = (
     ? buffState.weaponModifiers[targetId]
     : createDefaultWeaponModifier();
 
-  const nextMod: WeaponModifierState = { ...existing };
-  if (option.statType === "weapon_dmg") {
-    nextMod.damageMultiplier *= option.multiplierOrDelta;
-  } else if (option.statType === "attack_freq") {
-    nextMod.cooldownMultiplier *= option.multiplierOrDelta;
-  } else if (option.statType === "duration") {
-    nextMod.durationMultiplier *= option.multiplierOrDelta;
-  } else {
-    return err("STORAGE_ERROR", "不明な武器強化種別です。");
-  }
+  const modResult = applyWeaponModifierOption(existing, option);
+  if (!modResult.ok) return modResult;
 
   return ok({
     ...buffState,
     weaponModifiers: {
       ...buffState.weaponModifiers,
-      [targetId]: nextMod,
+      [targetId]: modResult.data,
     },
   });
 };

@@ -1,19 +1,15 @@
-import { WeaponSlotBar } from "@/components/shared/WeaponSlotBar";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 import { Progress } from "@/components/ui/Progress";
 import { Toggle } from "@/components/ui/Toggle";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { Text } from "@/components/ui/Typography";
 import type { BattleViewState } from "@/engine";
-import { Pause } from "lucide-react";
 
 export interface BattleHudOverlayProps {
   readonly stageName: string;
   readonly viewState: BattleViewState;
   readonly controlsDisabled: boolean;
   readonly onToggleSpeed: () => void;
-  readonly onPause: () => void;
 }
 
 export const BattleHudOverlay = ({
@@ -21,14 +17,13 @@ export const BattleHudOverlay = ({
   viewState,
   controlsDisabled,
   onToggleSpeed,
-  onPause,
 }: BattleHudOverlayProps) => {
-  const { hud, buffState } = viewState;
+  const { hud } = viewState;
   const isDoubleSpeed = hud.gameSpeed === 2;
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-10 flex flex-col justify-between p-3">
-      <div className="pointer-events-auto flex flex-col gap-2 rounded-lg border border-border/30 bg-battle-surface/85 p-3 text-battle-foreground backdrop-blur-xs">
+    <div className="z-10 shrink-0 border-t border-border/30 bg-battle-surface px-3 pt-2.5 pb-[calc(0.75rem+env(safe-area-inset-bottom))] text-battle-foreground">
+      <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0">
             <Text
@@ -65,26 +60,15 @@ export const BattleHudOverlay = ({
                   {isDoubleSpeed ? "2x" : "1x"}
                 </Toggle>
               </Tooltip.Trigger>
-              <Tooltip.Content>等速 (1x) / 2倍速 (2x) 切替</Tooltip.Content>
+              <Tooltip.Content>等速 / 2倍速 切替</Tooltip.Content>
             </Tooltip.Root>
-
-            <Button
-              type="button"
-              variant="secondary"
-              size="icon"
-              disabled={controlsDisabled}
-              onClick={onPause}
-              aria-label="一時停止"
-            >
-              <Pause className="h-4 w-4" aria-hidden="true" />
-            </Button>
           </div>
         </div>
 
         <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between">
             <Text size="caption" className="text-battle-foreground/85">
-              結界耐久
+              耐久値
             </Text>
             <Text
               size="caption"
@@ -124,13 +108,6 @@ export const BattleHudOverlay = ({
             />
           </Progress.Root>
         </div>
-      </div>
-
-      <div className="pointer-events-auto rounded-lg border border-border/30 bg-battle-surface/85 p-2 backdrop-blur-xs">
-        <WeaponSlotBar
-          unlockedWeaponIds={buffState.unlockedWeaponIds}
-          compact
-        />
       </div>
     </div>
   );

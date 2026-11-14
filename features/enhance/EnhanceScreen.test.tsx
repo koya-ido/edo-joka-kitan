@@ -47,11 +47,11 @@ describe("features/enhance/EnhanceScreen (5-State, Double-Submit Guard, Integrat
     expect(screen.getByText("霊脈接続中…")).toBeTruthy();
 
     await waitFor(() => {
-      expect(screen.getAllByText("Lv.0（未強化）")).toHaveLength(3);
+      expect(screen.getAllByText("Lv.0")).toHaveLength(3);
     });
     expect(
       screen.getByText(
-        "現在はすべて未強化（Lv.0）です。水晶の勾玉を捧げて基礎能力を底上げしましょう。",
+        "水晶の勾玉を捧げて基礎能力を底上げしましょう。",
       ),
     ).toBeTruthy();
     expect(screen.getByText("120")).toBeTruthy();
@@ -83,7 +83,7 @@ describe("features/enhance/EnhanceScreen (5-State, Double-Submit Guard, Integrat
     await waitFor(() => {
       expect(screen.getByText("Lv.1 / 20")).toBeTruthy();
       expect(screen.getByText("140")).toBeTruthy();
-      expect(screen.getByText("結界耐久を Lv.1 に強化しました")).toBeTruthy();
+      expect(screen.getByText("耐久値を Lv.1 に強化しました")).toBeTruthy();
     });
   });
 
@@ -150,5 +150,62 @@ describe("features/enhance/EnhanceScreen (5-State, Double-Submit Guard, Integrat
       expect(screen.getByRole("button", { name: "再試行" })).toBeTruthy();
     });
     expect(screen.queryByRole("button", { name: "強化する" })).toBeNull();
+  });
+
+  it("switches to weapon enhance tab, refines weapon with double-submit guard, and updates UI & toast", async () => {
+    await storage.seedEnhanceMidProgressSave();
+
+    let resolveRefine!: (
+      value: Awaited<ReturnType<typeof storage.enhanceWeaponRefine>>,
+    ) => void;
+    const realRefine = storage.enhanceWeaponRefine;
+    const refineSpy = vi
+      .spyOn(storage, "enhanceWeaponRefine")
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolveRefine = resolve;
+          }),
+      );
+
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("tab", { name: "武器強化" })).toBeTruthy();
+    });
+
+    const weaponTab = screen.getByRole("tab", { name: "武器強化" });
+    fireEvent.mouseDown(weaponTab);
+    fireEvent.click(weaponTab);
+
+    await waitFor(() => {
+      expect(screen.getByText("銘刀・波紋")).toBeTruthy();
+      expect(screen.getByText("精錬Lv.0")).toBeTruthy();
+    });
+
+    const refineBtn = screen.getByRole<HTMLButtonElement>("button", {
+      name: "精錬する",
+    });
+    fireEvent.click(refineBtn);
+    fireEvent.click(refineBtn);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole<HTMLButtonElement>("button", { name: "強化中…" })
+          .disabled,
+      ).toBe(true);
+    });
+    expect(refineSpy).toHaveBeenCalledTimes(1);
+
+    refineSpy.mockRestore();
+    const committed = await realRefine("sword_hamon");
+    resolveRefine(committed);
+
+    await waitFor(() => {
+      expect(screen.getByText("精錬Lv.1 / 5")).toBeTruthy();
+      expect(
+        screen.getByText("銘刀・波紋を 精錬Lv.1 に強化しました"),
+      ).toBeTruthy();
+    });
   });
 });

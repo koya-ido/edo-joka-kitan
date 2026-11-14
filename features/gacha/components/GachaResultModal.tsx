@@ -24,7 +24,7 @@ const mapOutcomeToStatus = (item: GachaPullResultItem): DomainStatusType => {
 
 const formatLevelProgress = (item: GachaPullResultItem): string => {
   if (item.outcome === "new") {
-    return "Lv.0（初獲得）";
+    return "Lv.0";
   }
   if (item.outcome === "awakening_or_refine") {
     return `Lv.${String(item.previousLevel ?? 0)} → Lv.${String(item.nextLevel)}`;
@@ -43,7 +43,7 @@ export const GachaResultModal = ({ open, onOpenChange, result }: Props) => {
         <Dialog.Header>
           <Dialog.Title>召喚結果</Dialog.Title>
           <Dialog.Description>
-            消費翡翠: {result.spentHisui} 個（{result.items.length}回召喚）
+            消費翡翠: {result.spentHisui} 個
           </Dialog.Description>
         </Dialog.Header>
 

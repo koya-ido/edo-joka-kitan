@@ -60,7 +60,7 @@ export const FormationSummaryCard = ({
                   {characterMaster.name}
                 </Text>
                 <Text size="caption" tone="muted">
-                  固有: {characterMaster.passiveSkill.name} (+{String(passiveValue)})
+                  固有: {characterMaster.passiveSkill.name}
                 </Text>
               </div>
             </div>
@@ -126,7 +126,7 @@ export const FormationSummaryCard = ({
         atk={totalStats.atk}
         luk={totalStats.luk}
         title="合算基礎ステータス"
-        subtitle={`${characterMaster.name}（覚醒Lv.${String(awakeningLevel)}）＋ 社での永続強化`}
+        subtitle={characterMaster.name}
       />
     </div>
   );

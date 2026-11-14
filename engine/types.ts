@@ -7,6 +7,7 @@ import type {
   InGameBuffState,
   PassiveEffectType,
   StageMaster,
+  WeaponColorToken,
   WeaponGenre,
   WeaponId,
   WeaponMaster,
@@ -37,12 +38,17 @@ export interface EnemyEntity {
   readonly radius: number;
   contactCooldownMs: number;
   hitFlashMs: number;
+  slowRemainingMs?: number;
+  slowRatio?: number;
+  vulnerableRemainingMs?: number;
+  vulnerableMultiplier?: number;
 }
 
 /** 飛翔弾・呪符・火縄弾エンティティ */
 export interface ProjectileEntity {
   readonly id: number;
   readonly genre: WeaponGenre;
+  readonly colorToken: WeaponColorToken;
   x: number;
   y: number;
   vx: number;
@@ -56,6 +62,10 @@ export interface ProjectileEntity {
   readonly explosionRadius: number;
   readonly splashRatio: number;
   readonly homingTurnRate: number;
+  remainingBounces: number;
+  splitCount: number;
+  readonly splitPierceBonus: number;
+  readonly splitBounceBonus: number;
   readonly hitEnemyIds: Set<number>;
 }
 
@@ -63,6 +73,7 @@ export interface ProjectileEntity {
 export interface SlashArcEntity {
   readonly id: number;
   readonly genre: "sword" | "fan";
+  readonly colorToken: WeaponColorToken;
   readonly x: number;
   readonly y: number;
   readonly angleRad: number;
@@ -72,9 +83,20 @@ export interface SlashArcEntity {
   readonly maxLifeMs: number;
 }
 
+/** 爆発エフェクト */
+export interface ExplosionEntity {
+  readonly id: number;
+  readonly x: number;
+  readonly y: number;
+  readonly radius: number;
+  remainingLifeMs: number;
+  readonly maxLifeMs: number;
+}
+
 /** 鏡系照射ビーム */
 export interface BeamEntity {
   readonly id: number;
+  readonly colorToken: WeaponColorToken;
   readonly targetEnemyId: number;
   readonly damagePerTick: number;
   readonly isCrit: boolean;
@@ -84,20 +106,35 @@ export interface BeamEntity {
   remainingLifeMs: number;
   endX: number;
   endY: number;
+  readonly bounceRemaining: number;
+  readonly explosionRadius: number;
+  chainPoints?: readonly { readonly x: number; readonly y: number }[];
 }
 
-/** 鈴系全方位波動 */
-export interface BellWaveEntity {
+/** 呪符系・直接召喚（落雷／霊風）エフェクト */
+export interface TalismanStrikeEntity {
+  readonly id: number;
+  readonly colorToken: WeaponColorToken;
+  readonly x: number;
+  readonly y: number;
+  readonly chainLines: readonly {
+    readonly fromX: number;
+    readonly fromY: number;
+    readonly toX: number;
+    readonly toY: number;
+  }[];
+  remainingLifeMs: number;
+  readonly maxLifeMs: number;
+}
+
+/** 爆発エフェクト */
+export interface ExplosionEntity {
   readonly id: number;
   readonly x: number;
   readonly y: number;
-  currentRadius: number;
-  readonly maxRadius: number;
-  readonly damage: number;
-  readonly isCrit: boolean;
+  readonly radius: number;
   remainingLifeMs: number;
   readonly maxLifeMs: number;
-  readonly hitEnemyIds: Set<number>;
 }
 
 /** 浮遊ダメージ数値 */
@@ -108,6 +145,16 @@ export interface FloatingTextEntity {
   readonly text: string;
   readonly isCrit: boolean;
   readonly isHeal: boolean;
+  remainingLifeMs: number;
+  readonly maxLifeMs: number;
+}
+
+/** 爆発エフェクト */
+export interface ExplosionEntity {
+  readonly id: number;
+  readonly x: number;
+  readonly y: number;
+  readonly radius: number;
   remainingLifeMs: number;
   readonly maxLifeMs: number;
 }
@@ -147,8 +194,4 @@ export interface BattleEngineConfig {
 }
 
 /** 武器の genreParams から安全に数値を取得する */
-export const readGenreParam = (
-  params: Readonly<Record<string, number>>,
-  key: string,
-  fallback: number,
-): number => (Object.hasOwn(params, key) ? params[key] : fallback);
+export const readGenreParam = (params: Readonly<Record<string, number>>, key: string, fallback: number): number => (Object.hasOwn(params, key) ? params[key] : fallback);

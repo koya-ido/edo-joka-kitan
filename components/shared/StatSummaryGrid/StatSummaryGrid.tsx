@@ -38,13 +38,13 @@ export const StatSummaryGrid = ({
   const items: readonly StatCellItem[] = [
     {
       key: "hp",
-      label: "結界耐久",
+      label: "耐久値",
       valueText: String(hp),
       deltaText: deltas?.hp && deltas.hp > 0 ? `+${String(deltas.hp)}` : null,
     },
     {
       key: "atk",
-      label: "霊力攻撃",
+      label: "攻撃力",
       valueText: String(atk),
       deltaText:
         deltas?.atk && deltas.atk > 0 ? `+${String(deltas.atk)}` : null,

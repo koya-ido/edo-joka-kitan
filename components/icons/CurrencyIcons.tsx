@@ -25,11 +25,11 @@ export const HisuiIcon = ({ className, ...rest }: SVGProps<SVGSVGElement>) => (
     {...rest}
   >
     <path
-      d="M12 2.5L19.5 8.5L17 19.5H7L4.5 8.5L12 2.5Z"
+      d="M12 3.5L19.5 9.5L17 20.5H7L4.5 9.5L12 3.5Z"
       fill="currentColor"
     />
     <path
-      d="M12 5.5L15.5 9.5L14 17H10L8.5 9.5L12 5.5Z"
+      d="M12 6.5L15.5 10.5L14 18H10L8.5 10.5L12 6.5Z"
       fill="var(--card)"
       fillOpacity="0.3"
     />

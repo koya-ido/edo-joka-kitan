@@ -1,5 +1,6 @@
 import {
   enhancePermanentStat,
+  enhanceWeaponRefine,
   loadOrInitializeSave,
   openPlayerDb,
   seedEnhanceInsufficientMagatamaSave,
@@ -138,5 +139,62 @@ describe("storage/enhance-repository (atomic tx & 401/403 guards)", () => {
     dbCheck.close();
     expect(raw?.permanentStats.hpLevel).toBe(999);
     expect(raw?.permanentStats.atkLevel).toBe(0);
+  });
+
+  it("refines owned weapon and persists refineLevel & magatama deduction", async () => {
+    await seedInitialPlayerSave();
+    const db = await openPlayerDb();
+    const tx = db.transaction("playerSave", "readwrite");
+    const store = tx.objectStore("playerSave");
+    const existing = await store.get(SAVE_RECORD_KEY);
+    if (existing) {
+      await store.put(
+        {
+          ...existing,
+          currencies: { ...existing.currencies, magatama: 100 },
+        },
+        SAVE_RECORD_KEY,
+      );
+    }
+    await tx.done;
+    db.close();
+
+    const res = await enhanceWeaponRefine("sword_hamon");
+    expect(res.ok).toBe(true);
+    if (res.ok) {
+      expect(res.data.ownedWeapons.sword_hamon.refineLevel).toBe(1);
+      expect(res.data.currencies.magatama).toBe(70);
+    }
+
+    const reloaded = await loadOrInitializeSave();
+    expect(reloaded.ok).toBe(true);
+    if (reloaded.ok) {
+      expect(reloaded.data.save.ownedWeapons.sword_hamon.refineLevel).toBe(1);
+      expect(reloaded.data.save.currencies.magatama).toBe(70);
+    }
+  });
+
+  it("403-equivalent: rejects unowned weapon and insufficient magatama in enhanceWeaponRefine", async () => {
+    await seedEnhanceInsufficientMagatamaSave();
+
+    const insufficientRes = await enhanceWeaponRefine("sword_hamon");
+    expect(insufficientRes.ok).toBe(false);
+    if (!insufficientRes.ok) {
+      expect(insufficientRes.error.code).toBe("INSUFFICIENT_MAGATAMA");
+    }
+
+    const unownedRes = await enhanceWeaponRefine("bow_azusa");
+    expect(unownedRes.ok).toBe(false);
+    if (!unownedRes.ok) {
+      expect(unownedRes.error.code).toBe("UNOWNED_WEAPON");
+    }
+  });
+
+  it("401-equivalent: rejects enhanceWeaponRefine when save record is missing", async () => {
+    const res = await enhanceWeaponRefine("sword_hamon");
+    expect(res.ok).toBe(false);
+    if (!res.ok) {
+      expect(res.error.code).toBe("SAVE_CORRUPTED");
+    }
   });
 });

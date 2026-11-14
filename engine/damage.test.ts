@@ -1,4 +1,5 @@
 import { CHARACTER_MASTER_MAP, WEAPON_MASTER_MAP } from "@/data";
+import { createDefaultWeaponModifier } from "@/domain";
 import {
   calculateEffectiveCooldownMs,
   calculateWeaponDamage,
@@ -13,11 +14,7 @@ const baseBuffState = (): InGameBuffState => ({
   critDamageMultiplier: 1.5,
   unlockedWeaponIds: ["sword_hamon"],
   weaponModifiers: {
-    sword_hamon: {
-      damageMultiplier: 1,
-      cooldownMultiplier: 1,
-      durationMultiplier: 1,
-    },
+    sword_hamon: createDefaultWeaponModifier(),
   },
 });
 

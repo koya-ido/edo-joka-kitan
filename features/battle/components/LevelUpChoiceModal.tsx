@@ -1,3 +1,4 @@
+import { MagatamaIcon } from "@/components/icons";
 import { CurrencyPill } from "@/components/shared/CurrencyPill";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -31,7 +32,6 @@ const CATEGORY_LABEL_MAP: Readonly<
 
 export const LevelUpChoiceModal = ({
   open,
-  level,
   choices,
   currentMagatama,
   rerollCostMagatama,
@@ -49,7 +49,7 @@ export const LevelUpChoiceModal = ({
         <Dialog.Header>
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-accent" aria-hidden="true" />
-            <Dialog.Title>霊力昇華（Lv.{level}）</Dialog.Title>
+            <Dialog.Title>霊力昇華</Dialog.Title>
           </div>
           <Dialog.Description>
             獲得する術式を1つ選択してください。
@@ -119,7 +119,9 @@ export const LevelUpChoiceModal = ({
               onClick={onReroll}
             >
               <RefreshCw className="h-4 w-4" aria-hidden="true" />
-              再抽選（勾玉 {rerollCostMagatama}）
+              <span>再抽選</span>
+              <MagatamaIcon className="h-4 w-4 text-magatama" aria-hidden="true" />
+              <span className="tabular-nums">×{rerollCostMagatama}</span>
             </Button>
             {!canAffordReroll ? (
               <Text size="caption" tone="destructive">

@@ -9,9 +9,10 @@ export interface AppShellProps {
   currentPath: string;
   onNavigate: (path: string) => void;
   currencies?: CurrencyBalances | null;
-  onBack?: () => void;
   headerActions?: ReactNode;
+  hideHeader?: boolean;
   hideBottomNav?: boolean;
+  fullBleed?: boolean;
   isNavigationDisabled?: boolean;
   children: ReactNode;
 }
@@ -21,9 +22,10 @@ export const AppShell = ({
   currentPath,
   onNavigate,
   currencies,
-  onBack,
   headerActions,
+  hideHeader = false,
   hideBottomNav = false,
+  fullBleed = false,
   isNavigationDisabled = false,
   children,
 }: AppShellProps) => (
@@ -34,14 +36,17 @@ export const AppShell = ({
         "md:max-w-[450px] md:border-x-2 md:border-accent/35 md:shadow-2xl",
       )}
     >
-      <ScreenHeader
-        title={title}
-        currencies={currencies}
-        onBack={onBack}
-        disabled={isNavigationDisabled}
-        actions={headerActions}
-      />
-      <main className="flex flex-1 flex-col px-3.5 py-3">{children}</main>
+      {!hideHeader && (
+        <ScreenHeader
+          title={title}
+          currencies={currencies}
+          isHome={currentPath === "/"}
+          actions={headerActions}
+        />
+      )}
+      <main className={cn("flex flex-1 flex-col", fullBleed ? "p-0" : "px-3.5 py-3")}>
+        {children}
+      </main>
       {!hideBottomNav && (
         <BottomTabNav
           currentPath={currentPath}

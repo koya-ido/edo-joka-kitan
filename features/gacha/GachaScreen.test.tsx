@@ -59,10 +59,10 @@ describe("features/gacha/GachaScreen (5-State, Double-Submit Guard, Skip, Integr
     });
 
     const singleButton = screen.getByRole<HTMLButtonElement>("button", {
-      name: /1回召喚（翡翠 5）/,
+      name: /1回召喚\s*×5/,
     });
     const multiButton = screen.getByRole<HTMLButtonElement>("button", {
-      name: /10回召喚（翡翠 50）/,
+      name: /10回召喚\s*×50/,
     });
     expect(singleButton.disabled).toBe(false);
     expect(multiButton.disabled).toBe(false);
@@ -151,7 +151,7 @@ describe("features/gacha/GachaScreen (5-State, Double-Submit Guard, Skip, Integr
       expect(screen.getByText("英霊召喚の儀")).toBeTruthy();
     });
 
-    fireEvent.click(screen.getByRole("button", { name: /10回召喚（翡翠 50）/ }));
+    fireEvent.click(screen.getByRole("button", { name: /10回召喚\s*×50/ }));
 
     await waitFor(() => {
       expect(screen.getByText("霊脈召喚中…")).toBeTruthy();

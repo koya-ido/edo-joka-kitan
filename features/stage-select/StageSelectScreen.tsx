@@ -36,6 +36,13 @@ export const StageSelectScreen = ({
   });
 
   const isLocked = isSortiePending || isSessionPending;
+  const nextUnverifiedItem = items.find(
+    (item) => item.isUnlocked && !item.isCleared,
+  );
+  const visibleItems = items.filter(
+    (item) => item.isCleared || item === nextUnverifiedItem,
+  );
+  const orderedItems = [...visibleItems].reverse();
 
   return (
     <div className="flex flex-col gap-4">
@@ -51,7 +58,13 @@ export const StageSelectScreen = ({
         </div>
       )}
 
-      {items.length === 0 ? (
+      <EquippedSummaryBar
+        summary={equippedSummary}
+        isDisabled={isLocked}
+        onOpenFormation={handleOpenFormation}
+      />
+
+      {orderedItems.length === 0 ? (
         <Card.Root>
           <Card.Header>
             <Heading as="h2">選択可能な土地がありません</Heading>
@@ -75,7 +88,7 @@ export const StageSelectScreen = ({
         </Card.Root>
       ) : (
         <section aria-label="出撃ステージ一覧" className="flex flex-col gap-3">
-          {items.map((item) => (
+          {orderedItems.map((item) => (
             <StageCard
               key={item.master.id}
               item={item}
@@ -86,12 +99,6 @@ export const StageSelectScreen = ({
           ))}
         </section>
       )}
-
-      <EquippedSummaryBar
-        summary={equippedSummary}
-        isDisabled={isLocked}
-        onOpenFormation={handleOpenFormation}
-      />
     </div>
   );
 };

@@ -63,14 +63,14 @@ describe("features/battle/BattleScreen (5-State, HUD, Pause, Retreat, Error)", (
     vi.restoreAllMocks();
   });
 
-  it("renders HUD in preparing (Empty) state, shows equipped weapon, and toggles 1x/2x speed", () => {
+  it("renders HUD in preparing (Empty) state without weapon slot bar, and toggles 1x/2x speed", () => {
     renderBattle();
 
     expect(screen.getByText("第壱節：迷いの竹林")).toBeTruthy();
     expect(screen.getByText("Wave 1 / 10")).toBeTruthy();
     expect(screen.getByText("開戦準備中")).toBeTruthy();
     expect(screen.getByText("120 / 120")).toBeTruthy();
-    expect(screen.getByText("銘刀・波紋")).toBeTruthy();
+    expect(screen.queryByText("銘刀・波紋")).toBeNull();
 
     const speedToggle = screen.getByRole("button", { name: "戦闘速度切替" });
     expect(speedToggle.textContent).toBe("1x");
@@ -86,6 +86,15 @@ describe("features/battle/BattleScreen (5-State, HUD, Pause, Retreat, Error)", (
 
     expect(screen.getByText("戦闘一時停止")).toBeTruthy();
     expect(screen.getByText("安倍 晴明（見習い）")).toBeTruthy();
+
+    const slotButton = screen.getByRole("button", {
+      name: "銘刀・波紋の詳細を表示",
+    });
+    expect(screen.queryByText("銘刀・波紋")).toBeNull();
+    fireEvent.click(slotButton);
+    expect(screen.getByText("銘刀・波紋")).toBeTruthy();
+    fireEvent.click(slotButton);
+    expect(screen.queryByText("銘刀・波紋")).toBeNull();
     expect(
       screen.getByRole<HTMLButtonElement>("button", {
         name: "戦闘速度切替",

@@ -19,7 +19,7 @@ const SAMPLE_CHOICES: readonly InGameUpgradeOption[] = [
     targetWeaponId: "sword_hamon",
     statType: "weapon_dmg",
     title: "銘刀・波紋・威力強化",
-    description: "銘刀・波紋のダメージ ×1.30",
+    description: "ダメージ ×1.30",
     multiplierOrDelta: 1.3,
   },
   {
@@ -202,5 +202,35 @@ describe("features/battle Slice 7 modals (5-State, Double-Submit, Disabled)", ()
     expect(onRetry).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByRole("button", { name: "保存せず戻る" }));
     expect(onExit).toHaveBeenCalledTimes(1);
+
+    const onRetryBattle = vi.fn();
+    rerender(
+      <BattleResultModal
+        open
+        phase="defeat"
+        stageName="第壱節：迷いの竹林"
+        reachedWave={4}
+        totalWaves={10}
+        isCommitting={false}
+        committedReward={{
+          stageId: "stage_1_bamboo",
+          outcome: "defeat",
+          reachedWave: 4,
+          earnedMagatama: 24,
+          earnedHisui: 0,
+          newlyUnlockedStageId: null,
+        }}
+        commitError={null}
+        isExiting={false}
+        onRetryCommit={onRetry}
+        onRetryBattle={onRetryBattle}
+        onExitToStages={onExit}
+      />,
+    );
+    expect(screen.getByText("結界崩壊")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "再チャレンジ" }));
+    expect(onRetryBattle).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole("button", { name: "ステージ選択へ戻る" }));
+    expect(onExit).toHaveBeenCalledTimes(2);
   });
 });

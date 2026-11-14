@@ -81,10 +81,10 @@ export const FormationScreen = ({
       >
         <Tabs.List aria-label="編成対象切替">
           <Tabs.Trigger value="character" disabled={isAnyPending}>
-            主人公（1名）
+            主人公
           </Tabs.Trigger>
           <Tabs.Trigger value="weapon" disabled={isAnyPending}>
-            持ち込み武器（1枠）
+            持ち込み武器
           </Tabs.Trigger>
         </Tabs.List>
 

@@ -1,8 +1,7 @@
 import { useAppToast } from "@/components/shared/AppToastProvider";
 import { ConfirmAlertDialog } from "@/components/shared/ConfirmAlertDialog";
-import { AspectRatio } from "@/components/ui/AspectRatio";
+import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Typography";
-import { BATTLE_FIELD_HEIGHT, BATTLE_FIELD_WIDTH } from "@/engine";
 import { BattleErrorModal } from "@/features/battle/components/BattleErrorModal";
 import { BattleHudOverlay } from "@/features/battle/components/BattleHudOverlay";
 import { BattlePauseModal } from "@/features/battle/components/BattlePauseModal";
@@ -10,7 +9,7 @@ import { BattleResultModal } from "@/features/battle/components/BattleResultModa
 import { LevelUpChoiceModal } from "@/features/battle/components/LevelUpChoiceModal";
 import { useBattleEngine } from "@/features/battle/hooks/useBattleEngine";
 import type { PlayerSaveData } from "@/types";
-import { Loader2 } from "lucide-react";
+import { Loader2, Pause } from "lucide-react";
 
 export interface BattleScreenProps {
   readonly save: PlayerSaveData;
@@ -45,6 +44,7 @@ export const BattleScreen = ({
     selectUpgradeChoice,
     rerollChoices,
     retryCommitResult,
+    retryBattle,
     confirmExitToStages,
   } = useBattleEngine(save, stageId, {
     onSaveCommitted,
@@ -69,16 +69,30 @@ export const BattleScreen = ({
   return (
     <section
       aria-label="バトル画面"
-      className="relative flex flex-col items-center justify-center"
+      className="relative flex flex-1 flex-col bg-battle-surface-deep"
     >
-      <div className="relative w-full overflow-hidden rounded-lg border border-border bg-battle-surface-deep shadow-md touch-manipulation">
-        <AspectRatio ratio={BATTLE_FIELD_WIDTH / BATTLE_FIELD_HEIGHT}>
-          <canvas
-            ref={canvasRef}
-            className="h-full w-full block"
-            aria-label="穢土浄化戦闘キャンバス"
-          />
-        </AspectRatio>
+      <div className="relative flex-1 min-h-0 w-full overflow-hidden touch-manipulation">
+        <canvas
+          ref={canvasRef}
+          className="block h-full w-full"
+          aria-label="穢土浄化戦闘キャンバス"
+        />
+
+        {launchContext && viewState ? (
+          <div className="absolute top-0 left-0 z-10 p-3 pt-[calc(0.75rem+env(safe-area-inset-top))]">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              disabled={controlsDisabled}
+              onClick={pauseBattle}
+              aria-label="一時停止"
+              className="min-h-11 min-w-11 rounded-lg border border-border/30 bg-battle-surface/65 text-battle-foreground backdrop-blur-xs hover:bg-battle-surface/85"
+            >
+              <Pause className="h-5 w-5" aria-hidden="true" />
+            </Button>
+          </div>
+        ) : null}
 
         {isInitializing ? (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-battle-surface-deep/90 text-battle-foreground">
@@ -91,17 +105,16 @@ export const BattleScreen = ({
             </Text>
           </div>
         ) : null}
-
-        {launchContext && viewState ? (
-          <BattleHudOverlay
-            stageName={launchContext.stage.name}
-            viewState={viewState}
-            controlsDisabled={controlsDisabled}
-            onToggleSpeed={toggleSpeed}
-            onPause={pauseBattle}
-          />
-        ) : null}
       </div>
+
+      {launchContext && viewState ? (
+        <BattleHudOverlay
+          stageName={launchContext.stage.name}
+          viewState={viewState}
+          controlsDisabled={controlsDisabled}
+          onToggleSpeed={toggleSpeed}
+        />
+      ) : null}
 
       {launchContext && viewState ? (
         <>
@@ -145,6 +158,7 @@ export const BattleScreen = ({
             onRetryCommit={() => {
               void retryCommitResult();
             }}
+            onRetryBattle={retryBattle}
             onExitToStages={() => {
               confirmExitToStages(onExitToStages);
             }}

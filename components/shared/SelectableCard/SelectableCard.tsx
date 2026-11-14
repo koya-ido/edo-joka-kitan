@@ -67,7 +67,7 @@ export const SelectableCard = ({
           </Text>
         )}
 
-        {meta && <div className="mt-1 flex flex-wrap gap-2">{meta}</div>}
+        {meta && <div className="mt-1 flex flex-wrap items-center gap-2">{meta}</div>}
       </div>
     </div>
   </RadioGroup.Item>

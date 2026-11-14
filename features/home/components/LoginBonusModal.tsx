@@ -38,7 +38,7 @@ export const LoginBonusModal = ({
           <Dialog.Title>本日のログインボーナス</Dialog.Title>
         </div>
         <Dialog.Description>
-          毎日 0:00（ローカル時刻）以降に1回、祓いの旅路を支える霊力通貨を受け取れます。
+          毎日 0:00以降に1回、祓いの旅路を支える霊力通貨を受け取れます。
         </Dialog.Description>
       </Dialog.Header>
 

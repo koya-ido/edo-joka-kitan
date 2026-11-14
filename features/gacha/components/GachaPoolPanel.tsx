@@ -1,3 +1,4 @@
+import { HisuiIcon } from "@/components/icons";
 import { ItemAvatar } from "@/components/shared/ItemAvatar";
 import { AspectRatio } from "@/components/ui/AspectRatio";
 import { Badge } from "@/components/ui/Badge";
@@ -106,7 +107,7 @@ export const GachaPoolPanel = ({
                   {isCharacter ? "覚醒" : "精錬"}レベルが +1 されます。
                 </Text>
                 <Text size="caption" tone="muted">
-                  既に最大レベル（Lv.5）に到達している場合は、余剰分として「水晶の勾玉」へ自動変換されます。
+                  既に最大レベルに到達している場合は、余剰分として「水晶の勾玉」へ自動変換されます。
                 </Text>
               </div>
             </Popover.Content>
@@ -126,7 +127,9 @@ export const GachaPoolPanel = ({
               }}
             >
               <Sparkles className="h-4 w-4" aria-hidden="true" />
-              1回召喚（翡翠 {singleCost}）
+              <span>1回召喚</span>
+              <HisuiIcon className="h-4 w-4 shrink-0 text-hisui" aria-hidden="true" />
+              <span className="tabular-nums">×{singleCost}</span>
             </Button>
             {!canPullSingle && (
               <Text size="caption" tone="destructive" className="text-center">
@@ -147,7 +150,9 @@ export const GachaPoolPanel = ({
               }}
             >
               <Sparkles className="h-4 w-4" aria-hidden="true" />
-              10回召喚（翡翠 {multiCost}）
+              <span>10回召喚</span>
+              <HisuiIcon className="h-4 w-4 shrink-0 text-hisui" aria-hidden="true" />
+              <span className="tabular-nums">×{multiCost}</span>
             </Button>
             {!canPullMulti && (
               <Text size="caption" tone="destructive" className="text-center">

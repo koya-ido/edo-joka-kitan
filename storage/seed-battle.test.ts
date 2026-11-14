@@ -72,8 +72,8 @@ describe("storage/seed-battle (Slice 6 migration & battle seed verification)", (
     }
   });
 
-  it("seeds all 9 weapon genres and all 3 characters ready for battle verification", async () => {
-    expect(WEAPON_MASTERS).toHaveLength(9);
+  it("seeds all 8 weapon genres and all 3 characters ready for battle verification", async () => {
+    expect(WEAPON_MASTERS).toHaveLength(8);
 
     const seeded = await seedBattleAllWeaponsReadySave(
       "white_fox_miko",
@@ -84,7 +84,7 @@ describe("storage/seed-battle (Slice 6 migration & battle seed verification)", (
     const loaded = await loadOrInitializeSave();
     expect(loaded.ok).toBe(true);
     if (loaded.ok) {
-      expect(Object.keys(loaded.data.save.ownedWeapons)).toHaveLength(9);
+      expect(Object.keys(loaded.data.save.ownedWeapons)).toHaveLength(8);
       expect(Object.keys(loaded.data.save.ownedCharacters)).toHaveLength(3);
       expect(loaded.data.save.equippedCharacterId).toBe("white_fox_miko");
       expect(loaded.data.save.equippedWeaponId).toBe("orb_magatama");

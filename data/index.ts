@@ -3,6 +3,7 @@ export { ENEMY_MASTER_MAP, ENEMY_MASTERS } from "./enemy-master";
 export {
   ENHANCE_STAT_CONFIG_MAP,
   ENHANCE_STAT_CONFIGS,
+  WEAPON_REFINE_COST_CONFIG,
   type EnhanceStatKey,
 } from "./enhance-config";
 export { GACHA_CONFIG } from "./gacha-config";

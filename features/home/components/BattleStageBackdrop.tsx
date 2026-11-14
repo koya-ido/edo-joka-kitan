@@ -67,7 +67,7 @@ export const BattleStageBackdrop = () => (
         strokeWidth="1"
       />
       <polygon
-        points="100,26 122,162 34,76 166,76 78,162"
+        points="100,24 144.67,161.49 27.72,76.51 172.28,76.51 55.33,161.49"
         fill="none"
         stroke="var(--accent)"
         strokeWidth="1.2"
@@ -86,4 +86,3 @@ export const BattleStageBackdrop = () => (
     <span className="absolute right-2 bottom-2 h-3 w-3 border-r-2 border-b-2 border-accent/60" />
   </div>
 );
-

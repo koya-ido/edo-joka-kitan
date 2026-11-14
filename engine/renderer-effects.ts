@@ -1,12 +1,21 @@
 import type { BattlePalette } from "@/engine/palette";
+import { drawProjectileByGenre } from "@/engine/renderer-projectile-shapes";
+import {
+  drawFanGust,
+  drawMirrorBeam,
+  drawOrbNode,
+  drawSwordSlash,
+  drawTalismanStrike,
+} from "@/engine/renderer-weapon-shapes";
 import {
   BARRIER_CENTER_X,
   BARRIER_CENTER_Y,
   readGenreParam,
   type BeamEntity,
-  type BellWaveEntity,
+  type ExplosionEntity,
   type ProjectileEntity,
   type SlashArcEntity,
+  type TalismanStrikeEntity,
 } from "@/engine/types";
 import type { WeaponMaster } from "@/types";
 
@@ -14,15 +23,18 @@ export interface WeaponEffectsRenderData {
   readonly palette: BattlePalette;
   readonly slashArcs: readonly SlashArcEntity[];
   readonly beams: readonly BeamEntity[];
-  readonly bellWaves: readonly BellWaveEntity[];
+  readonly talismanStrikes?: readonly TalismanStrikeEntity[];
+  readonly explosions?: readonly ExplosionEntity[];
   readonly projectiles: readonly ProjectileEntity[];
   readonly orbitalWeapons: readonly {
     readonly weapon: WeaponMaster;
     readonly angleRad: number;
+    readonly extraOrbs?: number;
+    readonly rangeMultiplier?: number;
   }[];
 }
 
-/** 9系統の武器エフェクト・弾道・波動を Canvas へ描画する */
+/** 9系統の武器エフェクト・弾道・波動を武器色と武器種別形状で Canvas へ描画する */
 export const drawWeaponEffects = (
   ctx: CanvasRenderingContext2D,
   state: WeaponEffectsRenderData,
@@ -30,74 +42,74 @@ export const drawWeaponEffects = (
   const { palette } = state;
 
   for (const arc of state.slashArcs) {
-    ctx.save();
-    ctx.globalAlpha = Math.max(0.15, arc.remainingLifeMs / arc.maxLifeMs);
-    ctx.strokeStyle = arc.genre === "fan" ? palette.hisui : palette.accent;
-    ctx.lineWidth = 10;
-    ctx.beginPath();
-    ctx.arc(
-      arc.x,
-      arc.y,
-      arc.range * 0.72,
-      arc.angleRad - arc.arcRad / 2,
-      arc.angleRad + arc.arcRad / 2,
-    );
-    ctx.stroke();
-    ctx.restore();
+    const color = palette.weaponColors[arc.colorToken];
+    if (arc.genre === "fan") {
+      drawFanGust(ctx, arc, color);
+    } else {
+      drawSwordSlash(ctx, arc, color, palette);
+    }
   }
 
   for (const beam of state.beams) {
-    ctx.save();
-    ctx.strokeStyle = palette.accent;
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(BARRIER_CENTER_X, BARRIER_CENTER_Y);
-    ctx.lineTo(beam.endX, beam.endY);
-    ctx.stroke();
-    ctx.restore();
+    const color = palette.weaponColors[beam.colorToken];
+    drawMirrorBeam(ctx, beam, color, palette);
   }
 
-  for (const wave of state.bellWaves) {
+  for (const strike of state.talismanStrikes ?? []) {
+    const color = palette.weaponColors[strike.colorToken];
+    drawTalismanStrike(ctx, strike, color, palette);
+  }
+
+  for (const exp of state.explosions ?? []) {
+    const progress = 1 - Math.max(0, exp.remainingLifeMs) / exp.maxLifeMs;
+    const alpha = Math.max(0, 1 - progress);
+    const currentRadius = Math.max(8, exp.radius * (0.35 + 0.65 * progress));
     ctx.save();
-    ctx.globalAlpha = Math.max(0.1, wave.remainingLifeMs / wave.maxLifeMs);
-    ctx.strokeStyle = palette.magatama;
+    ctx.globalAlpha = alpha * 0.35;
+    ctx.fillStyle = palette.primary;
+    ctx.beginPath();
+    ctx.arc(exp.x, exp.y, currentRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.globalAlpha = alpha * 0.85;
+    ctx.strokeStyle = palette.accent;
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.arc(wave.x, wave.y, wave.currentRadius, 0, Math.PI * 2);
+    ctx.arc(exp.x, exp.y, currentRadius, 0, Math.PI * 2);
     ctx.stroke();
+
+    ctx.globalAlpha = alpha * 0.7;
+    ctx.fillStyle = palette.foreground;
+    ctx.beginPath();
+    ctx.arc(exp.x, exp.y, currentRadius * 0.35, 0, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
   }
 
   for (const orb of state.orbitalWeapons) {
+    const color = palette.weaponColors[orb.weapon.colorToken];
     const count = Math.max(
       1,
-      readGenreParam(orb.weapon.genreParams, "orbCount", 3),
+      readGenreParam(orb.weapon.genreParams, "orbCount", 3) +
+        (orb.extraOrbs ?? 0),
     );
-    const radius = readGenreParam(orb.weapon.genreParams, "orbitRadius", 88);
+    const radius =
+      readGenreParam(orb.weapon.genreParams, "orbitRadius", 88) *
+      Math.max(0.5, orb.rangeMultiplier ?? 1);
     for (let i = 0; i < count; i += 1) {
       const a = orb.angleRad + ((Math.PI * 2) / count) * i;
-      ctx.fillStyle = palette.magatama;
-      ctx.beginPath();
-      ctx.arc(
+      drawOrbNode(
+        ctx,
         BARRIER_CENTER_X + Math.cos(a) * radius,
         BARRIER_CENTER_Y + Math.sin(a) * radius,
-        8,
-        0,
-        Math.PI * 2,
+        color,
+        palette,
       );
-      ctx.fill();
     }
   }
 
   for (const p of state.projectiles) {
-    ctx.fillStyle =
-      p.genre === "talisman"
-        ? palette.magatama
-        : p.genre === "matchlock"
-          ? palette.primary
-          : palette.accent;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-    ctx.fill();
+    const color = palette.weaponColors[p.colorToken];
+    drawProjectileByGenre(ctx, p, color, palette);
   }
 };

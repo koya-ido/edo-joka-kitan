@@ -1,4 +1,14 @@
-import type { InGameUpgradeOption, WeaponId, WeaponMaster } from "@/types";
+import { WEAPON_UPGRADE_CAPS } from "@/domain/battle-upgrade-caps";
+import { buildGenreSpecificOptions } from "@/domain/battle-upgrade-genre-pool";
+import { MAX_SWORD_COMBO_BONUS } from "@/domain/battle-upgrade-sword-pool";
+import type {
+  InGameUpgradeOption,
+  WeaponId,
+  WeaponMaster,
+  WeaponModifierState,
+} from "@/types";
+
+export { MAX_SWORD_COMBO_BONUS };
 
 export const buildBaseStatOptions = (): readonly InGameUpgradeOption[] => [
   {
@@ -6,7 +16,7 @@ export const buildBaseStatOptions = (): readonly InGameUpgradeOption[] => [
     category: "base_stat",
     statType: "atk_pct",
     title: "霊力増幅",
-    description: "全攻撃力 ×1.25（複利乗算）",
+    description: "全攻撃力 +25%",
     multiplierOrDelta: 1.25,
   },
   {
@@ -22,7 +32,7 @@ export const buildBaseStatOptions = (): readonly InGameUpgradeOption[] => [
     category: "base_stat",
     statType: "crit_dmg",
     title: "会心極意",
-    description: "会心ダメージ倍率 ×1.25（複利乗算）",
+    description: "会心ダメージ倍率 +25%",
     multiplierOrDelta: 1.25,
   },
 ];
@@ -30,42 +40,56 @@ export const buildBaseStatOptions = (): readonly InGameUpgradeOption[] => [
 export const buildWeaponStatOptions = (
   unlockedWeaponIds: readonly WeaponId[],
   weaponMap: Readonly<Record<WeaponId, WeaponMaster>>,
+  weaponModifiers?: Readonly<Record<string, WeaponModifierState>>,
 ): readonly InGameUpgradeOption[] => {
   const options: InGameUpgradeOption[] = [];
   for (const weaponId of unlockedWeaponIds) {
     if (!Object.hasOwn(weaponMap, weaponId)) continue;
     const weapon = weaponMap[weaponId];
-    options.push(
-      {
+    const mod =
+      weaponModifiers && Object.hasOwn(weaponModifiers, weapon.id)
+        ? weaponModifiers[weapon.id]
+        : undefined;
+
+    // 全武器共通3種（威力・攻撃頻度・攻撃範囲）
+    if (
+      (mod?.damageMultiplier ?? 1) < WEAPON_UPGRADE_CAPS.maxDamageMultiplier
+    ) {
+      options.push({
         id: `weapon_dmg_${weapon.id}`,
         category: "weapon_stat",
         targetWeaponId: weapon.id,
         statType: "weapon_dmg",
         title: `${weapon.name}・威力強化`,
-        description: `${weapon.name}のダメージ ×1.30`,
+        description: "ダメージ +30%",
         multiplierOrDelta: 1.3,
-      },
-      {
+      });
+    }
+    if (
+      (mod?.cooldownMultiplier ?? 1) > WEAPON_UPGRADE_CAPS.minCooldownMultiplier
+    ) {
+      options.push({
         id: `weapon_freq_${weapon.id}`,
         category: "weapon_stat",
         targetWeaponId: weapon.id,
         statType: "attack_freq",
         title: `${weapon.name}・連撃加速`,
-        description: `${weapon.name}の攻撃間隔 ×0.85`,
-        multiplierOrDelta: 0.85,
-      },
-    );
-    if (weapon.baseDurationMs > 0) {
+        description: "攻撃頻度 +15%",
+        multiplierOrDelta: 1 / 1.15,
+      });
+    }
+    if ((mod?.rangeMultiplier ?? 1) < WEAPON_UPGRADE_CAPS.maxRangeMultiplier) {
       options.push({
-        id: `weapon_dur_${weapon.id}`,
+        id: `weapon_range_${weapon.id}`,
         category: "weapon_stat",
         targetWeaponId: weapon.id,
-        statType: "duration",
-        title: `${weapon.name}・持続延長`,
-        description: `${weapon.name}の持続時間 ×1.25`,
+        statType: "weapon_range",
+        title: `${weapon.name}・攻撃範囲拡大`,
+        description: "攻撃範囲 +25%",
         multiplierOrDelta: 1.25,
       });
     }
+    options.push(...buildGenreSpecificOptions(weapon, mod));
   }
   return options;
 };

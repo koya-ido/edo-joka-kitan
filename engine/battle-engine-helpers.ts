@@ -1,4 +1,8 @@
-import { applyUpgradeOption, generateUpgradeChoices } from "@/domain";
+import {
+  applyUpgradeOption,
+  createDefaultWeaponModifier,
+  generateUpgradeChoices,
+} from "@/domain";
 import type { MutableBattleState } from "@/engine/battle-state";
 import type { BattlePalette } from "@/engine/palette";
 import { renderBattleFrame } from "@/engine/renderer";
@@ -16,10 +20,17 @@ export const renderEngineFrame = (
     .filter(
       (id) => Object.hasOwn(weaponMap, id) && weaponMap[id].genre === "orb",
     )
-    .map((id) => ({
-      weapon: weaponMap[id],
-      angleRad: state.orbAngles.get(id) ?? 0,
-    }));
+    .map((id) => {
+      const mod = Object.hasOwn(state.buffState.weaponModifiers, id)
+        ? state.buffState.weaponModifiers[id]
+        : undefined;
+      return {
+        weapon: weaponMap[id],
+        angleRad: state.orbAngles.get(id) ?? 0,
+        extraOrbs: mod?.extraProjectiles ?? 0,
+        rangeMultiplier: mod?.rangeMultiplier ?? 1,
+      };
+    });
   renderBattleFrame(canvasCtx, {
     palette,
     barrierHp: state.barrierHp,
@@ -28,7 +39,8 @@ export const renderEngineFrame = (
     projectiles: state.projectiles,
     slashArcs: state.slashArcs,
     beams: state.beams,
-    bellWaves: state.bellWaves,
+    talismanStrikes: state.talismanStrikes,
+    explosions: state.explosions,
     floatingTexts: state.floatingTexts,
     orbitalWeapons,
   });
@@ -37,12 +49,14 @@ export const renderEngineFrame = (
 export const buildEngineUpgradeChoices = (
   state: MutableBattleState,
   weaponMap: Readonly<Record<WeaponId, WeaponMaster>>,
+  ownedWeaponIds: readonly WeaponId[],
   rng: () => number,
 ): readonly InGameUpgradeOption[] =>
   generateUpgradeChoices({
     buffState: state.buffState,
     weaponMap,
     allWeapons: Object.values(weaponMap),
+    ownedWeaponIds,
     maxActiveWeapons: MAX_ACTIVE_WEAPONS,
     rng,
   });
@@ -60,11 +74,7 @@ export const unlockEngineWeaponInRun = (
   )
     return false;
   state.buffState.unlockedWeaponIds.push(weaponId);
-  state.buffState.weaponModifiers[weaponId] = {
-    damageMultiplier: 1,
-    cooldownMultiplier: 1,
-    durationMultiplier: 1,
-  };
+  state.buffState.weaponModifiers[weaponId] = createDefaultWeaponModifier();
   state.weaponCooldowns.set(weaponId, 0);
   return true;
 };
@@ -73,6 +83,7 @@ export const applyEngineUpgradeChoice = (
   state: MutableBattleState,
   optionId: string,
   weaponMap: Readonly<Record<WeaponId, WeaponMaster>>,
+  ownedWeaponIds: readonly WeaponId[],
   rng: () => number,
 ): "invalid" | "next_level_up" | "resume_playing" => {
   if (state.phase !== "level_up_modal") return "invalid";
@@ -94,6 +105,7 @@ export const applyEngineUpgradeChoice = (
     state.pendingUpgradeChoices = buildEngineUpgradeChoices(
       state,
       weaponMap,
+      ownedWeaponIds,
       rng,
     );
     return "next_level_up";

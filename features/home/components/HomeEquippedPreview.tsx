@@ -2,12 +2,10 @@ import { ItemAvatar } from "@/components/shared/ItemAvatar";
 import { AspectRatio } from "@/components/ui/AspectRatio";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
-import { Separator } from "@/components/ui/Separator";
 import { Heading, Text } from "@/components/ui/Typography";
 import { CHARACTER_MASTER_MAP, WEAPON_MASTER_MAP } from "@/data";
 import { BattleStageBackdrop } from "@/features/home/components/BattleStageBackdrop";
 import type { PlayerSaveData, WeaponGenre } from "@/types";
-import { Shield } from "lucide-react";
 
 const WEAPON_GENRE_LABELS: Readonly<Record<WeaponGenre, string>> = {
   bow: "弓矢系",
@@ -17,7 +15,6 @@ const WEAPON_GENRE_LABELS: Readonly<Record<WeaponGenre, string>> = {
   talisman: "呪符系",
   matchlock: "火縄銃系",
   fan: "扇・軍配系",
-  bell: "神具・鈴系",
   orb: "霊珠・勾玉系",
 };
 
@@ -55,14 +52,10 @@ export const HomeEquippedPreview = ({ save }: HomeEquippedPreviewProps) => {
           <Badge variant="accent" className="border border-accent-foreground/20 shadow-xs">
             現在の出撃編成
           </Badge>
-          <Badge className="rounded-full border-barrier/40 bg-battle-surface-deep/80 px-2.5 text-battle-foreground">
-            <Shield className="h-3.5 w-3.5 text-barrier" aria-hidden="true" />
-            <span>解放済: {save.unlockedStageIds.length} 節</span>
-          </Badge>
         </div>
 
-        <div className="relative z-10 flex items-center justify-around gap-3 py-1">
-          <div className="flex flex-col items-center gap-1.5 text-center">
+        <div className="relative z-10 grid grid-cols-2 items-center gap-3 py-1">
+          <div className="flex min-w-0 flex-col items-center gap-1.5 text-center">
             <div className="rounded-full p-1 ring-2 ring-primary/45 ring-offset-2 ring-offset-battle-surface">
               <ItemAvatar
                 kind="character"
@@ -79,9 +72,7 @@ export const HomeEquippedPreview = ({ save }: HomeEquippedPreviewProps) => {
             </Heading>
           </div>
 
-          <Separator orientation="vertical" className="h-16 bg-accent/35" />
-
-          <div className="flex flex-col items-center gap-1.5 text-center">
+          <div className="flex min-w-0 flex-col items-center gap-1.5 text-center">
             <div className="rounded-full p-1 ring-2 ring-accent/45 ring-offset-2 ring-offset-battle-surface">
               <ItemAvatar
                 kind="weapon"

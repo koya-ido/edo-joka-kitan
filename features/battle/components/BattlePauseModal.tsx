@@ -60,7 +60,7 @@ export const BattlePauseModal = ({
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div>
                   <Text size="caption" tone="muted">
-                    結界耐久
+                    耐久値
                   </Text>
                   <Text size="label" tabularNums className="block">
                     {metaStats.hp}
@@ -68,7 +68,7 @@ export const BattlePauseModal = ({
                 </div>
                 <div>
                   <Text size="caption" tone="muted">
-                    霊力攻撃
+                    攻撃力
                   </Text>
                   <Text size="label" tabularNums className="block">
                     {Math.round(metaStats.atk * buffState.atkMultiplier)}

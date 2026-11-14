@@ -23,6 +23,7 @@ export type {
   StageMaster,
   StageWaveDefinition,
   WaveSpawnEntry,
+  WeaponColorToken,
   WeaponMaster,
 } from "./master";
 

@@ -37,6 +37,16 @@
   --barrier: oklch(0.62 0.155 150);
   --exp: oklch(0.6 0.16 245);
 
+  /* 武器メインカラー（OKLCH） */
+  --weapon-sword: oklch(0.68 0.16 235);
+  --weapon-bow: oklch(0.78 0.15 85);
+  --weapon-shuriken: oklch(0.72 0.14 190);
+  --weapon-mirror: oklch(0.9 0.05 95);
+  --weapon-talisman: oklch(0.64 0.18 300);
+  --weapon-matchlock: oklch(0.63 0.21 30);
+  --weapon-fan: oklch(0.68 0.16 152);
+  --weapon-orb: oklch(0.72 0.17 55);
+
   /* ゲームUI 立体・質感トークン */
   --primary-edge: oklch(0.36 0.17 26);
   --secondary-edge: oklch(0.76 0.028 76);
@@ -109,6 +119,14 @@
   --color-hisui-foreground: var(--hisui-foreground);
   --color-barrier: var(--barrier);
   --color-exp: var(--exp);
+  --color-weapon-sword: var(--weapon-sword);
+  --color-weapon-bow: var(--weapon-bow);
+  --color-weapon-shuriken: var(--weapon-shuriken);
+  --color-weapon-mirror: var(--weapon-mirror);
+  --color-weapon-talisman: var(--weapon-talisman);
+  --color-weapon-matchlock: var(--weapon-matchlock);
+  --color-weapon-fan: var(--weapon-fan);
+  --color-weapon-orb: var(--weapon-orb);
 
   --font-display: var(--font-display);
   --font-sans: var(--font-sans);

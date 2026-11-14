@@ -43,7 +43,6 @@ export const WEAPON_GENRE_LABELS: Readonly<Record<WeaponGenre, string>> =
     talisman: "呪符系",
     matchlock: "火縄銃系",
     fan: "扇・軍配系",
-    bell: "神具・鈴系",
     orb: "霊珠・勾玉系",
   });
 

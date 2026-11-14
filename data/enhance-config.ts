@@ -8,7 +8,7 @@ export const ENHANCE_STAT_CONFIGS: readonly EnhanceStatConfig[] = Object.freeze(
   [
     {
       statKey: "hpLevel",
-      label: "結界耐久",
+      label: "耐久値",
       valuePerLevel: 20,
       baseCostMagatama: 20,
       costStepMagatama: 10,
@@ -16,7 +16,7 @@ export const ENHANCE_STAT_CONFIGS: readonly EnhanceStatConfig[] = Object.freeze(
     },
     {
       statKey: "atkLevel",
-      label: "霊力攻撃",
+      label: "攻撃力",
       valuePerLevel: 3,
       baseCostMagatama: 25,
       costStepMagatama: 15,
@@ -32,6 +32,12 @@ export const ENHANCE_STAT_CONFIGS: readonly EnhanceStatConfig[] = Object.freeze(
     },
   ],
 );
+
+/** 武器精錬強化の勾玉コスト設定（不変） */
+export const WEAPON_REFINE_COST_CONFIG = Object.freeze({
+  baseCostMagatama: 30,
+  costStepMagatama: 20,
+});
 
 /** statKey で O(1) 参照するための永続強化マスタマップ */
 export const ENHANCE_STAT_CONFIG_MAP: Readonly<

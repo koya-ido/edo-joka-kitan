@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/components/ui/cn";
-import { Flame, Shield, Sparkles, Swords } from "lucide-react";
+import { Flame, Home, Shield, Sparkles, Swords } from "lucide-react";
 
-export type AppTabPath = "/stages" | "/gacha" | "/enhance" | "/formation";
+export type AppTabPath = "/" | "/stages" | "/gacha" | "/enhance" | "/formation";
 
 export interface BottomTabNavProps {
   currentPath: string;
@@ -15,6 +15,7 @@ const TAB_ITEMS: readonly {
   readonly label: string;
   readonly Icon: typeof Swords;
 }[] = [
+    { path: "/", label: "本陣", Icon: Home },
     { path: "/stages", label: "出撃", Icon: Swords },
     { path: "/gacha", label: "ガチャ", Icon: Sparkles },
     { path: "/enhance", label: "社", Icon: Flame },
@@ -28,7 +29,7 @@ export const BottomTabNav = ({
 }: BottomTabNavProps) => (
   <nav
     aria-label="メインナビゲーション"
-    className="game-urushi-bar sticky bottom-0 z-20 grid grid-cols-4 gap-1.5 border-t-2 border-accent/45 px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] shadow-lg"
+    className="game-urushi-bar sticky bottom-0 z-20 grid grid-cols-5 gap-1.5 border-t-2 border-accent/45 px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] shadow-lg"
   >
     {TAB_ITEMS.map(({ path, label, Icon }) => {
       const isActive = currentPath === path;

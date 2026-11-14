@@ -39,6 +39,7 @@ export interface UseBattleEngineResult {
   readonly selectUpgradeChoice: (optionId: string) => void;
   readonly rerollChoices: () => Promise<void>;
   readonly retryCommitResult: () => Promise<void>;
+  readonly retryBattle: () => void;
   readonly confirmExitToStages: (onExit: () => void) => void;
 }
 
@@ -49,14 +50,21 @@ export const useBattleEngine = (
 ): UseBattleEngineResult => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const engineRef = useRef<BattleEngine | null>(null);
+  const [attemptSeq, setAttemptSeq] = useState(0);
   const stableLaunchRef = useRef<{
     stageId: string;
+    attemptSeq: number;
     result: DomainResult<BattleLaunchContext>;
   } | null>(null);
 
-  if (!stableLaunchRef.current || stableLaunchRef.current.stageId !== stageId) {
+  if (
+    !stableLaunchRef.current ||
+    stableLaunchRef.current.stageId !== stageId ||
+    stableLaunchRef.current.attemptSeq !== attemptSeq
+  ) {
     stableLaunchRef.current = {
       stageId,
+      attemptSeq,
       result: prepareBattleSession(save, stageId),
     };
   }
@@ -145,6 +153,14 @@ export const useBattleEngine = (
     [persistence.isRerolling, persistence.isCommitting],
   );
 
+  const retryBattle = useCallback(() => {
+    if (isExiting || persistence.isCommitting) return;
+    engineRef.current?.stop();
+    setRuntimeError(null);
+    setViewState(null);
+    setAttemptSeq((seq) => seq + 1);
+  }, [isExiting, persistence.isCommitting]);
+
   const confirmExitToStages = useCallback(
     (onExit: () => void) => {
       if (isExiting || persistence.isCommitting) return;
@@ -175,6 +191,7 @@ export const useBattleEngine = (
     selectUpgradeChoice,
     rerollChoices: persistence.rerollChoices,
     retryCommitResult: persistence.retryCommitResult,
+    retryBattle,
     confirmExitToStages,
   };
 };

@@ -101,10 +101,10 @@ describe("features/formation/FormationScreen (5-State, Double-Submit Guard, Inte
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByRole("tab", { name: "持ち込み武器（1枠）" })).toBeTruthy();
+      expect(screen.getByRole("tab", { name: "持ち込み武器" })).toBeTruthy();
     });
 
-    const weaponTab = screen.getByRole("tab", { name: "持ち込み武器（1枠）" });
+    const weaponTab = screen.getByRole("tab", { name: "持ち込み武器" });
     fireEvent.mouseDown(weaponTab);
     fireEvent.click(weaponTab);
 
@@ -131,25 +131,24 @@ describe("features/formation/FormationScreen (5-State, Double-Submit Guard, Inte
     });
   });
 
-  it("shows Empty guidance when only 1 character/weapon is owned and handles ?from=stages back route", async () => {
+  it("renders owned character without single-owned guidance and navigates to top via footer tab", async () => {
     window.location.hash = "#/formation?from=stages";
     await storage.seedFormationSingleOwnedSave();
 
     render(<App />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText(
-          "現在所持している主人公は1名のみです。他の候補はガチャ（召喚）で獲得できます。",
-        ),
-      ).toBeTruthy();
+      expect(screen.getAllByText("安倍 晴明（見習い）").length).toBeGreaterThan(0);
     });
 
-    const backButton = screen.getByRole("button", { name: "戻る" });
-    fireEvent.click(backButton);
+    expect(screen.queryByText(/現在所持している/)).toBeNull();
+    expect(screen.queryByRole("button", { name: "戻る" })).toBeNull();
+
+    const homeTab = screen.getByRole("button", { name: "本陣" });
+    fireEvent.click(homeTab);
 
     await waitFor(() => {
-      expect(window.location.hash).toBe("#/stages");
+      expect(window.location.hash).toBe("#/");
     });
   });
 
@@ -177,6 +176,6 @@ describe("features/formation/FormationScreen (5-State, Double-Submit Guard, Inte
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "再試行" })).toBeTruthy();
     });
-    expect(screen.queryByRole("tab", { name: "主人公（1名）" })).toBeNull();
+    expect(screen.queryByRole("tab", { name: "主人公" })).toBeNull();
   });
 });

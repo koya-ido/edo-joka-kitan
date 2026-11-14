@@ -1,49 +1,27 @@
 import { CurrencyPill } from "@/components/shared/CurrencyPill";
-import { Button } from "@/components/ui/Button";
 import { Heading } from "@/components/ui/Typography";
 import { VisuallyHidden } from "@/components/ui/VisuallyHidden";
 import type { CurrencyBalances } from "@/types";
-import { ArrowLeft, Flame } from "lucide-react";
+import { Flame } from "lucide-react";
 import type { ReactNode } from "react";
 
 export interface ScreenHeaderProps {
   title: string;
   currencies?: CurrencyBalances | null;
-  onBack?: () => void;
-  backLabel?: string;
-  disabled?: boolean;
+  isHome?: boolean;
   actions?: ReactNode;
 }
 
 export const ScreenHeader = ({
   title,
   currencies,
-  onBack,
-  backLabel = "戻る",
-  disabled = false,
+  isHome = false,
   actions,
 }: ScreenHeaderProps) => (
   <header className="game-urushi-bar sticky top-0 z-20 border-b-2 border-accent/45 pt-[env(safe-area-inset-top)] shadow-md">
     <div className="flex min-h-14 items-center justify-between gap-2 px-3 py-1.5">
       <div className="flex min-w-0 items-center gap-2">
-        {onBack ? (
-          <>
-            <Button
-              variant="ghost"
-              size="icon"
-              disabled={disabled}
-              onClick={onBack}
-              aria-label={backLabel}
-              className="text-battle-foreground hover:bg-battle-foreground/10"
-            >
-              <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-              <VisuallyHidden>{backLabel}</VisuallyHidden>
-            </Button>
-            <Heading as="h1" className="truncate text-base leading-6 text-battle-foreground sm:text-lg">
-              {title}
-            </Heading>
-          </>
-        ) : (
+        {isHome ? (
           <div className="flex items-center gap-1.5">
             <span
               aria-hidden="true"
@@ -58,6 +36,10 @@ export const ScreenHeader = ({
               <Heading as="h1">{title}</Heading>
             </VisuallyHidden>
           </div>
+        ) : (
+          <Heading as="h1" className="truncate text-base leading-6 text-battle-foreground sm:text-lg">
+            {title}
+          </Heading>
         )}
       </div>
       <div className="flex shrink-0 items-center gap-1.5">

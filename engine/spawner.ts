@@ -112,23 +112,42 @@ export const updateEnemiesMovement = (
     if (enemy.contactCooldownMs > 0) {
       enemy.contactCooldownMs = Math.max(0, enemy.contactCooldownMs - dtMs);
     }
+    if (enemy.slowRemainingMs && enemy.slowRemainingMs > 0) {
+      enemy.slowRemainingMs = Math.max(0, enemy.slowRemainingMs - dtMs);
+    }
+    if (enemy.vulnerableRemainingMs && enemy.vulnerableRemainingMs > 0) {
+      enemy.vulnerableRemainingMs = Math.max(
+        0,
+        enemy.vulnerableRemainingMs - dtMs,
+      );
+    }
 
     const dx = BARRIER_CENTER_X - enemy.x;
     const dy = BARRIER_CENTER_Y - enemy.y;
     const dist = Math.hypot(dx, dy);
     const contactDist = BARRIER_RADIUS + enemy.radius;
+    const slowFactor =
+      enemy.slowRemainingMs && enemy.slowRemainingMs > 0
+        ? Math.max(0.2, 1 - (enemy.slowRatio ?? 0))
+        : 1;
 
+    let currentDist = dist;
     if (dist > contactDist && dist > 0) {
-      const step = Math.min(dist - contactDist, enemy.moveSpeed * dtSec);
+      const step = Math.min(
+        dist - contactDist,
+        enemy.moveSpeed * slowFactor * dtSec,
+      );
       enemy.x += (dx / dist) * step;
       enemy.y += (dy / dist) * step;
-    } else if (enemy.contactCooldownMs <= 0) {
+      currentDist = Math.hypot(
+        BARRIER_CENTER_X - enemy.x,
+        BARRIER_CENTER_Y - enemy.y,
+      );
+    }
+
+    if (currentDist <= contactDist + 0.5 && enemy.contactCooldownMs <= 0) {
       totalBarrierDamage += enemy.contactDamage;
       enemy.contactCooldownMs = 1000;
-      if (dist > 0) {
-        enemy.x -= (dx / dist) * 14;
-        enemy.y -= (dy / dist) * 14;
-      }
     }
   }
 

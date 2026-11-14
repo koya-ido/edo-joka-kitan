@@ -19,6 +19,7 @@ export interface BattleResultModalProps {
   readonly commitError: string | null;
   readonly isExiting: boolean;
   readonly onRetryCommit: () => void;
+  readonly onRetryBattle?: () => void;
   readonly onExitToStages: () => void;
 }
 
@@ -33,6 +34,7 @@ export const BattleResultModal = ({
   commitError,
   isExiting,
   onRetryCommit,
+  onRetryBattle,
   onExitToStages,
 }: BattleResultModalProps) => {
   const isVictory = phase === "victory";
@@ -56,7 +58,7 @@ export const BattleResultModal = ({
               />
             )}
             <Dialog.Title>
-              {isVictory ? "ステージ浄化完了" : "結界決壊"}
+              {isVictory ? "ステージ浄化完了" : "結界崩壊"}
             </Dialog.Title>
           </div>
           <Dialog.Description>
@@ -92,7 +94,7 @@ export const BattleResultModal = ({
             <div className="space-y-3 rounded-lg border border-border bg-card p-4">
               <div className="flex items-center justify-between">
                 <Text size="label">
-                  {isVictory ? "浄化報酬" : "救済報酬（到達Wave加算）"}
+                  {isVictory ? "浄化報酬" : "救済報酬"}
                 </Text>
                 <Badge variant={isVictory ? "success" : "destructive"}>
                   {isVictory ? "勝利" : "敗北"}
@@ -141,6 +143,26 @@ export const BattleResultModal = ({
                 onClick={onRetryCommit}
               >
                 再試行して受け取る
+              </Button>
+            </>
+          ) : !isVictory && onRetryBattle ? (
+            <>
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={isCommitting || isExiting || committedReward === null}
+                onClick={onExitToStages}
+              >
+                ステージ選択へ戻る
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                isPending={isCommitting || isExiting}
+                disabled={isCommitting || isExiting || committedReward === null}
+                onClick={onRetryBattle}
+              >
+                再チャレンジ
               </Button>
             </>
           ) : (

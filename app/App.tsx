@@ -5,6 +5,7 @@ import { AppShell } from "@/components/shared/AppShell";
 import { AppToastProvider, useAppToast } from "@/components/shared/AppToastProvider";
 import { StateView } from "@/components/shared/StateView";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { STAGE_MASTER_MAP } from "@/data";
 import { guardProtectedRouteAccess } from "@/domain";
 import { BattleScreen } from "@/features/battle";
 import { EnhanceScreen, useEnhanceActions } from "@/features/enhance";
@@ -17,8 +18,8 @@ import { useEffect } from "react";
 const ROUTE_TITLES: Readonly<Record<string, string>> = {
   "/": appEnv.VITE_APP_TITLE,
   "/stages": "出撃ステージ選択",
-  "/gacha": "召喚（ガチャ）",
-  "/enhance": "社（永続強化）",
+  "/gacha": "召喚",
+  "/enhance": "社",
   "/formation": "出撃編成",
 };
 
@@ -71,9 +72,12 @@ const AppShellContent = () => {
     guardProtectedRouteAccess(save, route.battleStageId).ok,
   );
 
-  const title = isBattleRoute
-    ? `穢土浄化戦 (${route.battleStageId})`
-    : (ROUTE_TITLES[route.path] ?? appEnv.VITE_APP_TITLE);
+  const title =
+    isBattleRoute && route.battleStageId
+      ? Object.hasOwn(STAGE_MASTER_MAP, route.battleStageId)
+        ? STAGE_MASTER_MAP[route.battleStageId].name
+        : route.battleStageId
+      : (ROUTE_TITLES[route.path] ?? appEnv.VITE_APP_TITLE);
 
   const handleReset = async () => {
     const res = await resetSessionToInitial();
@@ -92,24 +96,12 @@ const AppShellContent = () => {
     gachaActions.isMutating ||
     formationActions.isMutating;
 
-  const backTarget =
-    isFormationRoute && route.from === "stages" ? "/stages" : "/";
-
   return (
     <AppShell
       title={title}
       currentPath={route.path}
-      onNavigate={(to) => {
-        navigate(to);
-      }}
+      onNavigate={(to) => { navigate(to); }}
       currencies={save?.currencies}
-      onBack={
-        !isHomeRoute
-          ? () => {
-            navigate(backTarget);
-          }
-          : undefined
-      }
       headerActions={
         isHomeRoute ? (
           <HomeHeaderActions
@@ -124,7 +116,9 @@ const AppShellContent = () => {
           />
         ) : undefined
       }
+      hideHeader={isBattleRoute}
       hideBottomNav={isBattleRoute}
+      fullBleed={isBattleRoute}
       isNavigationDisabled={isLocked}
     >
       <StateView

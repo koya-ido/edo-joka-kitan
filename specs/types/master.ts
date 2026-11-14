@@ -35,11 +35,27 @@ export interface CharacterMaster {
   readonly isInitial: boolean;
 }
 
+/** 武器メインカラートークンキー */
+export type WeaponColorToken =
+  | "sword"
+  | "bow"
+  | "shuriken"
+  | "mirror"
+  | "talisman"
+  | "matchlock"
+  | "fan"
+  | "orb";
+
+/** 武器個別のユニークスキル解放フラグ */
+export type WeaponUniqueSkill = "explosion" | "debuff";
+
 /** 武器マスタ定義（不変） */
 export interface WeaponMaster {
   readonly id: WeaponId;
   readonly name: string;
   readonly genre: WeaponGenre;
+  readonly colorToken: WeaponColorToken;
+  readonly uniqueSkills?: readonly WeaponUniqueSkill[];
   readonly description: string;
   readonly baseDamage: number;
   readonly damagePerRefine: number;

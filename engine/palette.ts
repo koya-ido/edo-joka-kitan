@@ -1,3 +1,5 @@
+import type { WeaponColorToken } from "@/types";
+
 /** Canvas 2D 描画に使用するトークン解決済みパレット */
 export interface BattlePalette {
   readonly surface: string;
@@ -11,7 +13,19 @@ export interface BattlePalette {
   readonly hisui: string;
   readonly magatama: string;
   readonly border: string;
+  readonly weaponColors: Readonly<Record<WeaponColorToken, string>>;
 }
+
+const FALLBACK_WEAPON_COLORS: Readonly<Record<WeaponColorToken, string>> = {
+  sword: "oklch(0.68 0.16 235)",
+  bow: "oklch(0.78 0.15 85)",
+  shuriken: "oklch(0.72 0.14 190)",
+  mirror: "oklch(0.9 0.05 95)",
+  talisman: "oklch(0.64 0.18 300)",
+  matchlock: "oklch(0.63 0.21 30)",
+  fan: "oklch(0.68 0.16 152)",
+  orb: "oklch(0.72 0.17 55)",
+};
 
 const FALLBACK_PALETTE: BattlePalette = {
   surface: "oklch(0.16 0.02 260)",
@@ -25,6 +39,7 @@ const FALLBACK_PALETTE: BattlePalette = {
   hisui: "oklch(0.56 0.145 162)",
   magatama: "oklch(0.54 0.175 295)",
   border: "oklch(0.84 0.025 78)",
+  weaponColors: FALLBACK_WEAPON_COLORS,
 };
 
 const readCssVar = (varName: string, fallback: string): string => {
@@ -53,4 +68,17 @@ export const resolveBattlePalette = (): BattlePalette => ({
   hisui: readCssVar("--hisui", FALLBACK_PALETTE.hisui),
   magatama: readCssVar("--magatama", FALLBACK_PALETTE.magatama),
   border: readCssVar("--border", FALLBACK_PALETTE.border),
+  weaponColors: {
+    sword: readCssVar("--weapon-sword", FALLBACK_WEAPON_COLORS.sword),
+    bow: readCssVar("--weapon-bow", FALLBACK_WEAPON_COLORS.bow),
+    shuriken: readCssVar("--weapon-shuriken", FALLBACK_WEAPON_COLORS.shuriken),
+    mirror: readCssVar("--weapon-mirror", FALLBACK_WEAPON_COLORS.mirror),
+    talisman: readCssVar("--weapon-talisman", FALLBACK_WEAPON_COLORS.talisman),
+    matchlock: readCssVar(
+      "--weapon-matchlock",
+      FALLBACK_WEAPON_COLORS.matchlock,
+    ),
+    fan: readCssVar("--weapon-fan", FALLBACK_WEAPON_COLORS.fan),
+    orb: readCssVar("--weapon-orb", FALLBACK_WEAPON_COLORS.orb),
+  },
 });

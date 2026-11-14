@@ -77,12 +77,11 @@ export type CurrencyType = "magatama" | "hisui";
 export type WeaponGenre =
   | "bow" // 弓矢系: 長射程・直線貫通
   | "sword" // 刀剣系: 中射程・扇状薙ぎ払い
-  | "shuriken" // 手裏剣系: 高連射・多重拡散・滞留
+  | "shuriken" // 手裏剣系: 高連射・多重拡散
   | "mirror" // 鏡系: 持続照射・光線反射
-  | "talisman" // 呪符系: 誘導・状態異常・時限爆発
-  | "matchlock" // 火縄銃系: 超高火力・着弾範囲爆発
+  | "talisman" // 呪符系: 直接召喚・連鎖・状態異常
+  | "matchlock" // 火縄銃系: 超高火力・貫通
   | "fan" // 扇・軍配系: 突風・ノックバック
-  | "bell" // 神具・鈴系: 全方位円形波動
   | "orb"; // 霊珠・勾玉系: 旋回オービット・接触削り
 
 export type CharacterId =
@@ -236,20 +235,69 @@ export type InGameUpgradeCategory =
   | "weapon_stat"
   | "weapon_unlock";
 
+export type InGameStatType =
+  | "atk_pct"
+  | "crit_rate"
+  | "crit_dmg"
+  | "attack_freq"
+  | "weapon_dmg"
+  | "duration"
+  | "weapon_range"
+  | "sword_slash_unlock"
+  | "sword_slash_size"
+  | "sword_slash_pierce_1"
+  | "sword_slash_pierce_2"
+  | "sword_combo_1"
+  | "sword_combo_2"
+  | "projectile_plus_1"
+  | "projectile_plus_2"
+  | "pierce_plus_1"
+  | "pierce_plus_2"
+  | "bounce_plus_1"
+  | "bounce_plus_2"
+  | "explosion_unlock"
+  | "explosion_radius_30"
+  | "explosion_radius_50"
+  | "explosion_radius_100"
+  | "split_unlock"
+  | "split_pierce_plus_1"
+  | "split_pierce_plus_2"
+  | "split_bounce_plus_1"
+  | "talisman_chain_plus_1"
+  | "talisman_chain_plus_2"
+  | "fan_knockback_pct"
+  | "debuff_unlock";
+
 export interface InGameUpgradeOption {
   id: string;
   category: InGameUpgradeCategory;
   targetWeaponId?: WeaponId;
-  statType?:
-    | "atk_pct"
-    | "crit_rate"
-    | "crit_dmg"
-    | "attack_freq"
-    | "weapon_dmg"
-    | "duration";
+  statType?: InGameStatType;
   title: string;
   description: string;
   multiplierOrDelta: number;
+}
+
+export interface WeaponModifierState {
+  damageMultiplier: number; // 初期値 1.0
+  cooldownMultiplier: number; // 初期値 1.0（小さいほど高速）
+  durationMultiplier: number; // 初期値 1.0
+  rangeMultiplier: number; // 初期値 1.0
+  slashWaveEnabled: boolean; // 刀剣類の斬撃発生
+  slashWaveSizeMultiplier: number;
+  slashWavePierceBonus: number;
+  comboBonus: number; // 刀剣類の連撃追加数
+  extraProjectiles: number; // 連射数・発射数・旋回珠数追加
+  pierceBonus: number; // 貫通数追加
+  bounceBonus: number; // 壁反射回数追加
+  explosionEnabled: boolean; // 爆発発生
+  explosionRadiusMultiplier: number; // 爆発範囲倍率
+  splitEnabled: boolean; // 分裂発生（初着弾時+2）
+  splitPierceBonus: number;
+  splitBounceBonus: number;
+  chainBonus: number; // 呪符の連鎖数追加
+  knockbackMultiplier: number; // 扇のノックバック距離倍率
+  debuffLevel: number; // デバフ付与レベル
 }
 
 export interface InGameBuffState {
@@ -259,14 +307,7 @@ export interface InGameBuffState {
   critDamageMultiplier: number; // 初期値 1.5（基礎150%等）
   // 武器別強化状態
   unlockedWeaponIds: WeaponId[];
-  weaponModifiers: Record<
-    WeaponId,
-    {
-      damageMultiplier: number; // 初期値 1.0
-      cooldownMultiplier: number; // 初期値 1.0（小さいほど高速）
-      durationMultiplier: number; // 初期値 1.0
-    }
-  >;
+  weaponModifiers: Record<WeaponId, WeaponModifierState>;
 }
 
 export interface BattleHudSnapshot {
@@ -343,6 +384,13 @@ export interface BattleHudSnapshot {
   - 結界HP `<= 0` で `defeat`（結界決壊）。
 - **敗北時の救済仕様**:
   - `defeat` 時も、到達ウェーブ数に応じた少量の「水晶の勾玉」を必ず付与して持ち帰れる（`Math.floor(reachedWave * baseWaveRescueMagatama)` 等）。
+  - 敗北リザルトモーダルでは「ステージ選択に戻る」に加え、同じステージへ即座に再挑戦できる「再チャレンジ」ボタンを提供する。
+- **インゲーム強化（3択）とジャンル別強化・重複禁止ルール**:
+  - 武器強化の共通項目は「攻撃頻度 (`attack_freq`)」「威力 (`weapon_dmg`)」「攻撃範囲 (`weapon_range`)」の3種とし、加えて `WeaponGenre` ごとの固有強化項目（連射数・貫通・反射・分裂・斬撃発生・連鎖数・ノックバック・持続時間・個数追加・爆発発生/範囲拡大・デバフ付与など）を抽選する。
+  - **重複取得不可ルール**: 機能が増えるアンロック系スキル（`sword_slash_unlock`, `explosion_unlock`, `split_unlock`, `debuff_unlock` 等）は同一武器に対して重複取得不可とし、武器固有スキル（`uniqueSkills`）で既に所持している場合も候補から除外する。性能を向上させるスキルは各上限値まで重複取得可とする。
+- **飛び道具寿命・敵接触ダメージルール**:
+  - 飛び道具（`bow`, `shuriken`, `matchlock` 等）は時間経過では消滅せず、「残り貫通数が 0 以下になった場合」または「残り反射回数が 0 以下で画面外へ退出した場合」にのみ消滅する（反射回数は画面端・壁との衝突時のみ減算し、敵命中では減算しない）。分裂は初着弾時にのみ発生する。
+  - 敵ユニットは結界に接している間、1000ms（1秒）ごとに結界へ定期ダメージを与える。
 - **オートエイム＆武器自律発動（持ち込み1枠＋ラン内アンロック）**:
   - 主人公は画面下部中央に固定。バトル開始時は編成画面で選択した持ち込み武器1枠（`equippedWeaponId`）のみが解放済み（`unlockedWeaponIds = [equippedWeaponId]`）として自動発動する。
   - バトル中のレベルアップ3択「武器スキルの開放（`weapon_unlock`）」を選択することで、未開放の他武器スキルをバトル中一時的に追加アンロック（最大計3枠まで同時発動など、マスタ上限まで）でき、解放済みの武器はクールダウン完了ごとに「結界に最も近い妖怪」を自動索敵して発動する。
@@ -371,6 +419,7 @@ stateDiagram-v2
     BattlePlaying --> VictoryResult: Wave10 ボス撃破
     BattlePlaying --> DefeatResult: 結界HP 0
     VictoryResult --> StageSelect: 報酬受取・戻る
+    DefeatResult --> BattlePlaying: 再チャレンジ
     DefeatResult --> StageSelect: 救済勾玉受取・戻る
 ```
 

@@ -4,7 +4,17 @@ import * as storage from "@/storage";
 import { DB_NAME } from "@/types";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "fake-indexeddb/auto";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+
+beforeAll(() => {
+  if (typeof globalThis.ResizeObserver === "undefined") {
+    globalThis.ResizeObserver = class ResizeObserver {
+      observe = (): void => { };
+      unobserve = (): void => { };
+      disconnect = (): void => { };
+    };
+  }
+});
 
 const clearDatabase = async (): Promise<void> => {
   await new Promise<void>((resolve) => {
@@ -114,8 +124,9 @@ describe("features/home/HomeScreen (5-State, Login Bonus, Save Reset)", () => {
     const closeButtons = screen.getAllByRole("button", { name: "閉じる" });
     fireEvent.click(closeButtons[0]);
 
-    // 初期化ボタン押下 → 確認モーダル表示
-    fireEvent.click(screen.getByRole("button", { name: "初期化" }));
+    // プレイヤーアイコン押下 → ドロップダウンメニューから初期化ボタン押下 → 確認モーダル表示
+    fireEvent.click(screen.getByRole("button", { name: "プレイヤーメニュー" }));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "初期化" }));
     await waitFor(() => {
       expect(screen.getByText("セーブデータを初期化しますか？")).toBeTruthy();
     });
@@ -125,7 +136,8 @@ describe("features/home/HomeScreen (5-State, Login Bonus, Save Reset)", () => {
     expect(screen.getByLabelText("水晶の勾玉: 450")).toBeTruthy();
 
     // 再度開いて「初期化する」を確定
-    fireEvent.click(screen.getByRole("button", { name: "初期化" }));
+    fireEvent.click(screen.getByRole("button", { name: "プレイヤーメニュー" }));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "初期化" }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "初期化する" })).toBeTruthy();
     });

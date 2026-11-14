@@ -1,5 +1,8 @@
 export { commitBattleResult, rerollBattleChoices } from "./battle-repository";
-export { enhancePermanentStat } from "./enhance-repository";
+export {
+  enhancePermanentStat,
+  enhanceWeaponRefine,
+} from "./enhance-repository";
 export { updateFormation } from "./formation-repository";
 export { executeGachaPull } from "./gacha-repository";
 export { claimLoginBonus } from "./login-bonus-repository";
