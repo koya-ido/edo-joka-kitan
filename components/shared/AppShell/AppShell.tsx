@@ -29,7 +29,7 @@ export const AppShell = ({
   isNavigationDisabled = false,
   children,
 }: AppShellProps) => (
-  <div className="min-h-dvh w-full bg-frame-outer md:flex md:justify-center">
+  <div className="min-h-dvh w-full bg-frame-outer pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] md:flex md:justify-center">
     <div
       className={cn(
         "game-washi-canvas relative flex min-h-dvh w-full flex-col text-foreground",

@@ -1,7 +1,10 @@
 import { App } from "@/app/App";
+import { registerServiceWorker } from "@/app/pwa";
 import "@/app/styles/index.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+
+registerServiceWorker();
 
 const rootElement = document.getElementById("root");
 
